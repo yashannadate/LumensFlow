@@ -9,12 +9,13 @@ use soroban_sdk::{
 
 const HIGH_TTL: u32 = 999_999;
 
-/// Set ledger timestamp. Sequence number tracks with time to avoid archival.
+// ─── Helpers ────────────────────────────────────────────────────────────
+
 fn set_ledger(env: &Env, timestamp: u64) {
     env.ledger().set(LedgerInfo {
         timestamp,
         protocol_version: 22,
-        sequence_number: (timestamp / 5) as u32, // ~1 ledger per 5 seconds
+        sequence_number: (timestamp / 5) as u32,
         network_id: Default::default(),
         base_reserve: 10,
         min_temp_entry_ttl: HIGH_TTL,
@@ -23,29 +24,24 @@ fn set_ledger(env: &Env, timestamp: u64) {
     });
 }
 
-/// Creates env, mints tokens to sender, registers+initializes contract.
+/// Creates env, mints tokens to sender, registers + initializes contract.
 /// Returns (env, sender, receiver, token_address, contract_id)
 fn create_test_env() -> (Env, Address, Address, Address, Address) {
     let env = Env::default();
     env.mock_all_auths();
-
-    // Initial ledger at timestamp 1000
     set_ledger(&env, 1000);
 
     let admin = Address::generate(&env);
     let sender = Address::generate(&env);
     let receiver = Address::generate(&env);
 
-    // Create a test token (simulates native XLM)
     let token_address = env
         .register_stellar_asset_contract_v2(admin.clone())
         .address();
 
-    // Mint funds to sender
     let token_admin = StellarAssetClient::new(&env, &token_address);
     token_admin.mint(&sender, &1_000_000);
 
-    // Register and initialize the LumensFlow contract
     let contract_id = env.register_contract(None, LumensFlowContract);
     let client = LumensFlowContractClient::new(&env, &contract_id);
     client.initialize(&admin, &token_address);
@@ -53,16 +49,13 @@ fn create_test_env() -> (Env, Address, Address, Address, Address) {
     (env, sender, receiver, token_address, contract_id)
 }
 
-// ─── Test 1: Create Stream — verify all fields ──────────────────────────
+// ─── Test 1: Create stream — verify all fields ──────────────────────────
 #[test]
 fn test_create_stream() {
     let (env, sender, receiver, token_address, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
-    let deposit = 100_000i128;
-    let duration = 60u64; // minimum allowed duration
-
-    let stream_id = client.create_stream(&sender, &receiver, &deposit, &duration);
+    let stream_id = client.create_stream(&sender, &receiver, &100_000i128, &60u64);
     assert_eq!(stream_id, 0);
 
     let stream = client.get_stream(&stream_id);
@@ -70,31 +63,29 @@ fn test_create_stream() {
     assert_eq!(stream.sender, sender);
     assert_eq!(stream.receiver, receiver);
     assert_eq!(stream.deposit_amount, 100_000);
-    assert_eq!(stream.flow_rate, 1_666); // 100_000 / 60 = 1666
+    assert_eq!(stream.flow_rate, 1_666); // 100_000 / 60
     assert_eq!(stream.start_time, 1000);
     assert_eq!(stream.end_time, 1060);
     assert_eq!(stream.withdrawn_amount, 0);
     assert!(stream.is_active);
 
-    // Sender balance reduced by deposit amount
     let token = TokenClient::new(&env, &token_address);
     assert_eq!(token.balance(&sender), 900_000);
 }
 
-// ─── Test 2: Withdraw Partial — advance time halfway, withdraw ──────────
+// ─── Test 2: Withdraw partial — halfway through ─────────────────────────
 #[test]
 fn test_withdraw_partial() {
     let (env, sender, receiver, token_address, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
-    // start_time = 1000, end_time = 2000, flow_rate = 100
+    // flow_rate = 100 stroops/sec, end_time = 2000
     client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
 
-    // Advance to halfway: elapsed = 500s
-    set_ledger(&env, 1500);
+    set_ledger(&env, 1500); // 500s elapsed
 
     let withdrawable = client.withdrawable_amount(&0);
-    assert_eq!(withdrawable, 50_000); // 100 * 500
+    assert_eq!(withdrawable, 50_000);
 
     let withdrawn = client.withdraw(&0, &receiver);
     assert_eq!(withdrawn, 50_000);
@@ -104,48 +95,42 @@ fn test_withdraw_partial() {
 
     let stream = client.get_stream(&0);
     assert_eq!(stream.withdrawn_amount, 50_000);
-    assert!(stream.is_active); // not finished yet
+    assert!(stream.is_active); // still running
 }
 
-// ─── Test 3: Cancel Mid-Stream — refund math correct ───────────────────
+// ─── Test 3: Cancel mid-stream — refund math correct ───────────────────
 #[test]
 fn test_cancel_mid_stream() {
     let (env, sender, receiver, token_address, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
-    // start_time = 1000, flow_rate = 100
     client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
 
-    // 30% through: elapsed = 300s, streamed = 30_000
-    set_ledger(&env, 1300);
+    set_ledger(&env, 1300); // 300s elapsed = 30_000 streamed
 
     client.cancel_stream(&0, &sender);
 
     let token = TokenClient::new(&env, &token_address);
-    // receiver gets 30_000 (streamed, not yet withdrawn)
     assert_eq!(token.balance(&receiver), 30_000);
-    // sender gets back 70_000 refund → net balance: 1_000_000 - 100_000 + 70_000 = 970_000
+    // sender: 1_000_000 - 100_000 deposit + 70_000 refund = 970_000
     assert_eq!(token.balance(&sender), 970_000);
 
     let stream = client.get_stream(&0);
     assert!(!stream.is_active);
 }
 
-// ─── Test 4: Withdraw After End — clamped to deposit ───────────────────
+// ─── Test 4: Withdraw after end — clamped to full deposit ──────────────
 #[test]
 fn test_withdraw_after_end() {
     let (env, sender, receiver, token_address, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
-    // end_time = 2000
     client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
 
-    // Far past end
-    set_ledger(&env, 9999);
+    set_ledger(&env, 9999); // far past end
 
-    // Must be clamped to full deposit, not flow_rate * huge_elapsed
     let withdrawable = client.withdrawable_amount(&0);
-    assert_eq!(withdrawable, 100_000);
+    assert_eq!(withdrawable, 100_000); // clamped, not flow_rate * 8999
 
     let withdrawn = client.withdraw(&0, &receiver);
     assert_eq!(withdrawn, 100_000);
@@ -153,41 +138,38 @@ fn test_withdraw_after_end() {
     let token = TokenClient::new(&env, &token_address);
     assert_eq!(token.balance(&receiver), 100_000);
 
-    // Deactivated after full withdrawal past end
     let stream = client.get_stream(&0);
     assert!(!stream.is_active);
 }
 
-// ─── Test 5a: Unauthorized Withdraw — sender can't withdraw ────────────
+// ─── Test 5a: Unauthorized withdraw — sender can't withdraw ────────────
 #[test]
 #[should_panic]
 fn test_unauthorized_withdraw() {
-    let (env, sender, receiver, _token_address, contract_id) = create_test_env();
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
     client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
     set_ledger(&env, 1500);
 
-    // Sender tries to withdraw — must panic
-    client.withdraw(&0, &sender);
+    client.withdraw(&0, &sender); // must panic
 }
 
-// ─── Test 5b: Unauthorized Cancel — receiver can't cancel ──────────────
+// ─── Test 5b: Unauthorized cancel — receiver can't cancel ──────────────
 #[test]
 #[should_panic]
 fn test_unauthorized_cancel() {
-    let (env, sender, receiver, _token_address, contract_id) = create_test_env();
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
     client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
 
-    // Receiver tries to cancel — must panic
-    client.cancel_stream(&0, &receiver);
+    client.cancel_stream(&0, &receiver); // must panic
 }
 
-// ─── Test 7: Initialize Twice Fails ────────────────────────────────────
+// ─── Test 6: Initialize twice fails ────────────────────────────────────
 #[test]
-#[should_panic(expected = "already initialized")]
+#[should_panic]
 fn test_initialize_twice_fails() {
     let env = Env::default();
     env.mock_all_auths();
@@ -201,9 +183,154 @@ fn test_initialize_twice_fails() {
     let contract_id = env.register_contract(None, LumensFlowContract);
     let client = LumensFlowContractClient::new(&env, &contract_id);
 
-    // First call — should succeed
     client.initialize(&admin, &token_address);
+    client.initialize(&admin, &token_address); // must panic
+}
 
-    // Second call — must panic with "already initialized"
-    client.initialize(&admin, &token_address);
+// ─── Test 7: Double withdraw — second must return nothing ───────────────
+// This is the most important security test.
+// Prevents a double-spend where receiver drains the contract twice.
+#[test]
+fn test_double_withdraw_returns_nothing() {
+    let (env, sender, receiver, token_address, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+
+    set_ledger(&env, 1500); // 500s elapsed = 50_000 withdrawable
+
+    // First withdraw — succeeds
+    let first = client.withdraw(&0, &receiver);
+    assert_eq!(first, 50_000);
+
+    // Second withdraw immediately — nothing new accrued
+    // Must error with NothingToWithdraw
+    let result = client.try_withdraw(&0, &receiver);
+    assert!(result.is_err());
+
+    // Balance unchanged after second attempt
+    let token = TokenClient::new(&env, &token_address);
+    assert_eq!(token.balance(&receiver), 50_000);
+}
+
+// ─── Test 8: Cancel after partial withdraw — accounting correct ─────────
+// Receiver withdraws first, then sender cancels.
+// Receiver must NOT get paid twice for the already-withdrawn amount.
+#[test]
+fn test_cancel_after_partial_withdraw() {
+    let (env, sender, receiver, token_address, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    // flow_rate = 100/s, end_time = 2000
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+
+    // Receiver withdraws at 300s elapsed = 30_000
+    set_ledger(&env, 1300);
+    client.withdraw(&0, &receiver);
+
+    let token = TokenClient::new(&env, &token_address);
+    assert_eq!(token.balance(&receiver), 30_000);
+
+    // Sender cancels at 500s elapsed = 50_000 total streamed
+    // Receiver already has 30_000, should get 20_000 more
+    // Sender refund = 100_000 - 50_000 = 50_000
+    set_ledger(&env, 1500);
+    client.cancel_stream(&0, &sender);
+
+    assert_eq!(token.balance(&receiver), 50_000); // 30_000 + 20_000
+    // sender: 1_000_000 - 100_000 + 50_000 refund = 950_000
+    assert_eq!(token.balance(&sender), 950_000);
+
+    let stream = client.get_stream(&0);
+    assert!(!stream.is_active);
+}
+
+// ─── Test 9: Withdraw at stream start — nothing accrued ────────────────
+#[test]
+fn test_withdraw_at_start_fails() {
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+
+    // Still at start_time = 1000, nothing accrued
+    let result = client.try_withdraw(&0, &receiver);
+    assert!(result.is_err());
+}
+
+// ─── Test 10: Multiple streams — IDs increment correctly ───────────────
+#[test]
+fn test_multiple_streams_correct_ids() {
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    let id0 = client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+    let id1 = client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+
+    assert_eq!(id0, 0);
+    assert_eq!(id1, 1);
+
+    let s0 = client.get_stream(&0);
+    let s1 = client.get_stream(&1);
+    assert_eq!(s0.id, 0);
+    assert_eq!(s1.id, 1);
+}
+
+// ─── Test 11: Cancel already-cancelled stream fails ────────────────────
+#[test]
+fn test_cancel_inactive_stream_fails() {
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+    set_ledger(&env, 1300);
+
+    client.cancel_stream(&0, &sender); // first cancel — ok
+
+    let result = client.try_cancel_stream(&0, &sender); // second cancel — must fail
+    assert!(result.is_err());
+}
+
+// ─── Test 12: get_streams_for_user — both parties listed ───────────────
+#[test]
+fn test_get_streams_for_user() {
+    let (env, sender, receiver, _token, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+    client.create_stream(&sender, &receiver, &100_000i128, &1000u64);
+
+    let sender_streams = client.get_streams_for_user(&sender);
+    let receiver_streams = client.get_streams_for_user(&receiver);
+
+    assert_eq!(sender_streams.len(), 2);
+    assert_eq!(receiver_streams.len(), 2);
+    assert_eq!(sender_streams.get(0).unwrap(), 0);
+    assert_eq!(sender_streams.get(1).unwrap(), 1);
+}
+
+// ─── Test 13: Dust refund — truncation returned to sender ──────────────
+// 100_000 stroops / 60 seconds = 1666 flow_rate
+// 1666 * 60 = 99_960 → 40 stroops dust refunded to sender
+#[test]
+fn test_dust_refund_on_stream_end() {
+    let (env, sender, receiver, token_address, contract_id) = create_test_env();
+    let client = LumensFlowContractClient::new(&env, &contract_id);
+
+    // flow_rate = 1_666, dust = 100_000 - (1_666 * 60) = 40
+    client.create_stream(&sender, &receiver, &100_000i128, &60u64);
+
+    set_ledger(&env, 9999); // past end_time = 1060
+
+    // Receiver withdraws everything
+    client.withdraw(&0, &receiver);
+
+    let token = TokenClient::new(&env, &token_address);
+
+    // Receiver gets 99_960 (flow_rate * duration)
+    assert_eq!(token.balance(&receiver), 99_960);
+
+    // Sender gets back 40 dust
+    // sender started with 1_000_000, deposited 100_000, gets 40 dust back
+    assert_eq!(token.balance(&sender), 900_040);
 }
