@@ -1,111 +1,234 @@
+/* ── Fonts ──────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Montserrat:wght@400;500;600;700&display=swap');
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --font-display: 'Unbounded', sans-serif;
+  --font-body:    'Montserrat', sans-serif;
+  --bg:           #0a0a0f;
+  --card:         #111827;
+  --border:       #1f2937;
+  --purple:       #8b5cf6;
+  --purple-dark:  #7c3aed;
+  --purple-light: #a78bfa;
+  --green:        #22c55e;
+  --red:          #ef4444;
+  --amber:        #f59e0b;
+  --text:         #ffffff;
+  --text-muted:   #9ca3af;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+/* ── Base ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  font-family: var(--font-body);
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+body {
+  background: var(--bg);
+  color:      var(--text);
+  margin:     0;
+  font-size:  14px;
+  line-height: 1.6;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+/* ── Display font — headings, logo, hero ────────────────────────────────── */
+h1, h2,
+.logo-name,
+.hero-title,
+.section-title {
+  font-family: var(--font-display);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+/* ── Typography scale ───────────────────────────────────────────────────── */
+h1, .hero-title  { font-size: 64px; font-weight: 900; line-height: 1.1; margin: 0; }
+h2, .section-title {
+  font-size: 28px; font-weight: 700;
+  font-family: var(--font-display);
+  margin: 0 0 16px;
+}
+h3, .card-title { font-size: 15px; font-weight: 600; font-family: var(--font-body); margin: 0 0 8px; }
+p    { font-size: 14px; font-weight: 400; margin: 0; }
+.small  { font-size: 12px; }
+.label  { font-size: 13px; font-weight: 500; }
+.text-muted   { color: var(--text-muted); }
+.text-purple  { color: var(--purple); }
+.text-green   { color: var(--green); }
+.text-red     { color: var(--red); }
+
+/* ── Layout utilities ───────────────────────────────────────────────────── */
+.stack       { display: flex; flex-direction: column; }
+.row         { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.center      { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.mono        { font-family: monospace; letter-spacing: -0.3px; }
+
+/* ── Page containers ────────────────────────────────────────────────────── */
+.page-container      { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+.dashboard-container { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+
+/* ── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: #2d3748; }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--purple);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 600;
+}
+.btn-primary:hover   { background: var(--purple-dark); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-danger {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-danger:hover   { background: rgba(239,68,68,0.1); }
+.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-ghost:hover { color: var(--text); }
+
+/* ── Inputs ─────────────────────────────────────────────────────────────── */
+.input {
+  background: #0d0d14;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: white;
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.input:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+.input::placeholder { color: #4b5563; }
+
+/* ── Status badges ──────────────────────────────────────────────────────── */
+.badge-active {
+  background: rgba(34,197,94,0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+  padding: 3px 10px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.badge-cancelled {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+  padding: 3px 10px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-completed {
+  background: rgba(156,163,175,0.1);
+  color: #9ca3af;
+  border: 1px solid rgba(156,163,175,0.3);
+  padding: 3px 10px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-paused {
+  background: rgba(245,158,11,0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245,158,11,0.3);
+  padding: 3px 10px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ── Progress bar ───────────────────────────────────────────────────────── */
+.progress-bar {
+  width: 100%; height: 5px;
+  background: var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--purple-light));
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+/* Animated fill for active streams */
+.progress-fill.progress-animated {
+  background: linear-gradient(90deg, var(--purple-dark), var(--purple), var(--purple-light), var(--purple));
+  background-size: 200% 100%;
+  animation: flow-gradient 2s linear infinite;
+}
+
+/* ── Live pulsing amount ─────────────────────────────────────────────────── */
+.live-amount {
+  color: var(--purple);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Wallet modal fade-in ────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes pulse         { 0%,100% { opacity:1; } 50% { opacity:0.65; } }
+@keyframes spin          { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes shimmer       { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes flow-gradient { 0%{background-position:0% 0}   100%{background-position:200% 0} }
+
+/* ── Spin utility ───────────────────────────────────────────────────────── */
+.animate-spin  { animation: spin 1s linear infinite; }
+.animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+/* ── Shell layout ───────────────────────────────────────────────────────── */
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main  { flex: 1; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 768px) {
+  h1, .hero-title  { font-size: 40px; }
+  h2, .section-title { font-size: 22px; }
+  .page-container      { padding: 0 16px; }
+  .dashboard-container { padding: 16px; }
+}
+@media (max-width: 480px) {
+  h1, .hero-title { font-size: 32px; }
 }

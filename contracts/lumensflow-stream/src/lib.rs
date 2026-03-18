@@ -18,24 +18,36 @@ pub enum StreamError {
     InvalidDuration    = 8,
     SenderIsReceiver   = 9,
     FlowRateZero       = 10,
+    StreamNotFound     = 11,
 }
 
-// ─── Stream Data Structure ──────────────────────────────────────────────
+// ─── Stream Status Enum ──────────────────────────────────────────────────
+#[contracttype]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum StreamStatus {
+    Active    = 0,
+    Cancelled = 1,
+    Completed = 2,
+}
+
+// ─── Stream Data Structure ───────────────────────────────────────────────
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Stream {
-    pub id: u32,
-    pub sender: Address,
-    pub receiver: Address,
-    pub deposit_amount: i128,
-    pub flow_rate: i128,
-    pub start_time: u64,
-    pub end_time: u64,
+    pub id:               u32,
+    pub sender:           Address,
+    pub receiver:         Address,
+    pub deposit_amount:   i128,
+    /// Informational display rate (deposit / duration). Actual accrual uses
+    /// the higher-precision formula: deposit * elapsed / duration.
+    pub flow_rate:        i128,
+    pub start_time:       u64,
+    pub end_time:         u64,
     pub withdrawn_amount: i128,
-    pub is_active: bool,
+    pub status:           StreamStatus,
 }
 
-// ─── Storage Keys ───────────────────────────────────────────────────────
+// ─── Storage Keys ────────────────────────────────────────────────────────
 #[contracttype]
 pub enum DataKey {
     StreamCounter,
@@ -45,22 +57,29 @@ pub enum DataKey {
     Admin,
 }
 
-// ─── Event Topics ───────────────────────────────────────────────────────
-const STREAM_CREATED: Symbol = symbol_short!("created");
-const FUNDS_WITHDRAWN: Symbol = symbol_short!("withdraw");
+// ─── Event Topics ────────────────────────────────────────────────────────
+const STREAM_CREATED:   Symbol = symbol_short!("created");
+const FUNDS_WITHDRAWN:  Symbol = symbol_short!("withdraw");
 const STREAM_CANCELLED: Symbol = symbol_short!("cancel");
 
-// ─── TTL constant (~1 year in ledgers at ~5s per ledger) ────────────────
+// ─── TTL constant (~1 year in ledgers at ~5 s per ledger) ────────────────
 const STREAM_TTL_LEDGERS: u32 = 535_000;
 
-// ─── Contract ───────────────────────────────────────────────────────────
+// ─── Contract ────────────────────────────────────────────────────────────
 #[contract]
 pub struct LumensFlowContract;
 
 #[contractimpl]
 impl LumensFlowContract {
-    /// Initialize the contract. Can only be called once.
-    pub fn initialize(env: Env, admin: Address, token_address: Address) -> Result<(), StreamError> {
+
+    // ────────────────────────────────────────────────────────────────────
+    /// Initialize the contract.  Can only be called once.
+    // ────────────────────────────────────────────────────────────────────
+    pub fn initialize(
+        env: Env,
+        admin: Address,
+        token_address: Address,
+    ) -> Result<(), StreamError> {
         admin.require_auth();
 
         if env.storage().persistent().has(&DataKey::TokenAddress) {
@@ -74,7 +93,9 @@ impl LumensFlowContract {
         Ok(())
     }
 
+    // ────────────────────────────────────────────────────────────────────
     /// Create a new payment stream.
+    // ────────────────────────────────────────────────────────────────────
     pub fn create_stream(
         env: Env,
         sender: Address,
@@ -94,6 +115,7 @@ impl LumensFlowContract {
             return Err(StreamError::SenderIsReceiver);
         }
 
+        // Informational flow_rate for display only — NOT used in accrual math
         let flow_rate = deposit_amount / (duration as i128);
         if flow_rate <= 0 {
             return Err(StreamError::FlowRateZero);
@@ -106,43 +128,49 @@ impl LumensFlowContract {
             .ok_or(StreamError::NotInitialized)?;
 
         let token_client = token::Client::new(&env, &token_address);
-        token_client.transfer(&sender, &env.current_contract_address(), &deposit_amount);
+
+        // Collect deposit from sender
+        token_client.transfer(
+            &sender,
+            &env.current_contract_address(),
+            &deposit_amount,
+        );
 
         let stream_id: u32 = env
             .storage()
             .persistent()
             .get(&DataKey::StreamCounter)
-            .unwrap_or(0);
+            .unwrap_or(0u32);
 
         env.storage()
             .persistent()
             .set(&DataKey::StreamCounter, &(stream_id + 1));
 
         let start_time = env.ledger().timestamp();
-        let end_time = start_time + duration;
+        let end_time   = start_time + duration;
 
         let stream = Stream {
-            id: stream_id,
-            sender: sender.clone(),
-            receiver: receiver.clone(),
+            id:               stream_id,
+            sender:           sender.clone(),
+            receiver:         receiver.clone(),
             deposit_amount,
             flow_rate,
             start_time,
             end_time,
             withdrawn_amount: 0,
-            is_active: true,
+            status:           StreamStatus::Active,
         };
 
         env.storage()
             .persistent()
             .set(&DataKey::Stream(stream_id), &stream);
 
-        // ── Extend TTL so stream data survives for ~1 year ──────────────
+        // Extend TTL so stream data persists for ~1 year
         env.storage()
             .persistent()
             .extend_ttl(&DataKey::Stream(stream_id), STREAM_TTL_LEDGERS, STREAM_TTL_LEDGERS);
 
-        // Add to sender's stream list
+        // Register stream under sender's list
         let mut sender_streams: Vec<u32> = env
             .storage()
             .persistent()
@@ -153,7 +181,7 @@ impl LumensFlowContract {
             .persistent()
             .set(&DataKey::UserStreams(sender.clone()), &sender_streams);
 
-        // Add to receiver's stream list
+        // Register stream under receiver's list
         let mut receiver_streams: Vec<u32> = env
             .storage()
             .persistent()
@@ -172,17 +200,23 @@ impl LumensFlowContract {
         Ok(stream_id)
     }
 
-    /// Withdraw available streamed funds (receiver only).
-    pub fn withdraw(env: Env, stream_id: u32, receiver: Address) -> Result<i128, StreamError> {
+    // ────────────────────────────────────────────────────────────────────
+    /// Withdraw available streamed funds.  Only the stream receiver may call.
+    // ────────────────────────────────────────────────────────────────────
+    pub fn withdraw(
+        env: Env,
+        stream_id: u32,
+        receiver: Address,
+    ) -> Result<i128, StreamError> {
         receiver.require_auth();
 
         let mut stream: Stream = env
             .storage()
             .persistent()
             .get(&DataKey::Stream(stream_id))
-            .unwrap();
+            .ok_or(StreamError::StreamNotFound)?;
 
-        if !stream.is_active {
+        if stream.status != StreamStatus::Active {
             return Err(StreamError::NotActive);
         }
         if stream.receiver != receiver {
@@ -198,48 +232,31 @@ impl LumensFlowContract {
             .storage()
             .persistent()
             .get(&DataKey::TokenAddress)
-            .unwrap();
-        let token_client = token::Client::new(&env, &token_address);
+            .ok_or(StreamError::NotInitialized)?;
 
+        // ── Checks-Effects-Interactions: update state BEFORE transfer ────
+        stream.withdrawn_amount += withdrawable;
+
+        // Mark Completed when the receiver has withdrawn the full deposit
+        if stream.withdrawn_amount >= stream.deposit_amount {
+            stream.status = StreamStatus::Completed;
+        }
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Stream(stream_id), &stream);
+
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Stream(stream_id), STREAM_TTL_LEDGERS, STREAM_TTL_LEDGERS);
+
+        // Token transfer last
+        let token_client = token::Client::new(&env, &token_address);
         token_client.transfer(
             &env.current_contract_address(),
             &receiver,
             &withdrawable,
         );
-
-        stream.withdrawn_amount += withdrawable;
-
-        let now = env.ledger().timestamp();
-
-        // ── Deactivate + dust refund when stream fully ends ─────────────
-        if now >= stream.end_time {
-            let total_streamed = (stream.flow_rate
-                * (stream.end_time - stream.start_time) as i128)
-                .min(stream.deposit_amount);
-
-            if stream.withdrawn_amount >= total_streamed {
-                stream.is_active = false;
-
-                // Refund truncation dust to sender
-                let dust = stream.deposit_amount.saturating_sub(total_streamed);
-                if dust > 0 {
-                    token_client.transfer(
-                        &env.current_contract_address(),
-                        &stream.sender,
-                        &dust,
-                    );
-                }
-            }
-        }
-
-        // ── Bump TTL to keep stream data alive ──────────────────────────
-        env.storage()
-            .persistent()
-            .extend_ttl(&DataKey::Stream(stream_id), STREAM_TTL_LEDGERS, STREAM_TTL_LEDGERS);
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Stream(stream_id), &stream);
 
         env.events().publish(
             (FUNDS_WITHDRAWN, stream_id),
@@ -249,17 +266,24 @@ impl LumensFlowContract {
         Ok(withdrawable)
     }
 
-    /// Cancel an active stream (sender only).
-    pub fn cancel_stream(env: Env, stream_id: u32, sender: Address) -> Result<(), StreamError> {
+    // ────────────────────────────────────────────────────────────────────
+    /// Cancel an active stream.  Only the stream sender may call.
+    /// Proportional amount is paid to receiver; unstreamed funds refunded.
+    // ────────────────────────────────────────────────────────────────────
+    pub fn cancel_stream(
+        env: Env,
+        stream_id: u32,
+        sender: Address,
+    ) -> Result<(), StreamError> {
         sender.require_auth();
 
         let mut stream: Stream = env
             .storage()
             .persistent()
             .get(&DataKey::Stream(stream_id))
-            .unwrap();
+            .ok_or(StreamError::StreamNotFound)?;
 
-        if !stream.is_active {
+        if stream.status != StreamStatus::Active {
             return Err(StreamError::NotActive);
         }
         if stream.sender != sender {
@@ -274,22 +298,39 @@ impl LumensFlowContract {
             now - stream.start_time
         };
 
-        let mut streamed = stream.flow_rate * (elapsed as i128);
-        if streamed > stream.deposit_amount {
-            streamed = stream.deposit_amount;
-        }
+        let duration = (stream.end_time - stream.start_time) as i128;
 
-        // What receiver is still owed (not yet withdrawn)
-        let receiver_amount = streamed - stream.withdrawn_amount;
+        // Precise accrual: deposit * elapsed / duration  (no flow_rate truncation)
+        let streamed = if duration > 0 {
+            ((stream.deposit_amount * (elapsed as i128)) / duration)
+                .min(stream.deposit_amount)
+        } else {
+            stream.deposit_amount
+        };
 
-        // Refund unstreamed + dust back to sender
-        let sender_refund = stream.deposit_amount - streamed;
+        // Receiver gets what they haven't yet withdrawn
+        let receiver_amount = (streamed - stream.withdrawn_amount).max(0);
+
+        // Sender gets back everything that hasn't streamed yet
+        let sender_refund = (stream.deposit_amount - streamed).max(0);
+
+        // ── Checks-Effects-Interactions: update state BEFORE transfers ───
+        stream.status           = StreamStatus::Cancelled;
+        stream.withdrawn_amount = streamed; // record full streamed amount
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Stream(stream_id), &stream);
+
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Stream(stream_id), STREAM_TTL_LEDGERS, STREAM_TTL_LEDGERS);
 
         let token_address: Address = env
             .storage()
             .persistent()
             .get(&DataKey::TokenAddress)
-            .unwrap();
+            .ok_or(StreamError::NotInitialized)?;
         let token_client = token::Client::new(&env, &token_address);
 
         if receiver_amount > 0 {
@@ -308,38 +349,37 @@ impl LumensFlowContract {
             );
         }
 
-        stream.is_active = false;
-        stream.withdrawn_amount = streamed;
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Stream(stream_id), &stream);
-
         env.events()
             .publish((STREAM_CANCELLED, stream_id), sender);
 
         Ok(())
     }
 
-    /// Get the full stream object.
-    pub fn get_stream(env: Env, stream_id: u32) -> Stream {
+    // ────────────────────────────────────────────────────────────────────
+    /// Read the full stream object.  Returns an error if stream_id is invalid.
+    // ────────────────────────────────────────────────────────────────────
+    pub fn get_stream(env: Env, stream_id: u32) -> Result<Stream, StreamError> {
         env.storage()
             .persistent()
             .get(&DataKey::Stream(stream_id))
-            .unwrap()
+            .ok_or(StreamError::StreamNotFound)
     }
 
+    // ────────────────────────────────────────────────────────────────────
     /// Calculate the amount currently available for withdrawal.
-    pub fn withdrawable_amount(env: Env, stream_id: u32) -> i128 {
+    // ────────────────────────────────────────────────────────────────────
+    pub fn withdrawable_amount(env: Env, stream_id: u32) -> Result<i128, StreamError> {
         let stream: Stream = env
             .storage()
             .persistent()
             .get(&DataKey::Stream(stream_id))
-            .unwrap();
-        Self::_withdrawable(&env, &stream)
+            .ok_or(StreamError::StreamNotFound)?;
+        Ok(Self::_withdrawable(&env, &stream))
     }
 
-    /// Get all stream IDs associated with an address.
+    // ────────────────────────────────────────────────────────────────────
+    /// Return all stream IDs linked to an address (sender or receiver).
+    // ────────────────────────────────────────────────────────────────────
     pub fn get_streams_for_user(env: Env, address: Address) -> Vec<u32> {
         env.storage()
             .persistent()
@@ -347,9 +387,19 @@ impl LumensFlowContract {
             .unwrap_or(Vec::new(&env))
     }
 
-    // ─── Internal helper ────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────
+    // Internal helpers
+    // ────────────────────────────────────────────────────────────────────
+
+    /// Compute withdrawable amount using high-precision formula.
+    ///
+    /// `streamed = deposit_amount * elapsed / duration`
+    ///
+    /// Using a single division on the product avoids the progressive
+    /// truncation that `flow_rate * elapsed` accumulates, and guarantees
+    /// `streamed == deposit_amount` exactly when `elapsed == duration`.
     fn _withdrawable(env: &Env, stream: &Stream) -> i128 {
-        if !stream.is_active {
+        if stream.status != StreamStatus::Active {
             return 0;
         }
 
@@ -363,10 +413,14 @@ impl LumensFlowContract {
             now - stream.start_time
         };
 
-        let mut streamed = stream.flow_rate * (elapsed as i128);
-        if streamed > stream.deposit_amount {
-            streamed = stream.deposit_amount;
+        let duration = (stream.end_time - stream.start_time) as i128;
+        if duration <= 0 {
+            return 0;
         }
+
+        // Precise accrual — single integer division
+        let streamed = ((stream.deposit_amount * (elapsed as i128)) / duration)
+            .min(stream.deposit_amount);
 
         let withdrawable = streamed - stream.withdrawn_amount;
         if withdrawable < 0 { 0 } else { withdrawable }
