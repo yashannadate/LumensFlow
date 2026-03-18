@@ -223,7 +223,7 @@ export default function HowItWorks() {
               padding: '16px 40px',
               fontSize: '16px',
               fontWeight: 600,
-              fontFamily: 'Unbounded, sans-serif',
+              fontFamily: 'var(--font-display)',
               cursor: 'pointer',
               transition: 'background 0.2s, transform 0.2s',
             }}

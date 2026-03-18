@@ -3,10 +3,12 @@ import {
   rpc, scValToNative, Address, xdr,
 } from '@stellar/stellar-sdk'
 
-export const CONTRACT_ID        = 'CBGP4HWBJA4JXWYAU3OG533VPKUUCD5F6UQ4MZKNEIXQJWRV53BYLZAO'
+export const CONTRACT_ID        = 'CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR'
 export const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
 export const RPC_URL            = 'https://soroban-testnet.stellar.org'
 export const HORIZON_URL        = 'https://horizon-testnet.stellar.org'
+// XLM Stellar Asset Contract on Testnet (56-char SAC address)
+export const XLM_TOKEN_CONTRACT = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC'
 
 const server = new rpc.Server(RPC_URL)
 
@@ -152,8 +154,19 @@ export async function cancelStream(streamId, senderAddress, signTransaction) {
 // ─── READ functions ───────────────────────────────────────────────────────
 export async function getStream(streamId, sourceAddress) {
   try {
-    const raw = await simulateContract('get_stream', [u32(streamId)], sourceAddress)
-    return parseStream(raw)
+    const rawPromise = simulateContract('get_stream', [u32(streamId)], sourceAddress)
+    const withdrawablePromise = simulateContract('withdrawable_amount', [u32(streamId)], sourceAddress)
+    
+    const [raw, wAmount] = await Promise.all([
+      rawPromise.catch(() => null),
+      withdrawablePromise.catch(() => 0n)
+    ])
+    
+    const stream = parseStream(raw)
+    if (stream) {
+      stream.contract_withdrawable = BigInt(wAmount || 0n)
+    }
+    return stream
   } catch {
     return null
   }

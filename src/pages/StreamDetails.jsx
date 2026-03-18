@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
+import { useToast } from '../components/Toast.jsx'
+import TxSuccess from '../components/TxSuccess.jsx'
 import { getErrorMessage, truncateAddress, getStream } from '../utils/stellar.js'
 import { getStreamStatus, calculateProgress } from '../utils/time.js'
 import {
   ArrowLeft, Download, XCircle, Clock,
   Copy, Check, ExternalLink,
-  ArrowUpRight, ArrowDownLeft, RefreshCw, Zap,
+  ArrowUpRight, ArrowDownLeft, RefreshCw,
 } from 'lucide-react'
 
 const ANON = 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN'
@@ -29,6 +31,7 @@ export default function StreamDetails() {
   const streamId = Number(id)
   const { address } = useWallet()
   const { withdraw, cancel } = useStream()
+  const toast = useToast()
 
   const [stream,  setStream]  = useState(null)
   const [loading, setLoading] = useState(true)
@@ -37,6 +40,7 @@ export default function StreamDetails() {
   const [now,     setNow]     = useState(Math.floor(Date.now() / 1000))
   const [txError, setTxError] = useState(null)
   const [txHash,  setTxHash]  = useState(null)
+  const [txType,  setTxType]  = useState(null)
   const [working, setWorking] = useState(false)
 
   // 1-second clock
@@ -73,24 +77,50 @@ export default function StreamDetails() {
   }
 
   const handleWithdraw = async () => {
-    setWorking(true); setTxError(null); setTxHash(null)
+    if (stream?.status !== 'Active') {
+      toast.error('Withdrawal Failed', 'Stream is no longer active')
+      return
+    }
+    setWorking(true); setTxError(null); setTxHash(null); setTxType('withdraw')
     try {
+      console.log('Stream BEFORE action:', stream)
       const result = await withdraw(streamId)
-      if (result?.txHash) setTxHash(result.txHash)
+      const updatedStream = await getStream(streamId, address)
+      if (updatedStream) setStream(updatedStream)
+      console.log('Stream AFTER action:', updatedStream, 'txHash:', result?.txHash)
+      
+      const hash = result?.txHash || null
+      setTxHash(hash)
+      toast.success('Withdrawal Successful', 'Your money has been successfully withdrawn.', hash)
     } catch (e) {
-      setTxError(getErrorMessage(e))
+      const msg = getErrorMessage(e)
+      setTxError(msg)
+      toast.error('Withdrawal Failed', msg)
     } finally {
       setWorking(false)
     }
   }
 
   const handleCancel = async () => {
-    setWorking(true); setTxError(null); setTxHash(null)
+    if (stream?.status !== 'Active') {
+      toast.error('Cancel Failed', 'Stream is no longer active')
+      return
+    }
+    setWorking(true); setTxError(null); setTxHash(null); setTxType('cancel')
     try {
+      console.log('Stream BEFORE action:', stream)
       const result = await cancel(streamId)
-      if (result?.txHash) setTxHash(result.txHash)
+      const updatedStream = await getStream(streamId, address)
+      if (updatedStream) setStream(updatedStream)
+      console.log('Stream AFTER action:', updatedStream, 'txHash:', result?.txHash)
+
+      const hash = result?.txHash || null
+      setTxHash(hash)
+      toast.success('Stream Cancelled', 'Your money stream has been successfully cancelled.', hash)
     } catch (e) {
-      setTxError(getErrorMessage(e))
+      const msg = getErrorMessage(e)
+      setTxError(msg)
+      toast.error('Cancel Failed', msg)
     } finally {
       setWorking(false)
     }
@@ -137,22 +167,24 @@ export default function StreamDetails() {
   const isGuest    = address && !isReceiver && !isSender
   const isAnon     = !address
 
-  const status   = getStreamStatus(stream, now)
-  const isActive = status === 'Active'
-
-  const total     = Number(stream.deposit_amount) / 1e7
+  // 100% Contract Math — ZERO JS approximations for money
   const start     = Number(stream.start_time)
   const end       = Number(stream.end_time)
   const dur       = end - start
+
+  const status   = (stream.status === 'Active' && now >= end) ? 'Completed' : stream.status
+  const isActive = status === 'Active'
+
+  const total     = Number(stream.deposit_amount) / 1e7
   const withdrawn = Number(stream.withdrawn_amount) / 1e7
   const flowRate  = dur > 0 ? total / dur : 0
 
-  // Precise mirror of contract math
-  const elapsed      = Math.max(0, Math.min(now, end) - start)
-  const streamed     = dur > 0 ? (total * elapsed) / dur : 0
-  const withdrawable = Math.max(0, streamed - withdrawn)
-  const remaining    = Math.max(0, total - streamed)
-  const progress     = calculateProgress(stream, now)
+  let withdrawable = Number(stream.contract_withdrawable || 0n) / 1e7
+  if (!isActive) withdrawable = 0 // Enforce status rule
+
+  const streamed = withdrawn + withdrawable
+  const remaining = Math.max(0, total - streamed)
+  const progress = total > 0 ? Math.min(100, Math.max(0, (streamed / total) * 100)) : 0
 
   const timeLeft    = end - now
   const tlDays      = Math.floor(timeLeft / 86400)
@@ -259,21 +291,14 @@ export default function StreamDetails() {
           </div>
         </div>
 
-        {/* TX Result */}
+        {/* TX Result — reusable component */}
         {txHash && (
-          <div style={{ padding: '12px 16px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '10px', fontSize: '13px' }}>
-            <div style={{ color: 'var(--green)', fontWeight: 600, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Zap size={14} /> Transaction confirmed!
-            </div>
-            <a
-              href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
-              target="_blank" rel="noreferrer"
-              style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', wordBreak: 'break-all' }}
-            >
-              <ExternalLink size={11} />
-              {txHash.slice(0, 16)}...{txHash.slice(-12)}
-            </a>
-          </div>
+          <TxSuccess
+            title={txType === 'withdraw' ? 'Withdrawal Successful' : 'Stream Cancelled'}
+            description={txType === 'withdraw' ? 'Your money has been successfully withdrawn.' : 'Your money stream has been successfully cancelled.'}
+            txHash={txHash}
+            onDismiss={() => { setTxHash(null); setTxType(null) }}
+          />
         )}
 
         {/* TX Error */}

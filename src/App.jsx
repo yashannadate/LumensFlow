@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { WalletProvider, useWallet } from './hooks/useWallet.jsx'
+import { ToastProvider } from './components/Toast.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 
@@ -8,7 +9,6 @@ import Dashboard from './pages/Dashboard.jsx'
 import CreateStream from './pages/CreateStream.jsx'
 import StreamDetails from './pages/StreamDetails.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
-import Explorer from './pages/Explorer.jsx'
 
 function ProtectedRoute({ children }) {
   const { isConnected } = useWallet()
@@ -28,7 +28,6 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/explorer" element={<Explorer />} />
           <Route
             path="/dashboard"
             element={
@@ -62,9 +61,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <WalletProvider>
-      <AppRoutes />
-    </WalletProvider>
+    <ToastProvider>
+      <WalletProvider>
+        <AppRoutes />
+      </WalletProvider>
+    </ToastProvider>
   )
 }
 
