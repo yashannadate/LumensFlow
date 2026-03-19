@@ -4,8 +4,8 @@ import {
 } from 'react'
 import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit'
 import { FreighterModule } from '@creit.tech/stellar-wallets-kit/modules/freighter'
-import { xBullModule }     from '@creit.tech/stellar-wallets-kit/modules/xbull'
-import { LobstrModule }    from '@creit.tech/stellar-wallets-kit/modules/lobstr'
+import { xBullModule } from '@creit.tech/stellar-wallets-kit/modules/xbull'
+import { LobstrModule } from '@creit.tech/stellar-wallets-kit/modules/lobstr'
 import { fetchXlmBalance } from '../utils/stellar.js'
 
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
@@ -20,10 +20,10 @@ function initKit() {
 }
 
 export function WalletProvider({ children }) {
-  const [address,    setAddress]    = useState(null)
-  const [balance,    setBalance]    = useState('0.00')
+  const [address, setAddress] = useState(null)
+  const [balance, setBalance] = useState('0.00')
   const [connecting, setConnecting] = useState(false)
-  const [error,      setError]      = useState(null)
+  const [error, setError] = useState(null)
   const kitInitialized = useRef(false)
 
   useEffect(() => {

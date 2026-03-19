@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
 import { useToast } from '../components/Toast.jsx'
-import TxSuccess from '../components/TxSuccess.jsx'
+
 import { getErrorMessage, truncateAddress, getStream } from '../utils/stellar.js'
 import { getStreamStatus, calculateProgress } from '../utils/time.js'
 import {
@@ -33,14 +33,14 @@ export default function StreamDetails() {
   const { withdraw, cancel } = useStream()
   const toast = useToast()
 
-  const [stream,  setStream]  = useState(null)
+  const [stream, setStream] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(null)
-  const [copied,  setCopied]  = useState(null)
-  const [now,     setNow]     = useState(Math.floor(Date.now() / 1000))
+  const [error, setError] = useState(null)
+  const [copied, setCopied] = useState(null)
+  const [now, setNow] = useState(Math.floor(Date.now() / 1000))
   const [txError, setTxError] = useState(null)
-  const [txHash,  setTxHash]  = useState(null)
-  const [txType,  setTxType]  = useState(null)
+  const [txHash, setTxHash] = useState(null)
+  const [txType, setTxType] = useState(null)
   const [working, setWorking] = useState(false)
 
   // 1-second clock
@@ -76,9 +76,10 @@ export default function StreamDetails() {
     setTimeout(() => setCopied(null), 2000)
   }
 
+  // ── Fixed: allow withdraw on Completed streams too ──────────────
   const handleWithdraw = async () => {
-    if (stream?.status !== 'Active') {
-      toast.error('Withdrawal Failed', 'Stream is no longer active')
+    if (stream?.status === 'Cancelled') {
+      toast.error('Withdrawal Failed', 'Stream was cancelled')
       return
     }
     setWorking(true); setTxError(null); setTxHash(null); setTxType('withdraw')
@@ -88,7 +89,7 @@ export default function StreamDetails() {
       const updatedStream = await getStream(streamId, address)
       if (updatedStream) setStream(updatedStream)
       console.log('Stream AFTER action:', updatedStream, 'txHash:', result?.txHash)
-      
+
       const hash = result?.txHash || null
       setTxHash(hash)
       toast.success('Withdrawal Successful', 'Your money has been successfully withdrawn.', hash)
@@ -161,41 +162,83 @@ export default function StreamDetails() {
 
   if (!stream) return null
 
-  // Compute live values
+  // ── Roles ────────────────────────────────────────────────────────
   const isReceiver = address === stream.receiver
-  const isSender   = address === stream.sender
-  const isGuest    = address && !isReceiver && !isSender
-  const isAnon     = !address
+  const isSender = address === stream.sender
+  const isGuest = address && !isReceiver && !isSender
+  const isAnon = !address
 
-  // 100% Contract Math — ZERO JS approximations for money
-  const start     = Number(stream.start_time)
-  const end       = Number(stream.end_time)
-  const dur       = end - start
+  // ── Core math ────────────────────────────────────────────────────
+  const start = Number(stream.start_time)
+  const end = Number(stream.end_time)
+  const dur = end - start
 
-  const status   = (stream.status === 'Active' && now >= end) ? 'Completed' : stream.status
+  // Compute real status — override Active→Completed when time passed
+  const status = (stream.status === 'Active' && now >= end)
+    ? 'Completed'
+    : stream.status
+
   const isActive = status === 'Active'
+  const isCompleted = status === 'Completed'
+  const isCancelled = status === 'Cancelled'
 
-  const total     = Number(stream.deposit_amount) / 1e7
+  const total = Number(stream.deposit_amount) / 1e7
   const withdrawn = Number(stream.withdrawn_amount) / 1e7
-  const flowRate  = dur > 0 ? total / dur : 0
+  const flowRate = dur > 0 ? total / dur : 0
 
-  let withdrawable = Number(stream.contract_withdrawable || 0n) / 1e7
-  if (!isActive) withdrawable = 0 // Enforce status rule
+  // ── Fixed withdrawable calculation ───────────────────────────────
+  // Contract returns 0 when is_active=false even if funds remain
+  // We calculate locally so receiver sees correct withdrawable amount
+  let withdrawable = 0
 
+  if (isActive) {
+    // Live stream — use contract value or calculate locally
+    withdrawable = Number(stream.contract_withdrawable || 0n) / 1e7
+    // Fallback: calculate locally if contract value missing
+    if (withdrawable === 0) {
+      const elapsed = Math.min(now, end) - start
+      if (elapsed > 0) {
+        let streamedRaw = flowRate * elapsed
+        if (streamedRaw > total) streamedRaw = total
+        withdrawable = Math.max(0, streamedRaw - withdrawn)
+      }
+    }
+  } else if (isCompleted) {
+    // Stream ended — calculate full withdrawable locally
+    // Contract returns 0 for inactive streams but funds still claimable
+    const elapsed = end - start // full duration elapsed
+    let streamedRaw = flowRate * elapsed
+    if (streamedRaw > total) streamedRaw = total
+    withdrawable = Math.max(0, streamedRaw - withdrawn)
+  } else if (isCancelled) {
+    // Cancelled — nothing to withdraw (already settled by contract)
+    withdrawable = 0
+  }
+
+  // ── Derived values ───────────────────────────────────────────────
   const streamed = withdrawn + withdrawable
   const remaining = Math.max(0, total - streamed)
-  const progress = total > 0 ? Math.min(100, Math.max(0, (streamed / total) * 100)) : 0
 
-  const timeLeft    = end - now
-  const tlDays      = Math.floor(timeLeft / 86400)
-  const tlHours     = Math.floor((timeLeft % 86400) / 3600)
-  const tlMins      = Math.floor((timeLeft % 3600) / 60)
+  // Completed streams always show 100% progress
+  const progress = isCompleted
+    ? 100
+    : total > 0
+      ? Math.min(100, Math.max(0, (streamed / total) * 100))
+      : 0
+
+  const timeLeft = end - now
+  const tlDays = Math.floor(timeLeft / 86400)
+  const tlHours = Math.floor((timeLeft % 86400) / 3600)
+  const tlMins = Math.floor((timeLeft % 3600) / 60)
   const timeLeftStr = timeLeft > 0
     ? `${tlDays > 0 ? tlDays + 'd ' : ''}${tlHours}h ${tlMins}m remaining`
     : 'Stream ended'
 
-  const endDate = new Date(end * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    + ' at ' + new Date(end * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  const endDate = new Date(end * 1000).toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric'
+  }) + ' at ' + new Date(end * 1000).toLocaleTimeString('en-US', {
+    hour: '2-digit', minute: '2-digit'
+  })
 
   const statCard = (label, value, sub, color) => (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -206,6 +249,14 @@ export default function StreamDetails() {
   )
 
   const badgeClass = `badge-${status.toLowerCase()}`
+
+  // ── Can receiver withdraw? ───────────────────────────────────────
+  // Allow on Active AND Completed — not on Cancelled
+  const canWithdraw = isReceiver && !isCancelled && withdrawable >= 0.0000001
+
+  // ── Can sender cancel? ───────────────────────────────────────────
+  // Only on Active streams
+  const canCancel = isSender && isActive
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', padding: '100px 24px 80px' }}>
@@ -234,8 +285,8 @@ export default function StreamDetails() {
 
           {/* Sender / Receiver */}
           {[
-            { label: 'From', icon: <ArrowUpRight size={12} />, addr: stream.sender,   key: 's' },
-            { label: 'To',   icon: <ArrowDownLeft size={12} />, addr: stream.receiver, key: 'r' },
+            { label: 'From', icon: <ArrowUpRight size={12} />, addr: stream.sender, key: 's' },
+            { label: 'To', icon: <ArrowDownLeft size={12} />, addr: stream.receiver, key: 'r' },
           ].map(row => (
             <div key={row.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -256,14 +307,14 @@ export default function StreamDetails() {
           </div>
         )}
 
-        {/* Stats 2×2 */}
+        {/* Stats 2×3 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          {statCard('Total Amount',  `${total.toFixed(7)} XLM`, null, null)}
-          {statCard('Flow Rate',     `${flowRate.toFixed(6)} XLM/sec`, `${(flowRate * 3600).toFixed(4)} XLM/hr`, 'var(--purple-light)')}
-          {statCard('Streamed',      `${streamed.toFixed(4)} XLM`, isActive ? 'live ↑' : null, isActive ? 'var(--purple)' : null)}
-          {statCard('Withdrawn',     `${withdrawn.toFixed(4)} XLM`, null, null)}
-          {statCard('Remaining',     `${remaining.toFixed(4)} XLM`, 'Left in stream', 'var(--green)')}
-          {statCard('Progress',      `${progress.toFixed(1)}%`, null, null)}
+          {statCard('Total Amount', `${total.toFixed(7)} XLM`, null, null)}
+          {statCard('Flow Rate', `${flowRate.toFixed(6)} XLM/sec`, `${(flowRate * 3600).toFixed(4)} XLM/hr`, 'var(--red-light)')}
+          {statCard('Streamed', `${streamed.toFixed(4)} XLM`, isActive ? 'live ↑' : isCompleted ? '100% complete' : null, isActive ? 'var(--red)' : isCompleted ? 'var(--green)' : null)}
+          {statCard('Withdrawn', `${withdrawn.toFixed(4)} XLM`, null, null)}
+          {statCard('Remaining', `${remaining.toFixed(4)} XLM`, 'Left in stream', 'var(--green)')}
+          {statCard('Progress', `${progress.toFixed(1)}%`, isCompleted ? 'Stream complete' : null, isCompleted ? 'var(--green)' : null)}
         </div>
 
         {/* Withdrawable Card */}
@@ -271,13 +322,27 @@ export default function StreamDetails() {
           <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase' }}>
             Withdrawable Now
           </div>
-          <div className={isActive ? 'live-amount' : ''} style={{ fontSize: '36px', fontWeight: 700, marginBottom: '20px', color: isActive ? 'var(--purple)' : 'white' }}>
+          <div
+            className={isActive ? 'live-amount' : ''}
+            style={{
+              fontSize: '36px',
+              fontWeight: 700,
+              marginBottom: '20px',
+              color: isCancelled ? 'var(--text-muted)' : isCompleted ? 'var(--green)' : 'var(--red)',
+            }}
+          >
             {withdrawable.toFixed(7)} <span style={{ fontSize: '16px', opacity: 0.6, fontWeight: 400 }}>XLM</span>
           </div>
 
           <div style={{ marginBottom: '12px' }}>
             <div className="progress-bar">
-              <div className={`progress-fill${isActive ? ' progress-animated' : ''}`} style={{ width: `${progress}%` }} />
+              <div
+                className={`progress-fill${isActive ? ' progress-animated' : ''}`}
+                style={{
+                  width: `${progress}%`,
+                  background: isCompleted ? 'var(--green)' : isCancelled ? 'var(--red)' : 'var(--red)',
+                }}
+              />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
               <span>{progress.toFixed(1)}% streamed</span>
@@ -286,20 +351,14 @@ export default function StreamDetails() {
           </div>
 
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'center', gap: '16px' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> {timeLeftStr}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={12} /> {timeLeftStr}
+            </span>
             <span>Ends: {endDate}</span>
           </div>
         </div>
 
-        {/* TX Result — reusable component */}
-        {txHash && (
-          <TxSuccess
-            title={txType === 'withdraw' ? 'Withdrawal Successful' : 'Stream Cancelled'}
-            description={txType === 'withdraw' ? 'Your money has been successfully withdrawn.' : 'Your money stream has been successfully cancelled.'}
-            txHash={txHash}
-            onDismiss={() => { setTxHash(null); setTxType(null) }}
-          />
-        )}
+
 
         {/* TX Error */}
         {txError && (
@@ -308,31 +367,43 @@ export default function StreamDetails() {
           </div>
         )}
 
-        {/* Action buttons */}
-        {(isReceiver || isSender) && isActive && (
+        {/* ── Fixed Action Buttons ─────────────────────────────────── */}
+        {/* Show for receiver on Active + Completed */}
+        {/* Show for sender only on Active */}
+        {(canWithdraw || canCancel) && (
           <div style={{ display: 'flex', gap: '12px' }}>
-            {isReceiver && (
+            {canWithdraw && (
               <button
                 onClick={handleWithdraw}
-                disabled={working || withdrawable < 0.0000001}
+                disabled={working}
                 className="btn-primary"
                 style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
               >
-                <Download size={16} /> {working ? 'Processing…' : 'Withdraw Funds'}
+                <Download size={16} />
+                {working ? 'Processing…' : `Withdraw ${withdrawable.toFixed(4)} XLM`}
               </button>
             )}
-            {isSender && (
+            {canCancel && (
               <button
                 onClick={handleCancel}
                 disabled={working}
                 className="btn-danger"
                 style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
               >
-                <XCircle size={16} /> {working ? 'Processing…' : 'Cancel Stream'}
+                <XCircle size={16} />
+                {working ? 'Processing…' : 'Cancel Stream'}
               </button>
             )}
           </div>
         )}
+
+        {/* Completed with nothing left to withdraw */}
+        {isCompleted && isReceiver && withdrawable < 0.0000001 && (
+          <div style={{ padding: '12px 16px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '10px', color: 'var(--green)', fontSize: '13px', textAlign: 'center' }}>
+            ✅ All funds have been withdrawn. Stream complete.
+          </div>
+        )}
+
       </div>
     </div>
   )

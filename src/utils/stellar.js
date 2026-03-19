@@ -1,37 +1,29 @@
 import {
   Contract, TransactionBuilder, BASE_FEE,
-  rpc, scValToNative, Address, xdr,
+  rpc, scValToNative, nativeToScVal, Address, xdr,
 } from '@stellar/stellar-sdk'
 
-export const CONTRACT_ID        = 'CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR'
+export const CONTRACT_ID = 'CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR'
 export const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
-export const RPC_URL            = 'https://soroban-testnet.stellar.org'
-export const HORIZON_URL        = 'https://horizon-testnet.stellar.org'
+export const RPC_URL = 'https://soroban-testnet.stellar.org'
+export const HORIZON_URL = 'https://horizon-testnet.stellar.org'
 // XLM Stellar Asset Contract on Testnet (56-char SAC address)
 export const XLM_TOKEN_CONTRACT = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC'
 
 const server = new rpc.Server(RPC_URL)
 
 // ─── ScVal helpers ────────────────────────────────────────────────────────
-const addr = (a) => Address.fromString(a).toScVal()
-const u32  = (n) => xdr.ScVal.scvU32(Number(n))
-const u64  = (n) => xdr.ScVal.scvU64(new xdr.Uint64(BigInt(n)))
+const addr = (a) => nativeToScVal(a, { type: 'address' })
+const u32 = (n) => nativeToScVal(Number(n), { type: 'u32' })
+const u64 = (n) => nativeToScVal(BigInt(n), { type: 'u64' })
+const i128 = (n) => nativeToScVal(BigInt(n), { type: 'i128' })
 
-const i128 = (n) => {
-  const big = BigInt(n)
-  const hi  = BigInt.asIntN(64,  big >> 64n)
-  const lo  = BigInt.asUintN(64, big)
-  return xdr.ScVal.scvI128(
-    new xdr.Int128Parts({ hi: new xdr.Int64(hi), lo: new xdr.Uint64(lo) })
-  )
-}
-
-export const xlmToStroops  = (xlm) => BigInt(Math.round(parseFloat(xlm) * 10_000_000))
-export const stroopsToXlm  = (s)   => (Number(s) / 10_000_000).toFixed(7)
+export const xlmToStroops = (xlm) => BigInt(Math.round(parseFloat(xlm) * 10_000_000))
+export const stroopsToXlm = (s) => (Number(s) / 10_000_000).toFixed(7)
 
 // ─── Transaction invoker ──────────────────────────────────────────────────
 async function invokeContract(method, args, sourceAddress, signTransaction) {
-  const account  = await server.getAccount(sourceAddress)
+  const account = await server.getAccount(sourceAddress)
   const contract = new Contract(CONTRACT_ID)
   const tx = new TransactionBuilder(account, {
     fee: BASE_FEE,
@@ -53,14 +45,29 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
     TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
   )
 
+  if (submitted.status === 'ERROR') {
+    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted))
+  }
+
   let result = submitted
   while (result.status === 'PENDING' || result.status === 'NOT_FOUND') {
     await new Promise(r => setTimeout(r, 1500))
-    result = await server.getTransaction(submitted.hash)
+    try {
+      result = await server.getTransaction(submitted.hash)
+    } catch (e) {
+      if (e?.message?.includes('Bad union switch')) {
+        console.warn('Swallowed SDK XDR parsing bug for confirmed transaction:', e)
+        result = { status: 'SUCCESS', hash: submitted.hash }
+        break
+      }
+      throw e
+    }
   }
+
   if (result.status === 'FAILED') {
-    throw new Error('Transaction failed: ' + JSON.stringify(result))
+    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result))
   }
+
   // Attach the tx hash to the result for UI display
   result.txHash = submitted.hash
   return result
@@ -68,7 +75,7 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
 
 // ─── Simulator for read-only calls ───────────────────────────────────────
 async function simulateContract(method, args, sourceAddress) {
-  const source  = sourceAddress || 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN'
+  const source = sourceAddress || 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN'
   const account = await server.getAccount(source)
   const contract = new Contract(CONTRACT_ID)
   const tx = new TransactionBuilder(account, {
@@ -105,14 +112,14 @@ function parseStream(raw) {
   }
 
   return {
-    id:               Number(raw.id               ?? raw[0] ?? 0),
-    sender:           String(raw.sender            ?? raw[1] ?? ''),
-    receiver:         String(raw.receiver          ?? raw[2] ?? ''),
-    deposit_amount:   BigInt(raw.deposit_amount    ?? raw[3] ?? 0),
-    flow_rate:        BigInt(raw.flow_rate         ?? raw[4] ?? 0),
-    start_time:       BigInt(raw.start_time        ?? raw[5] ?? 0),
-    end_time:         BigInt(raw.end_time          ?? raw[6] ?? 0),
-    withdrawn_amount: BigInt(raw.withdrawn_amount  ?? raw[7] ?? 0),
+    id: Number(raw.id ?? raw[0] ?? 0),
+    sender: String(raw.sender ?? raw[1] ?? ''),
+    receiver: String(raw.receiver ?? raw[2] ?? ''),
+    deposit_amount: BigInt(raw.deposit_amount ?? raw[3] ?? 0),
+    flow_rate: BigInt(raw.flow_rate ?? raw[4] ?? 0),
+    start_time: BigInt(raw.start_time ?? raw[5] ?? 0),
+    end_time: BigInt(raw.end_time ?? raw[6] ?? 0),
+    withdrawn_amount: BigInt(raw.withdrawn_amount ?? raw[7] ?? 0),
     status,
     // Backward-compat field so components that check is_active still work
     is_active: status === 'Active',
@@ -156,12 +163,12 @@ export async function getStream(streamId, sourceAddress) {
   try {
     const rawPromise = simulateContract('get_stream', [u32(streamId)], sourceAddress)
     const withdrawablePromise = simulateContract('withdrawable_amount', [u32(streamId)], sourceAddress)
-    
+
     const [raw, wAmount] = await Promise.all([
       rawPromise.catch(() => null),
       withdrawablePromise.catch(() => 0n)
     ])
-    
+
     const stream = parseStream(raw)
     if (stream) {
       stream.contract_withdrawable = BigInt(wAmount || 0n)

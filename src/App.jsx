@@ -22,40 +22,43 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   return (
-    <div className="app-shell">
-      <Navbar />
-      <main className="app-main">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create"
-            element={
-              <ProtectedRoute>
-                <CreateStream />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/stream/:id"
-            element={
-              <ProtectedRoute>
-                <StreamDetails />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <>
+
+      <div className="app-shell">
+        <Navbar />
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <CreateStream />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/stream/:id"
+              element={
+                <ProtectedRoute>
+                  <StreamDetails />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </>
   )
 }
 

@@ -13,8 +13,8 @@ import {
 export function useStream() {
   const { address, signTransaction } = useWallet()
   const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState(null)
-  const [txHash,  setTxHash]  = useState(null)
+  const [error, setError] = useState(null)
+  const [txHash, setTxHash] = useState(null)
 
   const handleAction = useCallback(async (actionFn) => {
     setLoading(true)
@@ -26,8 +26,9 @@ export function useStream() {
       return result
     } catch (e) {
       console.error('Stream action failed:', e)
-      setError(getErrorMessage(e))
-      return null
+      const errMessage = getErrorMessage(e)
+      setError(errMessage)
+      throw new Error(errMessage)
     } finally {
       setLoading(false)
     }
@@ -37,15 +38,15 @@ export function useStream() {
     handleAction(() =>
       createStream(address, receiver, amountXLM, durationSec, signTransaction)
     ),
-  [address, signTransaction, handleAction])
+    [address, signTransaction, handleAction])
 
   const withdrawAction = useCallback((streamId) =>
     handleAction(() => withdraw(Number(streamId), address, signTransaction)),
-  [address, signTransaction, handleAction])
+    [address, signTransaction, handleAction])
 
   const cancelAction = useCallback((streamId) =>
     handleAction(() => cancelStream(Number(streamId), address, signTransaction)),
-  [address, signTransaction, handleAction])
+    [address, signTransaction, handleAction])
 
   const fetchStream = useCallback(async (streamId) => {
     try { return await getStream(streamId, address) } catch { return null }
@@ -64,9 +65,9 @@ export function useStream() {
     loading,
     error,
     txHash,
-    create:          createAction,
-    withdraw:        withdrawAction,
-    cancel:          cancelAction,
+    create: createAction,
+    withdraw: withdrawAction,
+    cancel: cancelAction,
     fetchStream,
     fetchWithdrawable,
     fetchUserStreams,

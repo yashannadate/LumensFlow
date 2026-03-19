@@ -3,32 +3,32 @@ import { Wallet, Send, Droplets, TrendingUp, XCircle, ArrowRight } from 'lucide-
 
 const steps = [
   {
-    icon: <Wallet size={28} color="var(--purple)" />,
+    icon: <Wallet size={28} color="var(--accent-red)" />,
     title: 'Connect Wallet',
     desc: 'Connect Freighter, xBull, or Lobstr — your wallet is your identity on Stellar Network.',
     note: null,
   },
   {
-    icon: <Send size={28} color="var(--purple)" />,
+    icon: <Send size={28} color="var(--accent-red)" />,
     title: 'Create a Stream',
     desc: 'Enter receiver address, amount in XLM, and duration. Funds lock into the smart contract.',
     note: 'flow_rate = deposit ÷ duration (per second)',
   },
   {
-    icon: <Droplets size={28} color="var(--purple)" />,
+    icon: <Droplets size={28} color="var(--accent-red)" />,
     title: 'Funds Stream Live',
     desc: 'Balance increases every second — no transaction needed. Time does the work.',
     note: null,
     liveCounter: true,
   },
   {
-    icon: <TrendingUp size={28} color="var(--purple)" />,
+    icon: <TrendingUp size={28} color="var(--accent-red)" />,
     title: 'Receiver Withdraws',
     desc: 'Receiver can click Withdraw at any time, getting exactly what has streamed so far.',
     note: null,
   },
   {
-    icon: <XCircle size={28} color="var(--purple)" />,
+    icon: <XCircle size={28} color="var(--accent-red)" />,
     title: 'Cancel Anytime',
     desc: 'Sender can cancel early. Receiver gets earned portion, sender gets remaining XLM back.',
     note: null,
@@ -41,13 +41,13 @@ export default function HowItWorks() {
   return (
     <div style={{ minHeight: '100vh', paddingTop: '100px', paddingBottom: '100px' }}>
       {/* Page Header */}
-      <div style={{ textAlign: 'center', padding: '60px 24px 80px', background: 'radial-gradient(ellipse at top, rgba(139,92,246,0.08) 0%, transparent 60%)' }}>
+      <div style={{ textAlign: 'center', padding: '60px 24px 80px', background: 'radial-gradient(ellipse at top, rgba(239, 68, 68, 0.08) 0%, transparent 60%)' }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          border: '1px solid var(--purple)',
-          color: 'var(--purple-light)',
+          border: '1px solid var(--accent-red)',
+          color: 'white',
           borderRadius: '50px',
           padding: '6px 20px',
           fontSize: '11px',
@@ -70,8 +70,8 @@ export default function HowItWorks() {
         {/* Section 1 — The Concept */}
         <section style={{ marginBottom: '80px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(124,58,237,0.03))',
-            border: '1px solid rgba(139,92,246,0.2)',
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.03))',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
             borderRadius: '24px',
             padding: '40px',
           }}>
@@ -92,11 +92,11 @@ export default function HowItWorks() {
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>paid once</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--purple)', fontWeight: 500, width: '110px', flexShrink: 0 }}>Streaming</div>
+                <div style={{ fontSize: '12px', color: 'var(--accent-red)', fontWeight: 500, width: '110px', flexShrink: 0 }}>Streaming</div>
                 <div style={{ flex: 1, background: '#1f2937', borderRadius: '4px', height: '16px', overflow: 'hidden' }}>
-                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg, #7c3aed, #8b5cf6, #a78bfa)', borderRadius: '4px', animation: 'stream 3s linear infinite' }} />
+                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg, #dc2626, #ef4444, #fca5a5)', borderRadius: '4px', animation: 'stream 3s linear infinite' }} />
                 </div>
-                <span style={{ fontSize: '12px', color: 'var(--purple)', whiteSpace: 'nowrap' }}>every second</span>
+                <span style={{ fontSize: '12px', color: 'var(--accent-red)', whiteSpace: 'nowrap' }}>every second</span>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function HowItWorks() {
               top: '0',
               bottom: '0',
               width: '2px',
-              background: 'linear-gradient(to bottom, var(--purple), transparent)',
+              background: 'linear-gradient(to bottom, var(--accent-red), transparent)',
               opacity: 0.3,
             }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -124,8 +124,8 @@ export default function HowItWorks() {
                     width: '56px',
                     height: '56px',
                     borderRadius: '50%',
-                    background: 'rgba(139,92,246,0.1)',
-                    border: '2px solid rgba(139,92,246,0.4)',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '2px solid rgba(239, 68, 68, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -143,18 +143,18 @@ export default function HowItWorks() {
                     padding: '24px',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--purple)', background: 'rgba(139,92,246,0.1)', padding: '2px 10px', borderRadius: '50px' }}>Step {i + 1}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--accent-red)', background: 'rgba(239, 68, 68, 0.1)', padding: '2px 10px', borderRadius: '50px' }}>Step {i + 1}</span>
                       <h3 style={{ margin: 0, fontWeight: 600, fontSize: '18px' }}>{step.title}</h3>
                     </div>
                     <p style={{ color: 'var(--text-muted)', margin: 0, lineHeight: 1.7, fontWeight: 400, fontSize: '14px' }}>{step.desc}</p>
                     {step.note && (
-                      <div style={{ marginTop: '12px', padding: '8px 14px', background: '#0d0d14', borderRadius: '8px', fontFamily: 'monospace', fontSize: '12px', color: 'var(--purple-light)' }}>
+                      <div style={{ marginTop: '12px', padding: '8px 14px', background: '#0d0d14', borderRadius: '8px', fontFamily: 'monospace', fontSize: '12px', color: 'white' }}>
                         {step.note}
                       </div>
                     )}
                     {step.liveCounter && (
-                      <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(139,92,246,0.08)', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.2)' }}>
-                        <span style={{ color: 'var(--purple)', fontFamily: 'monospace', fontWeight: 600 }}>+0.0000386 XLM</span>
+                      <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                        <span style={{ color: 'var(--accent-red)', fontFamily: 'monospace', fontWeight: 600 }}>+0.0000386 XLM</span>
                         <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>/sec ↑</span>
                       </div>
                     )}
@@ -179,21 +179,21 @@ export default function HowItWorks() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
                   { label: 'Flow Rate', value: '100 ÷ 2,592,000 sec', sub: '= 0.0000386 XLM/sec' },
-                  { label: 'Per Hour',  value: '0.138 XLM/hour', sub: null },
-                  { label: 'Per Day',   value: '3.33 XLM/day', sub: null },
+                  { label: 'Per Hour', value: '0.138 XLM/hour', sub: null },
+                  { label: 'Per Day', value: '3.33 XLM/day', sub: null },
                 ].map((item, i) => (
                   <div key={i} style={{ background: '#0d0d14', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px', letterSpacing: '1px' }}>{item.label.toUpperCase()}</div>
-                    <div style={{ fontFamily: 'monospace', color: 'var(--purple)', fontSize: '16px' }}>{item.value}</div>
-                    {item.sub && <div style={{ fontFamily: 'monospace', color: 'var(--purple-light)', fontSize: '13px', marginTop: '2px' }}>{item.sub}</div>}
+                    <div style={{ fontFamily: 'monospace', color: 'var(--accent-red)', fontSize: '16px' }}>{item.value}</div>
+                    {item.sub && <div style={{ fontFamily: 'monospace', color: 'white', fontSize: '13px', marginTop: '2px' }}>{item.sub}</div>}
                   </div>
                 ))}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
-                  { label: 'After 15 days',      value: '50 XLM streamed', color: 'var(--purple)' },
-                  { label: 'Receiver can get',   value: '50 XLM',          color: 'var(--green)' },
-                  { label: 'Sender gets back',   value: '50 XLM',          color: '#9ca3af' },
+                  { label: 'After 15 days', value: '50 XLM streamed', color: 'var(--accent-red)' },
+                  { label: 'Receiver can get', value: '50 XLM', color: 'var(--green)' },
+                  { label: 'Sender gets back', value: '50 XLM', color: '#9ca3af' },
                 ].map((item, i) => (
                   <div key={i} style={{ background: '#0d0d14', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px', letterSpacing: '1px' }}>{item.label.toUpperCase()}</div>
@@ -216,7 +216,7 @@ export default function HowItWorks() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '10px',
-              background: 'var(--purple)',
+              background: 'var(--accent-red)',
               color: 'white',
               border: 'none',
               borderRadius: '50px',
@@ -227,8 +227,8 @@ export default function HowItWorks() {
               cursor: 'pointer',
               transition: 'background 0.2s, transform 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#7c3aed'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'var(--purple)'; e.currentTarget.style.transform = 'none' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#dc2626'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-red)'; e.currentTarget.style.transform = 'none' }}
           >
             Start Streaming <ArrowRight size={18} />
           </button>

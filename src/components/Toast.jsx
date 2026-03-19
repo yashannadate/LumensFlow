@@ -14,9 +14,9 @@ const nextId = () => ++_id
 /* ─── Single Toast ────────────────────────────────────────────────────── */
 function Toast({ toast, onRemove }) {
   const isSuccess = toast.type === 'success'
-  const color     = isSuccess ? '#22c55e' : '#ef4444'
-  const bg        = isSuccess ? 'rgba(34,197,94,0.08)'  : 'rgba(239,68,68,0.08)'
-  const border    = isSuccess ? 'rgba(34,197,94,0.25)'  : 'rgba(239,68,68,0.25)'
+  const color = isSuccess ? '#22c55e' : '#ef4444'
+  const bg = isSuccess ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)'
+  const border = isSuccess ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'
   const shortHash = toast.txHash
     ? `${toast.txHash.slice(0, 6)}…${toast.txHash.slice(-4)}`
     : null
@@ -53,7 +53,7 @@ function Toast({ toast, onRemove }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '20px' }}>
         {isSuccess
           ? <CheckCircle size={16} color={color} />
-          : <XCircle    size={16} color={color} />
+          : <XCircle size={16} color={color} />
         }
         <span style={{ fontWeight: 700, fontSize: '13px', color }}>
           {toast.title}
@@ -82,15 +82,17 @@ function Toast({ toast, onRemove }) {
             target="_blank" rel="noreferrer"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '3px',
-              fontSize: '11px', fontWeight: 600, color: '#a78bfa',
+              fontSize: '11px', fontWeight: 600,
               textDecoration: 'none',
-              border: '1px solid rgba(139,92,246,0.3)',
-              borderRadius: '5px', padding: '2px 8px',
-              background: 'rgba(139,92,246,0.08)',
-              transition: 'background 0.2s',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '8px',
+              background: 'rgba(239, 68, 68, 0.08)',
+              color: '#fca5a5',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
             }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,92,246,0.18)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(139,92,246,0.08)'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'}
           >
             <ExternalLink size={10} /> Explorer
           </a>
@@ -146,11 +148,11 @@ export function ToastProvider({ children }) {
 
   const success = useCallback((title, description, txHash) =>
     add({ type: 'success', title, description, txHash }),
-  [add])
+    [add])
 
   const error = useCallback((title, description) =>
     add({ type: 'error', title, description }, 8000),
-  [add])
+    [add])
 
   return (
     <ToastContext.Provider value={{ success, error, remove }}>

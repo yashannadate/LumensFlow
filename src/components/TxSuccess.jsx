@@ -111,16 +111,16 @@ export default function TxSuccess({ title, description, txHash, onDismiss }) {
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '4px',
             fontSize: '12px', fontWeight: 600,
-            color: '#a78bfa',
+            color: '#f87171',
             textDecoration: 'none',
             padding: '3px 10px',
-            border: '1px solid rgba(139,92,246,0.3)',
-            borderRadius: '6px',
-            background: 'rgba(139,92,246,0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '10px',
+            background: 'rgba(239, 68, 68, 0.08)',
             transition: 'all 0.2s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.18)'; e.currentTarget.style.color = '#c4b5fd' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.08)'; e.currentTarget.style.color = '#a78bfa' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)'; e.currentTarget.style.color = '#fca5a5' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.color = '#f87171' }}
         >
           <ExternalLink size={11} /> View on Explorer
         </a>

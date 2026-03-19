@@ -10,23 +10,32 @@ export function calculateFlowRate(depositStroops, durationSeconds) {
 }
 
 export function calculateWithdrawable(stream, nowSeconds) {
-  // Mirror contract _withdrawable() — uses high-precision formula
-  const status = stream.status ?? (stream.is_active ? 'Active' : 'Cancelled')
-  if (status !== 'Active') return 0n
+  // Mirror contract _withdrawable() with fix for Completed streams
+  // Contract returns 0 when is_active=false BUT funds still claimable
+  // So we calculate locally for both Active and Completed
 
-  const start    = Number(stream.start_time)
-  const end      = Number(stream.end_time)
-  const deposit  = BigInt(stream.deposit_amount)
+  const status = getStreamStatus(stream, nowSeconds)
+
+  // Cancelled = nothing to withdraw (contract already settled)
+  if (status === 'Cancelled') return 0n
+
+  const start = BigInt(stream.start_time)
+  const end = BigInt(stream.end_time)
+  const deposit = BigInt(stream.deposit_amount)
   const withdrawn = BigInt(stream.withdrawn_amount)
 
-  const duration = BigInt(end - start)
+  const duration = end - start
   if (duration <= 0n) return 0n
 
-  const clampedNow = Math.min(nowSeconds, end)
-  const elapsed    = BigInt(Math.max(0, clampedNow - start))
+  // For Completed: use full duration (end - start)
+  // For Active: use clamped current time
+  const nowBig = BigInt(Math.floor(nowSeconds))
+  const clampedNow = nowBig > end ? end : nowBig
+  const elapsed = clampedNow > start ? clampedNow - start : 0n
+
   if (elapsed === 0n) return 0n
 
-  // Precise: deposit * elapsed / duration  (mirrors contract exactly)
+  // Precise: deposit * elapsed / duration (mirrors contract exactly)
   let streamed = (deposit * elapsed) / duration
   if (streamed > deposit) streamed = deposit
 
@@ -35,23 +44,42 @@ export function calculateWithdrawable(stream, nowSeconds) {
 }
 
 export function calculateProgress(stream, nowSeconds) {
+  const status = getStreamStatus(stream, nowSeconds)
+
+  // Completed always 100%
+  if (status === 'Completed') return 100
+
+  // Cancelled — show how far it got
+  if (status === 'Cancelled') {
+    const total = Number(stream.end_time) - Number(stream.start_time)
+    if (total <= 0) return 0
+    const withdrawn = Number(stream.withdrawn_amount)
+    const deposit = Number(stream.deposit_amount)
+    if (deposit <= 0) return 0
+    return Math.min(100, Math.max(0, (withdrawn / deposit) * 100))
+  }
+
+  // Active — time-based progress
   const total = Number(stream.end_time) - Number(stream.start_time)
   const elapsed = Math.min(nowSeconds, Number(stream.end_time))
-                  - Number(stream.start_time)
+    - Number(stream.start_time)
   if (total <= 0) return 100
   return Math.min(100, Math.max(0, (elapsed / total) * 100))
 }
 
 export function getStreamStatus(stream, nowSeconds) {
-  // Prefer the explicit status field from contract enum
+  // Prefer explicit status field from contract enum
   const s = stream.status
   if (s === 'Cancelled') return 'Cancelled'
   if (s === 'Completed') return 'Completed'
-  if (s === 'Paused')    return 'Paused'
-  // If status is 'Active' (or not present), check if time has elapsed
+  if (s === 'Paused') return 'Paused'
+
+  // If Active or missing — check if time elapsed
   if (nowSeconds >= Number(stream.end_time)) return 'Completed'
-  // Backward compat: if only is_active bool is present
+
+  // Backward compat: only is_active bool present
   if (stream.is_active === false && !s) return 'Cancelled'
+
   return 'Active'
 }
 
@@ -68,15 +96,11 @@ export function formatDuration(seconds) {
   if (hours) parts.push(`${hours} hr${hours > 1 ? 's' : ''}`)
   if (minutes) parts.push(`${minutes} min`)
 
-  if (!parts.length) {
-    return `${s}s`
-  }
-
+  if (!parts.length) return `${s}s`
   return parts.join(' ')
 }
 
 export function formatStroops(stroops) {
-  // Convert stroops to XLM: stroops / 10_000_000
   return (Number(stroops) / STROOPS_PER_XLM).toFixed(7)
 }
 
