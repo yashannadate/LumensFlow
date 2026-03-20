@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import StreamCard from '../components/StreamCard.jsx'
+import ActiveUsers from '../components/ActiveUsers.jsx'
+import ActivityFeed from '../components/ActivityFeed.jsx'
 import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
-import { Plus, RefreshCw, Activity, Zap, Droplets, Send, Globe } from 'lucide-react'
+import { useActivityFeed } from '../hooks/useActivityFeed.jsx'
+import { Plus, RefreshCw, Activity, Zap, Droplets, Send, Globe, Rocket, Wallet } from 'lucide-react'
 
 export default function Dashboard() {
   const { isConnected, address } = useWallet()
   const { fetchUserStreams } = useStream()
+  const { activities, loading: feedLoading, refresh: refreshFeed } = useActivityFeed()
   const [streams, setStreams] = useState([])
   const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([])
 
   const load = async () => {
     if (!isConnected) { setLoading(false); return }
@@ -22,9 +27,20 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
+    refreshFeed()
   }
 
   useEffect(() => { load() }, [isConnected])
+
+  useEffect(() => {
+    if (streams && streams.length > 0) {
+      const s = new Set()
+      streams.forEach(st => { if (st.sender) s.add(st.sender); if (st.receiver) s.add(st.receiver) })
+      setUsers(Array.from(s))
+    } else {
+      setUsers([])
+    }
+  }, [streams])
 
   const now = Math.floor(Date.now() / 1000)
   const incoming = streams.filter(s => s.receiver === address)
@@ -32,119 +48,126 @@ export default function Dashboard() {
   const totalXlm = streams.reduce((acc, s) => acc + Number(s.deposit_amount) / 1e7, 0)
   const activeCount = streams.filter(s => s.status === 'Active' && now < Number(s.end_time)).length
 
-  const StatCard = ({ icon, label, value, color }) => (
-    <div className="stat-card">
-      <div style={{ padding: '10px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.15)', flexShrink: 0 }}>{icon}</div>
-      <div>
-        <div style={{ fontSize: '22px', fontWeight: 700, fontFamily: 'var(--font-body)', color: color || 'white' }}>
-          {loading ? '—' : value}
-        </div>
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>{label}</div>
-      </div>
+  /* ── Sub-components ────────────────────────────────────────── */
+  const StatCard = ({ icon, label, value, badge, accent = 'var(--primary)' }) => (
+    <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative' }}>
+       <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg,transparent,rgba(139,92,246,0.30),transparent)', pointerEvents: 'none' }} />
+       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {icon}
+          </div>
+          {badge}
+       </div>
+       <div>
+          <div style={{ fontSize: '26px', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em', marginBottom: '2px' }}>
+            {loading ? '—' : value}
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
+       </div>
     </div>
   )
 
-  const EmptySlot = ({ label, sub, cta }) => (
-    <div className="card center" style={{ padding: '60px 40px', minHeight: '200px', opacity: .7 }}>
-      <Activity size={32} style={{ color: 'var(--text-dim)', marginBottom: '14px' }} />
-      <p style={{ fontWeight: 600, fontSize: '15px', marginBottom: '6px' }}>{label}</p>
-      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>{sub}</p>
-      {cta}
+  const SectionHeader = ({ icon, title, count }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.12em', color: 'var(--primary)', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '8px', padding: '3px 10px', textTransform: 'uppercase' }}>
+        {count}
+      </div>
+      <h3 style={{ fontSize: '14px', fontFamily: 'var(--font-brand)', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{title}</h3>
+      <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, #1f2937, transparent)' }} />
     </div>
   )
 
   return (
-    <div style={{ padding: '88px 28px 80px', maxWidth: '1160px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '36px' }}>
+    <div style={{ padding: '40px 32px 80px', maxWidth: '1240px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '48px', position: 'relative', zIndex: 1 }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      {/* ── Page header ───────────────────────────────────── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
         <div>
-          <h2 style={{ marginBottom: '4px' }}>Dashboard</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-muted)' }}>
-            <Globe size={13} /> Stellar Testnet
-          </div>
+          <h1 style={{ fontSize: '38px', letterSpacing: '-0.04em' }}>Dashboard</h1>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={load} disabled={loading} className="btn-ghost" style={{ borderRadius: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={load} disabled={loading} className="btn-ghost" style={{ padding: '12px 24px', fontSize: '13px', borderRadius: '9999px' }}>
             <RefreshCw size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} /> Refresh
           </button>
           <Link to="/create" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ borderRadius: '12px' }}><Plus size={16} /> New Stream</button>
+            <button className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '9999px' }}>
+              <Plus size={16} /> Create Stream
+            </button>
           </Link>
         </div>
       </div>
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '14px' }} className="stats-3-grid">
-        <StatCard icon={<Activity size={20} color="var(--accent-red)" />} label="Total Streams" value={streams.length} color="var(--accent-red-dim)" />
-        <StatCard icon={<Zap size={20} color="var(--green)" />} label="Active Streams" value={activeCount} color="var(--green)" />
-        <StatCard icon={<Droplets size={20} color="var(--accent-red-dim)" />} label="Total XLM" value={`${totalXlm.toFixed(2)} XLM`} color="white" />
+      {/* ── Stat row ──────────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px' }} className="stats-3-grid">
+        <StatCard 
+          icon={<Activity size={16} color="var(--primary)" />}  
+          label="Total Streams" 
+          value={streams.length}
+          badge={<div style={{ fontSize: '10px', color: '#22c55e', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>+12.4%</div>}
+        />
+        <StatCard 
+          icon={<Zap size={16} color="#86EE1E" />} 
+          label="Active Payment Streams" 
+          value={activeCount}
+          badge={<div style={{ fontSize: '10px', color: '#86EE1E', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>LIVE</div>}
+        />
+        <StatCard 
+          icon={<Droplets size={16} color="#a78bfa" />}  
+          label="Estimated Flow Value"     
+          value={`${totalXlm.toFixed(2)}`}
+          badge={<div style={{ fontSize: '10px', color: '#a78bfa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>XLM</div>}
+        />
       </div>
 
-      {/* Streams grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }} className="dashboard-grid">
+      {/* ── Main content sections ─────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '40px' }} className="dashboard-two-col">
 
-        {/* Incoming */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Droplets size={18} color="var(--accent-red)" />
-            </div>
-            <h3 style={{ fontSize: '16px' }}>Incoming</h3>
-            <div style={{ marginLeft: 'auto', fontSize: '12px', padding: '3px 10px', borderRadius: '50px', background: 'rgba(239, 68, 68, 0.08)', color: 'var(--accent-red)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-              {incoming.length}
-            </div>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+          {/* Incoming */}
+          <section>
+            <SectionHeader title="Incoming Streams" count={incoming.length} />
+            {loading ? (
+              <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
+            ) : incoming.length === 0 ? (
+              <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No incoming streams detected</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {incoming.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
+              </div>
+            )}
+          </section>
 
-          {loading ? (
-            <div className="card center" style={{ padding: '60px' }}>
-              <RefreshCw size={28} className="animate-spin" style={{ color: 'var(--accent-red)', marginBottom: '12px' }} />
-              <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Syncing…</span>
-            </div>
-          ) : incoming.length === 0 ? (
-            <EmptySlot label="No incoming streams" sub="Your receiver streams appear here" />
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {incoming.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
-            </div>
-          )}
+          {/* Outgoing */}
+          <section>
+            <SectionHeader title="Outgoing Streams" count={outgoing.length} />
+            {loading ? (
+              <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
+            ) : outgoing.length === 0 ? (
+              <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No outgoing streams found</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {outgoing.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
+              </div>
+            )}
+          </section>
         </div>
 
-        {/* Outgoing */}
+        {/* Sidebar panels */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Send size={18} color="var(--accent-red)" />
-            </div>
-            <h3 style={{ fontSize: '16px' }}>Outgoing</h3>
-            <div style={{ marginLeft: 'auto', fontSize: '12px', padding: '3px 10px', borderRadius: '50px', background: 'rgba(239, 68, 68, 0.08)', color: 'var(--accent-red)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-              {outgoing.length}
-            </div>
-          </div>
+           <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Quick Actions</div>
+              <Link to="/create" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '9999px', fontSize: '14px', fontWeight: 700, fontFamily: 'var(--font-brand)' }}>
+                   ＋ Create Stream
+                </button>
+              </Link>
+           </div>
 
-          {loading ? (
-            <div className="card center" style={{ padding: '60px' }}>
-              <RefreshCw size={28} className="animate-spin" style={{ color: 'var(--accent-red)', marginBottom: '12px' }} />
-              <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Syncing…</span>
-            </div>
-          ) : outgoing.length === 0 ? (
-            <EmptySlot
-              label="No outgoing streams"
-              sub="Start streaming XLM to anyone"
-              cta={
-                <Link to="/create" style={{ textDecoration: 'none' }}>
-                  <button className="btn-primary" style={{ borderRadius: '10px', padding: '9px 20px', fontSize: '13px' }}>
-                    <Plus size={14} /> Create Stream
-                  </button>
-                </Link>
-              }
-            />
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {outgoing.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
-            </div>
-          )}
+           <ActivityFeed activities={activities} loading={feedLoading} />
+           
+           <ActiveUsers streams={streams} />
         </div>
+
       </div>
     </div>
   )

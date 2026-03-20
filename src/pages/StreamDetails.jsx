@@ -9,7 +9,7 @@ import { getStreamStatus, calculateProgress } from '../utils/time.js'
 import {
   ArrowLeft, Download, XCircle, Clock,
   Copy, Check, ExternalLink,
-  ArrowUpRight, ArrowDownLeft, RefreshCw,
+  ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, ShieldCheck, Info
 } from 'lucide-react'
 
 const ANON = 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN'
@@ -18,11 +18,18 @@ function SkeletonBox({ h = '50px', w = '100%' }) {
   return (
     <div style={{
       height: h, width: w,
-      background: 'linear-gradient(90deg, #1f2937 25%, #2d3748 50%, #1f2937 75%)',
-      backgroundSize: '200% 100%',
-      animation: 'shimmer 1.5s infinite',
-      borderRadius: '8px',
-    }} />
+      background: 'rgba(31, 41, 55, 0.4)',
+      borderRadius: '16px',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+       <div style={{
+         position: 'absolute', inset: 0,
+         background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)',
+         animation: 'shimmer 2s infinite',
+         backgroundSize: '200% 100%'
+       }} />
+    </div>
   )
 }
 
@@ -38,9 +45,6 @@ export default function StreamDetails() {
   const [error, setError] = useState(null)
   const [copied, setCopied] = useState(null)
   const [now, setNow] = useState(Math.floor(Date.now() / 1000))
-  const [txError, setTxError] = useState(null)
-  const [txHash, setTxHash] = useState(null)
-  const [txType, setTxType] = useState(null)
   const [working, setWorking] = useState(false)
 
   // 1-second clock
@@ -60,7 +64,8 @@ export default function StreamDetails() {
         setStream(data)
         setError(null)
       } catch (e) {
-        setError('Failed to load stream: ' + e.message)
+        setLoading(false)
+        // setError('Failed to load stream: ' + e.message)
       } finally {
         setLoading(false)
       }
@@ -76,333 +81,227 @@ export default function StreamDetails() {
     setTimeout(() => setCopied(null), 2000)
   }
 
-  // ── Fixed: allow withdraw on Completed streams too ──────────────
   const handleWithdraw = async () => {
-    if (stream?.status === 'Cancelled') {
-      toast.error('Withdrawal Failed', 'Stream was cancelled')
-      return
-    }
-    setWorking(true); setTxError(null); setTxHash(null); setTxType('withdraw')
+    setWorking(true)
     try {
-      console.log('Stream BEFORE action:', stream)
       const result = await withdraw(streamId)
       const updatedStream = await getStream(streamId, address)
       if (updatedStream) setStream(updatedStream)
-      console.log('Stream AFTER action:', updatedStream, 'txHash:', result?.txHash)
-
-      const hash = result?.txHash || null
-      setTxHash(hash)
-      toast.success('Withdrawal Successful', 'Your money has been successfully withdrawn.', hash)
+      toast.success('Withdrawal Successful', 'Your funds have been transferred to your wallet.', result?.txHash)
     } catch (e) {
-      const msg = getErrorMessage(e)
-      setTxError(msg)
-      toast.error('Withdrawal Failed', msg)
+      toast.error('Withdrawal Failed', getErrorMessage(e))
     } finally {
       setWorking(false)
     }
   }
 
   const handleCancel = async () => {
-    if (stream?.status !== 'Active') {
-      toast.error('Cancel Failed', 'Stream is no longer active')
-      return
-    }
-    setWorking(true); setTxError(null); setTxHash(null); setTxType('cancel')
+    setWorking(true)
     try {
-      console.log('Stream BEFORE action:', stream)
       const result = await cancel(streamId)
       const updatedStream = await getStream(streamId, address)
       if (updatedStream) setStream(updatedStream)
-      console.log('Stream AFTER action:', updatedStream, 'txHash:', result?.txHash)
-
-      const hash = result?.txHash || null
-      setTxHash(hash)
-      toast.success('Stream Cancelled', 'Your money stream has been successfully cancelled.', hash)
+      toast.success('Stream Cancelled', 'Remaining funds have been returned to sender.')
     } catch (e) {
-      const msg = getErrorMessage(e)
-      setTxError(msg)
-      toast.error('Cancel Failed', msg)
+      toast.error('Cancel Failed', getErrorMessage(e))
     } finally {
       setWorking(false)
     }
   }
 
-  // Loading skeleton
   if (loading && !stream) return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', padding: '100px 24px 80px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px', color: 'var(--text-muted)', fontSize: '14px' }}>
-        <RefreshCw size={14} className="animate-spin" /> Loading stream data...
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 32px 80px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', color: '#6b7280', fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+        <RefreshCw size={14} className="animate-spin" /> Synchronizing with Stellar Ledger...
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <SkeletonBox h="80px" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          <SkeletonBox h="90px" /> <SkeletonBox h="90px" />
-          <SkeletonBox h="90px" /> <SkeletonBox h="90px" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <SkeletonBox h="120px" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <SkeletonBox h="100px" /> <SkeletonBox h="100px" /> <SkeletonBox h="100px" />
         </div>
-        <SkeletonBox h="160px" />
+        <SkeletonBox h="240px" />
       </div>
-      <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
     </div>
   )
 
-  // Error state
   if (error && !stream) return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', padding: '100px 24px 80px' }}>
-      <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px', marginBottom: '40px' }}>
-        <ArrowLeft size={14} /> Back to Dashboard
-      </Link>
-      <div style={{ textAlign: 'center', padding: '60px 40px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '16px' }}>
-        <XCircle size={40} style={{ color: 'var(--red)', marginBottom: '16px' }} />
-        <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>{error}</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '24px' }}>The stream may not exist or the network may be unavailable.</p>
-        <Link to="/dashboard"><button className="btn-primary" style={{ margin: '0 auto' }}><ArrowLeft size={14} /> Back to Dashboard</button></Link>
-      </div>
+    <div style={{ maxWidth: '680px', margin: '100px auto', textAlign: 'center' }}>
+      <XCircle size={48} color="#ef4444" style={{ marginBottom: '24px' }} />
+      <h2 style={{ marginBottom: '12px' }}>Stream Not Found</h2>
+      <p style={{ color: '#9ca3af', marginBottom: '32px' }}>{error}</p>
+      <Link to="/dashboard"><button className="btn-primary">Back to Dashboard</button></Link>
     </div>
   )
 
   if (!stream) return null
 
-  // ── Roles ────────────────────────────────────────────────────────
   const isReceiver = address === stream.receiver
   const isSender = address === stream.sender
-  const isGuest = address && !isReceiver && !isSender
-  const isAnon = !address
-
-  // ── Core math ────────────────────────────────────────────────────
-  const start = Number(stream.start_time)
-  const end = Number(stream.end_time)
-  const dur = end - start
-
-  // Compute real status — override Active→Completed when time passed
-  const status = (stream.status === 'Active' && now >= end)
-    ? 'Completed'
-    : stream.status
-
-  const isActive = status === 'Active'
-  const isCompleted = status === 'Completed'
-  const isCancelled = status === 'Cancelled'
-
+  const status = (stream.status === 'Active' && now >= Number(stream.end_time)) ? 'Completed' : stream.status
+  
   const total = Number(stream.deposit_amount) / 1e7
   const withdrawn = Number(stream.withdrawn_amount) / 1e7
-  const flowRate = dur > 0 ? total / dur : 0
+  const start = Number(stream.start_time)
+  const end = Number(stream.end_time)
+  const duration = end - start
+  const flowRate = duration > 0 ? total / duration : 0
 
-  // ── Fixed withdrawable calculation ───────────────────────────────
-  // Contract returns 0 when is_active=false even if funds remain
-  // We calculate locally so receiver sees correct withdrawable amount
   let withdrawable = 0
-
-  if (isActive) {
-    // Live stream — use contract value or calculate locally
-    withdrawable = Number(stream.contract_withdrawable || 0n) / 1e7
-    // Fallback: calculate locally if contract value missing
-    if (withdrawable === 0) {
-      const elapsed = Math.min(now, end) - start
-      if (elapsed > 0) {
-        let streamedRaw = flowRate * elapsed
-        if (streamedRaw > total) streamedRaw = total
-        withdrawable = Math.max(0, streamedRaw - withdrawn)
-      }
-    }
-  } else if (isCompleted) {
-    // Stream ended — calculate full withdrawable locally
-    // Contract returns 0 for inactive streams but funds still claimable
-    const elapsed = end - start // full duration elapsed
-    let streamedRaw = flowRate * elapsed
-    if (streamedRaw > total) streamedRaw = total
-    withdrawable = Math.max(0, streamedRaw - withdrawn)
-  } else if (isCancelled) {
-    // Cancelled — nothing to withdraw (already settled by contract)
-    withdrawable = 0
+  if (status === 'Active') {
+    const elapsed = Math.min(now, end) - start
+    withdrawable = Math.max(0, (flowRate * elapsed) - withdrawn)
+  } else if (status === 'Completed') {
+    withdrawable = Math.max(0, total - withdrawn)
   }
 
-  // ── Derived values ───────────────────────────────────────────────
-  const streamed = withdrawn + withdrawable
-  const remaining = Math.max(0, total - streamed)
-
-  // Completed streams always show 100% progress
-  const progress = isCompleted
-    ? 100
-    : total > 0
-      ? Math.min(100, Math.max(0, (streamed / total) * 100))
-      : 0
-
-  const timeLeft = end - now
-  const tlDays = Math.floor(timeLeft / 86400)
-  const tlHours = Math.floor((timeLeft % 86400) / 3600)
-  const tlMins = Math.floor((timeLeft % 3600) / 60)
-  const timeLeftStr = timeLeft > 0
-    ? `${tlDays > 0 ? tlDays + 'd ' : ''}${tlHours}h ${tlMins}m remaining`
-    : 'Stream ended'
-
-  const endDate = new Date(end * 1000).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric'
-  }) + ' at ' + new Date(end * 1000).toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit'
-  })
-
-  const statCard = (label, value, sub, color) => (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</div>
-      <div style={{ fontSize: '20px', fontWeight: 700, color: color || 'white' }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{sub}</div>}
-    </div>
-  )
-
-  const badgeClass = `badge-${status.toLowerCase()}`
-
-  // ── Can receiver withdraw? ───────────────────────────────────────
-  // Allow on Active AND Completed — not on Cancelled
-  const canWithdraw = isReceiver && !isCancelled && withdrawable >= 0.0000001
-
-  // ── Can sender cancel? ───────────────────────────────────────────
-  // Only on Active streams
-  const canCancel = isSender && isActive
+  const progress = total > 0 ? Math.min(100, ((withdrawn + withdrawable) / total) * 100) : 0
+  const canWithdraw = isReceiver && status !== 'Cancelled' && withdrawable > 0.000001
+  const canCancel = isSender && status === 'Active'
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', padding: '100px 24px 80px' }}>
-      <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
-
-      <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px', marginBottom: '24px', fontWeight: 500 }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 32px 100px', position: 'relative', zIndex: 1 }}>
+      
+      <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#6b7280', textDecoration: 'none', fontSize: '13px', fontWeight: 600, marginBottom: '32px', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         <ArrowLeft size={14} /> Back to Dashboard
       </Link>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '32px', alignItems: 'start' }}>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          {/* Main Display Card */}
+          <div className="card" style={{ padding: '40px 32px', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.10) 0%, transparent 75%)' }}>
+             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '9999px', padding: '4px 14px', marginBottom: '24px' }}>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: status === 'Active' ? '#22c55e' : '#6b7280' }} />
+                <span style={{ fontSize: '10px', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.08em' }}>Stream #{streamId} · {status}</span>
+             </div>
 
-        {/* Header Card */}
-        <div className="card" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px' }}>Stream #{streamId}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className={badgeClass}>{status}</span>
-                <a href="https://stellar.expert/explorer/testnet" target="_blank" rel="noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)', fontSize: '12px', textDecoration: 'none' }}>
-                  <ExternalLink size={12} /> Testnet
-                </a>
+             <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Withdrawable Now</div>
+             <div style={{ fontFamily: 'var(--font-brand)', fontSize: '48px', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '8px' }}>
+                {withdrawable.toFixed(7)} <span style={{ fontSize: '20px', opacity: 0.5, fontWeight: 400 }}>XLM</span>
+             </div>
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#22c55e', fontSize: '13px', fontWeight: 600, marginBottom: '32px' }}>
+                <Zap size={14} /> +{flowRate.toFixed(6)} XLM/s Flow
+             </div>
+
+             <div style={{ marginBottom: '24px' }}>
+                <div style={{ width: '100%', height: '6px', background: '#131920', borderRadius: '9999px', overflow: 'hidden', marginBottom: '10px' }}>
+                   <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #22c55e)', transition: 'width 1s linear' }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>
+                   <span>{progress.toFixed(2)}% Streamed</span>
+                   <span>Target: {total.toFixed(2)} XLM</span>
+                </div>
+             </div>
+
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '24px', borderTop: '1px solid #1f2937' }}>
+                <div style={{ textAlign: 'left' }}>
+                   <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '4px' }}>Started</div>
+                   <div style={{ fontSize: '13px', color: '#fff', fontWeight: 500 }}>{new Date(start * 1000).toLocaleDateString()}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                   <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '4px' }}>Ends</div>
+                   <div style={{ fontSize: '13px', color: '#fff', fontWeight: 500 }}>{new Date(end * 1000).toLocaleDateString()}</div>
+                </div>
+             </div>
+          </div>
+
+          {/* Parties Card */}
+          <div className="card" style={{ padding: '24px' }}>
+             <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280', marginBottom: '20px', fontFamily: 'var(--font-mono)' }}>Stream Counterparties</h3>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ArrowUpRight size={18} color="#8b5cf6" />
+                   </div>
+                   <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Sender</div>
+                      <div style={{ fontSize: '14px', color: '#fff', fontFamily: 'var(--font-mono)' }}>{truncateAddress(stream.sender)}</div>
+                   </div>
+                   <button onClick={() => copy(stream.sender, 's')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
+                      {copied === 's' ? <Check size={16} color="#22c55e" /> : <Copy size={16} />}
+                   </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ArrowDownLeft size={18} color="#22c55e" />
+                   </div>
+                   <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Recipient</div>
+                      <div style={{ fontSize: '14px', color: '#fff', fontFamily: 'var(--font-mono)' }}>{truncateAddress(stream.receiver)}</div>
+                   </div>
+                   <button onClick={() => copy(stream.receiver, 'r')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
+                      {copied === 'r' ? <Check size={16} color="#22c55e" /> : <Copy size={16} />}
+                   </button>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        {/* Sidebar Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+           
+           {/* Summary Stats */}
+           <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1f2937', paddingBottom: '12px' }}>
+                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Deposited</span>
+                 <span style={{ fontSize: '14px', color: '#fff', fontWeight: 600 }}>{total.toFixed(2)} XLM</span>
               </div>
-            </div>
-          </div>
-
-          {/* Sender / Receiver */}
-          {[
-            { label: 'From', icon: <ArrowUpRight size={12} />, addr: stream.sender, key: 's' },
-            { label: 'To', icon: <ArrowDownLeft size={12} />, addr: stream.receiver, key: 'r' },
-          ].map(row => (
-            <div key={row.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '3px' }}>{row.icon} {row.label}</span>
-                <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{truncateAddress(row.addr)}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1f2937', paddingBottom: '12px' }}>
+                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Withdrawn</span>
+                 <span style={{ fontSize: '14px', color: '#fff', fontWeight: 600 }}>{withdrawn.toFixed(4)} XLM</span>
               </div>
-              <button onClick={() => copy(row.addr, row.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', display: 'flex' }}>
-                {copied === row.key ? <Check size={14} color="var(--green)" /> : <Copy size={14} />}
-              </button>
-            </div>
-          ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Remaining</span>
+                 <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: 700 }}>{(total - (withdrawn + withdrawable)).toFixed(4)} XLM</span>
+              </div>
+           </div>
+
+           {/* Dynamic Actions */}
+           {(canWithdraw || canCancel) && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                 {canWithdraw && (
+                    <button 
+                      disabled={working}
+                      onClick={handleWithdraw}
+                      className="btn-primary" 
+                      style={{ width: '100%', padding: '16px', borderRadius: '9999px', fontSize: '15px' }}
+                    >
+                       <Download size={18} /> {working ? 'Processing...' : `Withdraw ${withdrawable.toFixed(4)} XLM`}
+                    </button>
+                 )}
+                 {canCancel && (
+                    <button 
+                      disabled={working}
+                      onClick={handleCancel}
+                      style={{ 
+                        width: '100%', padding: '16px', borderRadius: '9999px', fontSize: '14px', fontWeight: 600,
+                        background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444',
+                        cursor: 'pointer'
+                      }}
+                    >
+                       <XCircle size={18} /> {working ? 'Processing...' : 'Cancel Stream'}
+                    </button>
+                 )}
+              </div>
+           )}
+
+           {/* Identity Context */}
+           <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed #1f2937' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                 <Info size={16} color="#6b7280" style={{ marginTop: '2px' }} />
+                 <p style={{ fontSize: '12px', color: '#6b7280', lineHeight: 1.6 }}>
+                    {isReceiver ? 'You are the recipient of this stream. You can withdraw accrued funds in real-time.' : 
+                     isSender ? 'You are the creator of this stream. You can cancel it to refund the remaining balance.' : 
+                     'You are viewing this stream as a public observer on the Stellar network.'}
+                 </p>
+              </div>
+           </div>
+
+           <a href={`https://stellar.expert/explorer/testnet/`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ justifyContent: 'center', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              View on Explorer <ExternalLink size={14} />
+           </a>
         </div>
-
-        {/* Guest / Anon notice */}
-        {(isGuest || isAnon) && (
-          <div style={{ padding: '12px 16px', background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '10px', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>
-            {isAnon ? '🔒 Connect your wallet to interact with this stream.' : '👁 You are viewing this stream as a guest.'}
-          </div>
-        )}
-
-        {/* Stats 2×3 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          {statCard('Total Amount', `${total.toFixed(7)} XLM`, null, null)}
-          {statCard('Flow Rate', `${flowRate.toFixed(6)} XLM/sec`, `${(flowRate * 3600).toFixed(4)} XLM/hr`, 'var(--red-light)')}
-          {statCard('Streamed', `${streamed.toFixed(4)} XLM`, isActive ? 'live ↑' : isCompleted ? '100% complete' : null, isActive ? 'var(--red)' : isCompleted ? 'var(--green)' : null)}
-          {statCard('Withdrawn', `${withdrawn.toFixed(4)} XLM`, null, null)}
-          {statCard('Remaining', `${remaining.toFixed(4)} XLM`, 'Left in stream', 'var(--green)')}
-          {statCard('Progress', `${progress.toFixed(1)}%`, isCompleted ? 'Stream complete' : null, isCompleted ? 'var(--green)' : null)}
-        </div>
-
-        {/* Withdrawable Card */}
-        <div className="card" style={{ textAlign: 'center', padding: '32px 24px', background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.06) 0%, transparent 70%)' }}>
-          <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase' }}>
-            Withdrawable Now
-          </div>
-          <div
-            className={isActive ? 'live-amount' : ''}
-            style={{
-              fontSize: '36px',
-              fontWeight: 700,
-              marginBottom: '20px',
-              color: isCancelled ? 'var(--text-muted)' : isCompleted ? 'var(--green)' : 'var(--red)',
-            }}
-          >
-            {withdrawable.toFixed(7)} <span style={{ fontSize: '16px', opacity: 0.6, fontWeight: 400 }}>XLM</span>
-          </div>
-
-          <div style={{ marginBottom: '12px' }}>
-            <div className="progress-bar">
-              <div
-                className={`progress-fill${isActive ? ' progress-animated' : ''}`}
-                style={{
-                  width: `${progress}%`,
-                  background: isCompleted ? 'var(--green)' : isCancelled ? 'var(--red)' : 'var(--red)',
-                }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
-              <span>{progress.toFixed(1)}% streamed</span>
-              <span>Target: {total.toFixed(2)} XLM</span>
-            </div>
-          </div>
-
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'center', gap: '16px' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Clock size={12} /> {timeLeftStr}
-            </span>
-            <span>Ends: {endDate}</span>
-          </div>
-        </div>
-
-
-
-        {/* TX Error */}
-        {txError && (
-          <div style={{ padding: '12px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', color: 'var(--red)', fontSize: '13px' }}>
-            {txError}
-          </div>
-        )}
-
-        {/* ── Fixed Action Buttons ─────────────────────────────────── */}
-        {/* Show for receiver on Active + Completed */}
-        {/* Show for sender only on Active */}
-        {(canWithdraw || canCancel) && (
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {canWithdraw && (
-              <button
-                onClick={handleWithdraw}
-                disabled={working}
-                className="btn-primary"
-                style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
-              >
-                <Download size={16} />
-                {working ? 'Processing…' : `Withdraw ${withdrawable.toFixed(4)} XLM`}
-              </button>
-            )}
-            {canCancel && (
-              <button
-                onClick={handleCancel}
-                disabled={working}
-                className="btn-danger"
-                style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
-              >
-                <XCircle size={16} />
-                {working ? 'Processing…' : 'Cancel Stream'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Completed with nothing left to withdraw */}
-        {isCompleted && isReceiver && withdrawable < 0.0000001 && (
-          <div style={{ padding: '12px 16px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '10px', color: 'var(--green)', fontSize: '13px', textAlign: 'center' }}>
-            ✅ All funds have been withdrawn. Stream complete.
-          </div>
-        )}
 
       </div>
     </div>

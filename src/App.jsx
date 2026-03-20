@@ -2,6 +2,8 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { WalletProvider, useWallet } from './hooks/useWallet.jsx'
 import { ToastProvider } from './components/Toast.jsx'
 import Navbar from './components/Navbar.jsx'
+import Sidebar from './components/Sidebar.jsx'
+import AppHeader from './components/AppHeader.jsx'
 import Footer from './components/Footer.jsx'
 
 import Landing from './pages/Landing.jsx'
@@ -10,55 +12,53 @@ import CreateStream from './pages/CreateStream.jsx'
 import StreamDetails from './pages/StreamDetails.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
 
+// Routes that use the sidebar shell layout
+const APP_ROUTES = ['/dashboard', '/create', '/stream']
+
 function ProtectedRoute({ children }) {
   const { isConnected } = useWallet()
   const location = useLocation()
-
-  if (!isConnected) {
-    return <Navigate to="/" replace state={{ from: location }} />
-  }
+  if (!isConnected) return <Navigate to="/" replace state={{ from: location }} />
   return children
 }
 
 function AppRoutes() {
-  return (
-    <>
+  const location = useLocation()
+  const isAppRoute = APP_ROUTES.some(r => location.pathname.startsWith(r))
 
-      <div className="app-shell">
-        <Navbar />
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <ProtectedRoute>
-                  <CreateStream />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/stream/:id"
-              element={
-                <ProtectedRoute>
-                  <StreamDetails />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
-        <Footer />
+  if (isAppRoute) {
+    // Authenticated sidebar+header shell
+    return (
+      <div className="app-authenticated">
+        <Sidebar />
+        <div className="app-content">
+          <AppHeader />
+          <main className="app-main">
+            <Routes>
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/create"    element={<ProtectedRoute><CreateStream /></ProtectedRoute>} />
+              <Route path="/stream/:id" element={<ProtectedRoute><StreamDetails /></ProtectedRoute>} />
+            </Routes>
+          </main>
+        </div>
       </div>
-    </>
+    )
+  }
+
+  // Public pages with floating navbar
+  return (
+    <div className="app-shell">
+      <Navbar />
+      <main className="app-main" style={{ paddingTop: '88px' }}>
+        <Routes>
+          <Route path="/"             element={<Landing />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          {/* Catch-all: redirect to dashboard or home */}
+          <Route path="*"             element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   )
 }
 

@@ -1,163 +1,219 @@
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
-import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock } from 'lucide-react'
+import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+// ── Particle component ──────────────────────────────────────────────────────
+const PARTICLES = Array.from({ length: 10 }, (_, i) => ({
+  id: i,
+  left: `${8 + i * 9}%`,
+  size: `${4 + (i % 5)}px`,
+  delay: `${(i * 0.7).toFixed(1)}s`,
+  dur: `${6 + (i % 5)}s`,
+  opacity: 0.4 + (i % 3) * 0.15,
+}))
+
+// ── Wave SVG paths ──────────────────────────────────────────────────────────
+function WaveLayer({ color, opacity, duration, direction = 1, yOffset = 0 }) {
+  return (
+    <svg
+      preserveAspectRatio="none"
+      viewBox="0 0 1440 120"
+      style={{
+        position: 'absolute', bottom: `${yOffset}px`, left: 0, width: '200%', height: '120px',
+        animation: `waveScroll${direction > 0 ? 'R' : 'L'} ${duration}s linear infinite`,
+        opacity,
+      }}
+    >
+      <defs>
+        <linearGradient id={`wg${duration}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#8b5cf6" />
+          <stop offset="50%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#wg${duration})`}
+        d="M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,20 1440,60 L1440,120 L0,120 Z"
+      />
+    </svg>
+  )
+}
 
 export default function Landing() {
   const { isConnected, connect } = useWallet()
   const navigate = useNavigate()
   const [cyclingWord, setCyclingWord] = useState('Second')
+  const [wordVisible, setWordVisible] = useState(true)
 
   const handleStart = async () => {
     if (!isConnected) await connect()
     navigate('/dashboard')
   }
 
-  // Cycling text animation
+  // Cycling text with slide-up animation
   useEffect(() => {
     const words = ['Second', 'Minute', 'Hour', 'Day']
     let index = 0
-
     const interval = setInterval(() => {
-      index = (index + 1) % words.length
-      setCyclingWord(words[index])
-    }, 2500)
-
+      setWordVisible(false)
+      setTimeout(() => {
+        index = (index + 1) % words.length
+        setCyclingWord(words[index])
+        setWordVisible(true)
+      }, 300)
+    }, 2200)
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', overflowX: 'hidden' }}>
 
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="center" style={{ minHeight: '90vh', paddingTop: '80px', paddingBottom: '60px', textAlign: 'center' }}>
+      <style>{`
+        @keyframes waveScrollR { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes waveScrollL { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+        @keyframes floatUp {
+          0%   { transform: translateY(0) scale(1); opacity: var(--p-op); }
+          100% { transform: translateY(-120vh) scale(0.6); opacity: 0; }
+        }
+        @keyframes wordSlideIn  { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes wordSlideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-14px); } }
+        @keyframes ripple { 0%,100%{transform:scale(1);opacity:0.6;} 50%{transform:scale(2);opacity:0;} }
+        @keyframes badge-glow { 0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,0);} 50%{box-shadow:0 0 16px 4px rgba(139,92,246,0.2);} }
 
-        <h3 style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: '16px',
-          fontWeight: 500,
-          letterSpacing: '2px',
-          lineHeight: 1.4,
-          marginBottom: '32px',
-          color: 'var(--text-muted)',
-          textTransform: 'uppercase'
-        }}>
-          Your Money, Your Schedule
-        </h3>
+        .word-in  { animation: wordSlideIn  0.30s ease both; }
+        .word-out { animation: wordSlideOut 0.30s ease both; }
 
-        <h1 style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'clamp(48px, 8vw, 72px)',
-          fontWeight: 800,
-          letterSpacing: '-2.5px',
-          lineHeight: 1.2,
-          marginBottom: '48px',
-          maxWidth: '920px',
-          padding: '0 20px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '20px'
-        }}>
-          <span>Stream Money</span>
+        .feature-card { transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease !important; }
+        .feature-card:hover {
+          border-color: rgba(139,92,246,0.40) !important;
+          box-shadow: 0 0 28px rgba(139,92,246,0.18) !important;
+          transform: translateY(-3px) !important;
+        }
+        .step-card { transition: border-color 0.2s, box-shadow 0.2s; }
+        .step-card:hover { border-color: rgba(139,92,246,0.30) !important; }
+
+        .cta-btn-primary:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 28px rgba(139,92,246,0.40) !important; }
+        .cta-btn-ghost:hover { background: rgba(139,92,246,0.08) !important; border-color: #8b5cf6 !important; }
+      `}</style>
+
+      {/* ── Particles ── */}
+      {PARTICLES.map(p => (
+        <div key={p.id} style={{
+          position: 'fixed',
+          bottom: '-12px',
+          left: p.left,
+          width: p.size,
+          height: p.size,
+          borderRadius: '50%',
+          background: `rgba(139, 92, 246, ${p.opacity})`,
+          boxShadow: `0 0 ${parseInt(p.size) + 2}px rgba(139,92,246,0.4)`,
+          animation: `floatUp ${p.dur} ${p.delay} linear infinite`,
+          '--p-op': p.opacity,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+      ))}
+
+      {/* ── Hero Glow ── */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: '80vh', pointerEvents: 'none', zIndex: 0,
+        background: 'radial-gradient(ellipse at 50% 20%, rgba(139,92,246,0.14) 0%, transparent 65%)',
+      }} />
+
+      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
+      <section style={{
+        position: 'relative', zIndex: 1,
+        minHeight: '95vh',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
+        textAlign: 'center', padding: '100px 24px 80px',
+      }}>
+
+
+        {/* Heading */}
+        <h1 style={{ marginBottom: '12px', maxWidth: '880px' }}>
+          Stream Every
+        </h1>
+        <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '28px' }}>
           <span
             key={cyclingWord}
+            className="word-in"
             style={{
-              color: 'var(--accent-red)',
-              display: 'inline-block',
-              minWidth: '200px',
-              animation: 'smoothFade 2.5s ease-in-out'
+              fontFamily: 'var(--font-brand)',
+              fontSize: 'clamp(40px, 7vw, 72px)',
+              fontWeight: 900,
+              lineHeight: 1.08,
+              letterSpacing: '-0.035em',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #e0d4ff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              display: 'block',
             }}
           >
             {cyclingWord}
           </span>
-        </h1>
+        </div>
 
-        <style>{`
-          @keyframes smoothFade {
-            0% { 
-              opacity: 0;
-              filter: blur(4px);
-              transform: translateY(8px) scale(0.98);
-            }
-            15% {
-              opacity: 1;
-              filter: blur(0px);
-              transform: translateY(0) scale(1);
-            }
-            85% {
-              opacity: 1;
-              filter: blur(0px);
-              transform: translateY(0) scale(1);
-            }
-            100% { 
-              opacity: 0;
-              filter: blur(4px);
-              transform: translateY(-8px) scale(0.98);
-            }
-          }
-        `}</style>
-
-        <p style={{
-          fontSize: '17px',
-          color: 'var(--text-muted)',
-          maxWidth: '640px',
-          lineHeight: 1.75,
-          marginBottom: '56px',
-          fontWeight: 400,
-          padding: '0 20px'
-        }}>
-          Welcome to LumensFlow, the protocol for money streaming. Join thousands of users earning, investing, and trading by the second on Stellar.
+        {/* Subtitle */}
+        <p style={{ fontSize: '17px', color: '#9ca3af', maxWidth: '520px', lineHeight: 1.75, marginBottom: '48px', fontFamily: 'var(--font-body)' }}>
+          Stream real-time XLM payments on the Stellar Network. Every second earns.
         </p>
 
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
-          <button onClick={handleStart} className="btn-primary">
-            Start Streaming <ArrowRight size={18} />
+        {/* CTAs */}
+        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
+          <button
+            onClick={handleStart}
+            className="cta-btn-primary"
+            style={{
+              background: '#8b5cf6', color: '#fff', border: 'none',
+              borderRadius: '9999px', padding: '14px 32px',
+              fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
+              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px',
+              boxShadow: '0 4px 20px rgba(139,92,246,0.35)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+            }}
+          >
+            Start Streaming <ArrowRight size={17} />
           </button>
-          <button onClick={() => navigate('/how-it-works')} className="btn-ghost">
+          <button
+            onClick={() => navigate('/how-it-works')}
+            className="cta-btn-ghost"
+            style={{
+              background: 'transparent', color: '#8b5cf6',
+              border: '1px solid rgba(139,92,246,0.40)',
+              borderRadius: '9999px', padding: '14px 32px',
+              fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
+              cursor: 'pointer', transition: 'background 0.2s, border-color 0.2s',
+            }}
+          >
             How It Works
           </button>
         </div>
+
+        {/* Animated wave band */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', overflow: 'hidden', pointerEvents: 'none' }}>
+          <WaveLayer opacity={0.25} duration={8} direction={1} yOffset={0} color="#8b5cf6" />
+          <WaveLayer opacity={0.15} duration={13} direction={-1} yOffset={20} color="#7c3aed" />
+          <WaveLayer opacity={0.10} duration={20} direction={1} yOffset={40} color="#a78bfa" />
+        </div>
       </section>
 
-      {/* ── Stats Bar ─────────────────────────────────────────────────── */}
-      <div style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        background: 'rgba(20, 20, 20, 0.60)',
-        backdropFilter: 'blur(24px)',
-        padding: '32px 0',
-        marginBottom: '40px'
-      }}>
+      {/* ══ STATS BAR ═════════════════════════════════════════════════════ */}
+      <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1f2937', borderBottom: '1px solid #1f2937', background: 'rgba(17,24,39,0.70)', backdropFilter: 'blur(20px)', padding: '32px 0', marginBottom: '0' }}>
         <div className="page-wrap">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '48px',
-            textAlign: 'center'
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', textAlign: 'center' }}>
             {[
               { n: '<0.003 XLM', s: 'Per Transaction' },
               { n: '100%', s: 'On-Chain & Trustless' },
               { n: 'Real-Time', s: 'Second-by-Second' },
             ].map((stat, i) => (
-              <div key={i}>
-                <div style={{
-                  fontSize: '28px',
-                  fontWeight: 700,
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--accent-red)',
-                  marginBottom: '6px'
-                }}>
+              <div key={i} style={{ padding: '0 16px', borderRight: i < 2 ? '1px solid #1f2937' : 'none' }}>
+                <div style={{ fontSize: 'clamp(22px,3.5vw,30px)', fontWeight: 700, fontFamily: 'var(--font-brand)', color: '#fff', marginBottom: '6px' }}>
                   {stat.n}
                 </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: 'var(--text-muted)',
-                  fontWeight: 500,
-                  letterSpacing: '0.3px'
-                }}>
+                <div style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)' }}>
                   {stat.s}
                 </div>
               </div>
@@ -166,96 +222,46 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* ── Get Started in 3 Steps ────────────────────────────────────── */}
-      <section className="center" style={{ padding: '80px 0' }}>
+      {/* ══ HOW IT WORKS ══════════════════════════════════════════════════ */}
+      <section style={{ position: 'relative', zIndex: 1, padding: '100px 0 80px' }}>
         <div className="page-wrap" style={{ width: '100%' }}>
-          <h2 style={{
-            textAlign: 'center',
-            marginBottom: '16px',
-            fontSize: '42px'
-          }}>
-            Get Started in 3 Steps
-          </h2>
-          <p style={{
-            color: 'var(--text-muted)',
-            marginBottom: '56px',
-            textAlign: 'center',
-            fontSize: '16px',
-            maxWidth: '600px',
-            margin: '0 auto 56px'
-          }}>
-            Stream money with just a wallet and testnet XLM.
-          </p>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
+              Getting Started
+            </div>
+            <h2>How It Works</h2>
+          </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '24px',
-            maxWidth: '1100px',
-            margin: '0 auto'
-          }}>
+          {/* Cards with dashed connector */}
+          <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+            {/* Dashed connector line */}
+            <div style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
+
             {[
-              {
-                num: '01',
-                title: 'Install Wallet',
-                desc: 'Get Freighter, xBull, or Lobstr from the browser extension store.',
-                icon: Shield
-              },
-              {
-                num: '02',
-                title: 'Get Testnet XLM',
-                desc: 'Use Stellar Friendbot to receive free testnet XLM instantly.',
-                icon: Zap
-              },
-              {
-                num: '03',
-                title: 'Create a Stream',
-                desc: 'Enter receiver address, amount, and duration — done in seconds.',
-                icon: Droplets
-              },
+              { num: '01', Icon: Shield, title: 'Connect Wallet', desc: 'Link your Stellar wallet (Freighter / xBull) in one click.', iconColor: '#8b5cf6' },
+              { num: '02', Icon: Zap, title: 'Create Stream', desc: 'Set recipient, amount per second, and duration. Done in seconds.', iconColor: '#8b5cf6' },
+              { num: '03', Icon: BarChart3, title: 'Earn Live', desc: 'Watch XLM flow in real-time. Withdraw any time.', iconColor: '#22c55e' },
             ].map((step, i) => {
-              const Icon = step.icon
+              const Icon = step.Icon
               return (
-                <div key={i} className="card" style={{ padding: '32px', textAlign: 'left' }}>
-                  <div style={{
-                    fontSize: '52px',
-                    fontWeight: 800,
-                    fontFamily: 'var(--font-body)',
-                    color: 'var(--accent-red)',
-                    opacity: 0.15,
-                    lineHeight: 1,
-                    marginBottom: '20px'
-                  }}>
-                    {step.num}
+                <div key={i} className="step-card" style={{
+                  background: 'rgba(17,24,39,0.80)', border: '1px solid #1f2937',
+                  borderRadius: '24px', padding: '32px 24px', textAlign: 'center',
+                  backdropFilter: 'blur(16px)', position: 'relative', zIndex: 1,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                    <div style={{
+                      width: '52px', height: '52px', borderRadius: '14px',
+                      background: step.iconColor === '#22c55e' ? 'rgba(34,197,94,0.10)' : 'rgba(139,92,246,0.10)',
+                      border: `1px solid ${step.iconColor === '#22c55e' ? 'rgba(34,197,94,0.25)' : 'rgba(139,92,246,0.25)'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon size={24} color={step.iconColor} />
+                    </div>
                   </div>
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '20px'
-                  }}>
-                    <Icon size={24} color="var(--accent-red)" />
-                  </div>
-                  <h3 style={{
-                    fontSize: '19px',
-                    marginBottom: '12px',
-                    fontWeight: 600
-                  }}>
-                    {step.title}
-                  </h3>
-                  <p style={{
-                    color: 'var(--text-muted)',
-                    fontSize: '14px',
-                    lineHeight: 1.7,
-                    fontWeight: 400
-                  }}>
-                    {step.desc}
-                  </p>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: '8px' }}>STEP {step.num}</div>
+                  <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px' }}>{step.title}</h3>
+                  <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.65, fontFamily: 'var(--font-body)' }}>{step.desc}</p>
                 </div>
               )
             })}
@@ -263,125 +269,74 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Why LumensFlow? ───────────────────────────────────────────── */}
-      <section id="features" className="center" style={{
-        padding: '80px 0',
-        background: 'radial-gradient(ellipse at center, rgba(239, 68, 68, 0.04) 0%, transparent 70%)'
-      }}>
+      {/* ══ FEATURES GRID ═════════════════════════════════════════════════ */}
+      <section style={{ position: 'relative', zIndex: 1, padding: '80px 0', background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.05) 0%, transparent 65%)' }}>
         <div className="page-wrap" style={{ width: '100%' }}>
-          <h2 style={{
-            textAlign: 'center',
-            marginBottom: '64px',
-            fontSize: '42px'
-          }}>
-            Why LumensFlow?
-          </h2>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
+              Built Different
+            </div>
+            <h2>Everything You Need</h2>
+          </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '20px',
-            maxWidth: '1200px',
-            margin: '0 auto'
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '18px', maxWidth: '1060px', margin: '0 auto' }}>
             {[
-              {
-                Icon: Droplets,
-                title: 'Real-Time Streaming',
-                desc: 'Funds flow every second with zero manual inputs — time does the work.'
-              },
-              {
-                Icon: Shield,
-                title: 'Non-Custodial',
-                desc: 'Your keys, your funds. The smart contract holds, never us.'
-              },
-              {
-                Icon: Zap,
-                title: 'Soroban Powered',
-                desc: 'Stellar Soroban smart contracts with sub-cent fees and instant finality.'
-              },
-              {
-                Icon: BarChart3,
-                title: 'Live Dashboard',
-                desc: 'Track all streams with real-time metrics — no refresh needed.'
-              },
-              {
-                Icon: Globe,
-                title: 'Stellar Testnet',
-                desc: 'Fully live on Stellar Testnet — production-ready architecture.'
-              },
-              {
-                Icon: Clock,
-                title: 'Flexible Duration',
-                desc: 'Stream for minutes, days, or months. Cancel anytime with refund.'
-              },
+              { Icon: Droplets, title: 'Real-Time Streaming', desc: 'Funds flow every second with zero manual inputs — time does the work.' },
+              { Icon: ShieldCheck, title: 'Non-Custodial Escrow', desc: 'Your keys, your funds. Stellar Soroban smart contract holds everything.' },
+              { Icon: Zap, title: 'Soroban Powered', desc: 'Sub-cent fees, instant finality, fully on-chain with Stellar Soroban.' },
+              { Icon: BarChart3, title: 'Live Dashboard', desc: 'Track all streams with real-time metrics and live XLM counters.' },
+              { Icon: Globe, title: 'Fully On-Chain', desc: '100% transparent, every action verifiable on the Stellar ledger.' },
+              { Icon: Clock, title: 'Flexible Duration', desc: 'Stream for minutes, days, or months. Cancel anytime with auto-refund.' },
             ].map(({ Icon, title, desc }, i) => (
-              <div key={i} className="card" style={{ padding: '32px' }}>
+              <div key={i} className="feature-card" style={{
+                background: 'rgba(17,24,39,0.75)', border: '1px solid #1f2937',
+                borderRadius: '24px', padding: '32px',
+                backdropFilter: 'blur(16px)',
+              }}>
                 <div style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '14px',
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px'
+                  width: '52px', height: '52px', borderRadius: '14px',
+                  background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.22)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px',
                 }}>
-                  <Icon size={26} color="var(--accent-red)" strokeWidth={2} />
+                  <Icon size={24} color="#8b5cf6" />
                 </div>
-                <h3 style={{
-                  fontSize: '18px',
-                  marginBottom: '10px',
-                  fontWeight: 600
-                }}>
-                  {title}
-                </h3>
-                <p style={{
-                  color: 'var(--text-muted)',
-                  fontSize: '14px',
-                  lineHeight: 1.7,
-                  fontWeight: 400
-                }}>
-                  {desc}
-                </p>
+                <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px' }}>{title}</h3>
+                <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>{desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Final CTA ─────────────────────────────────────────────────── */}
-      <section className="center" style={{ padding: '100px 0 120px' }}>
-        <div className="page-wrap" style={{
-          maxWidth: '720px',
-          width: '100%'
-        }}>
+      {/* ══ FINAL CTA ══════════════════════════════════════════════════════ */}
+      <section style={{ position: 'relative', zIndex: 1, padding: '100px 0 130px', textAlign: 'center' }}>
+        <div className="page-wrap" style={{ maxWidth: '680px', width: '100%' }}>
           <div style={{
-            background: 'rgba(30, 30, 30, 0.60)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '28px',
-            padding: '64px 48px',
-            textAlign: 'center',
+            background: 'rgba(17,24,39,0.85)', border: '1px solid rgba(139,92,246,0.20)',
+            borderRadius: '28px', padding: '64px 48px',
             backdropFilter: 'blur(24px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.30)'
+            boxShadow: '0 0 40px rgba(139,92,246,0.08)',
           }}>
-            <h2 style={{
-              marginBottom: '16px',
-              fontSize: '38px'
-            }}>
-              Ready to stream?
-            </h2>
-            <p style={{
-              color: 'var(--text-muted)',
-              marginBottom: '36px',
-              fontSize: '16px',
-              lineHeight: 1.6
-            }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '20px' }}>
+              Get Started Now
+            </div>
+            <h2 style={{ marginBottom: '16px' }}>Ready to stream?</h2>
+            <p style={{ color: '#9ca3af', marginBottom: '36px', fontSize: '16px', lineHeight: 1.65, fontFamily: 'var(--font-body)' }}>
               Start your first payment stream in under 60 seconds.
             </p>
-            <button onClick={handleStart} className="btn-primary" style={{ fontSize: '16px' }}>
-              Stream now<ArrowRight size={19} />
+            <button
+              onClick={handleStart}
+              className="cta-btn-primary"
+              style={{
+                background: '#8b5cf6', color: '#fff', border: 'none',
+                borderRadius: '9999px', padding: '14px 36px',
+                fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
+                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '10px',
+                boxShadow: '0 4px 20px rgba(139,92,246,0.35)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+              }}
+            >
+              Stream Now <ArrowRight size={17} />
             </button>
           </div>
         </div>

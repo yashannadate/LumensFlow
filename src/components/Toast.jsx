@@ -1,7 +1,7 @@
 import {
   createContext, useContext, useState, useCallback, useRef,
 } from 'react'
-import { CheckCircle, XCircle, X, ExternalLink } from 'lucide-react'
+import { CheckCircle, XCircle, X, ExternalLink, Zap, Info } from 'lucide-react'
 
 /* ─── Context ─────────────────────────────────────────────────────────── */
 const ToastContext = createContext(null)
@@ -15,87 +15,93 @@ const nextId = () => ++_id
 function Toast({ toast, onRemove }) {
   const isSuccess = toast.type === 'success'
   const color = isSuccess ? '#22c55e' : '#ef4444'
-  const bg = isSuccess ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)'
-  const border = isSuccess ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'
+  const accent = isSuccess ? '#22c55e' : '#ef4444'
+  const border = isSuccess ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'
+  const bg = '#0d1117'
+  
   const shortHash = toast.txHash
     ? `${toast.txHash.slice(0, 6)}…${toast.txHash.slice(-4)}`
     : null
 
   return (
     <div style={{
-      background: '#111827',
+      background: bg,
       border: `1px solid ${border}`,
-      borderLeft: `4px solid ${color}`,
-      borderRadius: '12px',
-      padding: '14px 16px',
+      borderRadius: '16px',
+      padding: '16px 20px',
       minWidth: '320px',
-      maxWidth: '400px',
-      boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-      animation: 'toast-in 0.3s ease',
+      maxWidth: '420px',
+      boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 0 20px ${isSuccess ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)'}`,
+      animation: 'toast-in 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
       display: 'flex',
       flexDirection: 'column',
-      gap: '8px',
+      gap: '10px',
       position: 'relative',
+      backdropFilter: 'blur(12px)'
     }}>
       {/* Close */}
       <button
         onClick={() => onRemove(toast.id)}
         style={{
-          position: 'absolute', top: '10px', right: '10px',
+          position: 'absolute', top: '12px', right: '12px',
           background: 'none', border: 'none', cursor: 'pointer',
-          color: '#6b7280', padding: '2px', display: 'flex',
+          color: '#6b7280', padding: '4px', display: 'flex',
+          transition: 'color 0.2s'
         }}
+        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+        onMouseLeave={e => e.currentTarget.style.color = '#6b7280'}
       >
-        <X size={13} />
+        <X size={14} />
       </button>
 
-      {/* Icon + Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '20px' }}>
-        {isSuccess
-          ? <CheckCircle size={16} color={color} />
-          : <XCircle size={16} color={color} />
-        }
-        <span style={{ fontWeight: 700, fontSize: '13px', color }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingRight: '24px' }}>
+        <div style={{ 
+          width: '28px', height: '28px', borderRadius: '8px', 
+          background: isSuccess ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          {isSuccess ? <CheckCircle size={16} color={color} /> : <XCircle size={16} color={color} />}
+        </div>
+        <span style={{ 
+          fontWeight: 700, fontSize: '14px', color: '#fff', 
+          fontFamily: 'var(--font-brand)', letterSpacing: '-0.01em' 
+        }}>
           {toast.title}
         </span>
       </div>
 
       {/* Description */}
       {toast.description && (
-        <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0, paddingLeft: '24px' }}>
+        <p style={{ 
+          fontSize: '13px', color: '#9ca3af', margin: 0, 
+          paddingLeft: '38px', lineHeight: 1.5, fontFamily: 'var(--font-body)' 
+        }}>
           {toast.description}
         </p>
       )}
 
-      {/* TxHash + Explorer */}
+      {/* Action / Explorer */}
       {shortHash && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '24px', flexWrap: 'wrap' }}>
-          <span style={{
-            fontFamily: 'monospace', fontSize: '11px',
-            background: bg, border: `1px solid ${border}`,
-            borderRadius: '5px', padding: '2px 7px', color: '#86efac',
-          }}>
-            {shortHash}
-          </span>
-          <a
-            href={`${EXPLORER_BASE}/${toast.txHash}`}
-            target="_blank" rel="noreferrer"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '3px',
-              fontSize: '11px', fontWeight: 600,
-              textDecoration: 'none',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              background: 'rgba(239, 68, 68, 0.08)',
-              color: '#fca5a5',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'}
-          >
-            <ExternalLink size={10} /> Explorer
-          </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '38px', marginTop: '4px' }}>
+           <div style={{ 
+             fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#6b7280',
+             background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: '6px'
+           }}>
+             {shortHash}
+           </div>
+           <a
+             href={`${EXPLORER_BASE}/${toast.txHash}`}
+             target="_blank" rel="noreferrer"
+             style={{
+               display: 'inline-flex', alignItems: 'center', gap: '6px',
+               fontSize: '11px', fontWeight: 600, color: '#8b5cf6',
+               textDecoration: 'none', fontFamily: 'var(--font-label)',
+               textTransform: 'uppercase', letterSpacing: '0.05em'
+             }}
+           >
+             Explorer <ExternalLink size={10} />
+           </a>
         </div>
       )}
     </div>
@@ -108,18 +114,18 @@ function ToastContainer({ toasts, onRemove }) {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '28px',
-      right: '24px',
-      zIndex: 9999,
+      bottom: '32px',
+      right: '32px',
+      zIndex: 10000,
       display: 'flex',
       flexDirection: 'column',
-      gap: '10px',
+      gap: '12px',
       alignItems: 'flex-end',
     }}>
       <style>{`
         @keyframes toast-in {
-          from { opacity: 0; transform: translateY(16px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0)    scale(1); }
+          from { opacity: 0; transform: translateX(32px) scale(0.9); }
+          to   { opacity: 1; transform: translateX(0)    scale(1); }
         }
       `}</style>
       {toasts.map(t => (
@@ -151,7 +157,7 @@ export function ToastProvider({ children }) {
     [add])
 
   const error = useCallback((title, description) =>
-    add({ type: 'error', title, description }, 8000),
+    add({ type: 'error', title, description }, 10000),
     [add])
 
   return (

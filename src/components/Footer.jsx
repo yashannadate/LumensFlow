@@ -1,150 +1,74 @@
-import { Zap } from 'lucide-react'
+import { Zap, Twitter, Github, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
     <footer style={{
-      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-      padding: '56px 28px',
-      background: 'rgba(20, 20, 20, 0.85)',
+      borderTop: '1px solid #1f2937',
+      padding: '80px 28px 60px',
+      background: 'rgba(6, 6, 13, 0.85)',
       backdropFilter: 'blur(20px)',
-      marginTop: 'auto'
+      position: 'relative',
+      zIndex: 1
     }}>
       <div style={{
-        maxWidth: '1160px',
+        maxWidth: '1100px',
         margin: '0 auto',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        flexWrap: 'wrap',
-        gap: '32px'
+        display: 'grid',
+        gridTemplateColumns: '1.2fr 1fr 1fr 1fr',
+        gap: '48px',
       }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              borderRadius: '10px',
-              padding: '7px',
-              display: 'flex',
-              boxShadow: '0 4px 16px rgba(239, 68, 68, 0.30)'
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              borderRadius: '10px', padding: '7px', display: 'flex',
+              boxShadow: '0 4px 16px rgba(139, 92, 246, 0.30)'
             }}>
-              <Zap size={16} color="white" />
+              <Zap size={18} color="white" />
             </div>
-            <span style={{
-              fontSize: '17px',
-              fontWeight: 700,
-              fontFamily: 'var(--font-brand)',
-              letterSpacing: '0.3px'
-            }}>
+            <span style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em' }}>
               LumensFlow
             </span>
           </div>
-          <p style={{
-            color: 'var(--text-muted)',
-            fontSize: '13px',
-            maxWidth: '280px',
-            lineHeight: 1.7
-          }}>
-            Continuous payment streaming infrastructure built on Stellar Soroban smart contracts.
+          <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '280px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>
+            The protocol for continuous payment streaming on Stellar. Built with Soroban.
           </p>
         </div>
-        <div style={{
-          display: 'flex',
-          gap: '48px',
-          flexWrap: 'wrap'
-        }}>
-          <div>
-            <div style={{
-              fontSize: '11px',
-              color: 'var(--text-dim)',
-              fontWeight: 600,
-              letterSpacing: '1.5px',
-              marginBottom: '12px',
-              textTransform: 'uppercase'
-            }}>
-              App
-            </div>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px'
-            }}>
-              {[['Dashboard', '/dashboard'], ['How It Works', '/how-it-works'], ['Create Stream', '/create']].map(([label, to]) => (
-                <Link key={to} to={to} style={{
-                  color: 'var(--text-muted)',
-                  textDecoration: 'none',
-                  fontSize: '13px'
-                }}>
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div style={{
-              fontSize: '11px',
-              color: 'var(--text-dim)',
-              fontWeight: 600,
-              letterSpacing: '1.5px',
-              marginBottom: '12px',
-              textTransform: 'uppercase'
-            }}>
-              Resources
-            </div>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px'
-            }}>
-              {[
-                ['Stellar Testnet', 'https://stellar.org/testnet'],
-                ['Friendbot', 'https://laboratory.stellar.org/#account-creator?network=testnet'],
-                ['Soroban Docs', 'https://soroban.stellar.org'],
-              ].map(([label, href]) => (
-                <a key={href} href={href} target="_blank" rel="noreferrer" style={{
-                  color: 'var(--text-muted)',
-                  textDecoration: 'none',
-                  fontSize: '13px'
-                }}>
-                  {label} ↗
-                </a>
-              ))}
-            </div>
+
+        <div>
+          <h4 style={{ fontSize: '11px', color: '#fff', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '24px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Platform</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              { label: 'Dashboard', to: '/dashboard' },
+              { label: 'Features', to: '/#features' },
+              { label: 'How It Works', to: '/how-it-works' },
+            ].map(link => (
+              <Link key={link.label} to={link.to} style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '13.5px', transition: 'color 0.2s' }}>{link.label}</Link>
+            ))}
           </div>
         </div>
+
+        <div>
+          <h4 style={{ fontSize: '11px', color: '#fff', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '24px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Resources</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              { label: 'Stellar Expert', to: 'https://stellar.expert' },
+              { label: 'Soroban Docs', to: 'https://soroban.stellar.org' },
+              { label: 'Network laboratory', to: 'https://laboratory.stellar.org' },
+            ].map(link => (
+              <a key={link.label} href={link.to} target="_blank" rel="noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '13.5px' }}>{link.label} ↗</a>
+            ))}
+          </div>
+        </div>
+
+        <div></div>
       </div>
-      <div style={{
-        maxWidth: '1160px',
-        margin: '28px auto 0',
-        paddingTop: '20px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '8px'
-      }}>
-        <p style={{
-          fontSize: '12px',
-          color: 'var(--text-dim)'
-        }}>
-          © 2026 LumensFlow Protocol
-        </p>
-        <p style={{
-          fontSize: '11px',
-          color: 'var(--text-dim)',
-          opacity: 0.6
-        }}>
-          Built for Rise In Stellar Journey to Mastery
-        </p>
+
+      <div style={{ maxWidth: '1100px', margin: '64px auto 0', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>© 2026 LUMENSFLOW PROTOCOL</div>
+        <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', gap: '20px' }}>
+        </div>
       </div>
     </footer>
   )

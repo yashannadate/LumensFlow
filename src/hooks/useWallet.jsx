@@ -61,11 +61,13 @@ export function WalletProvider({ children }) {
       const { address: pubKey } = await StellarWalletsKit.authModal()
       setAddress(pubKey)
       window.localStorage.setItem('lumensflow:address', pubKey)
+      return true
     } catch (e) {
       if (e?.code !== -1) {
         console.error('Wallet connect error:', e)
         setError(e?.message || 'Failed to connect wallet')
       }
+      return false
     } finally {
       setConnecting(false)
     }

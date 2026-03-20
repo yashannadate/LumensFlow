@@ -244,3 +244,116 @@ export function truncateAddress(address) {
   if (!address || address.length < 12) return address || ''
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
+
+// ─── Contract Event Fetcher ───────────────────────────────────────────────
+// Fetches and normalises Soroban contract events for the activity feed.
+export async function fetchContractEvents(limit = 100) {
+  try {
+    const latestLedger = await server.getLatestLedger()
+    let startLedger = Math.max(1, latestLedger.sequence - 10000)
+
+    let result = await server.getEvents({
+      startLedger,
+      filters: [{ type: 'contract', contractIds: [CONTRACT_ID] }],
+      limit,
+    }).catch(() => null)
+
+    if (!result || !result.events?.length) {
+      startLedger = Math.max(1, latestLedger.sequence - 20000)
+      result = await server.getEvents({
+        startLedger,
+        filters: [{ type: 'contract', contractIds: [CONTRACT_ID] }],
+        limit,
+      }).catch(() => null)
+    }
+
+    const eventsCount = result?.events?.length || 0
+    console.log('Total events fetched:', eventsCount)
+
+    if (!eventsCount) {
+      console.log('No contract events found — check CONTRACT_ID or ledger range')
+      return []
+    }
+
+    const activities = result.events
+      .map((ev) => {
+        try {
+          // Derive event type from the first topic
+          const topics = ev.topic?.map((t) => {
+            try { return scValToNative(t) } catch { return null }
+          }) ?? []
+
+          const firstTopic = String(topics[0] ?? '')
+          let type = 'unknown'
+          if (firstTopic.includes('created') || firstTopic.includes('create'))  type = 'created'
+          else if (firstTopic.includes('withdraw'))                               type = 'withdrawal'
+          else if (firstTopic.includes('cancel'))                                 type = 'cancelled'
+          else return null // skip unknown events
+
+          // Parse payload value
+          let payload = null
+          try { payload = scValToNative(ev.value) } catch { /* ignore */ }
+
+          // Extract fields based on contract event topologies
+          let sender = ''
+          let receiver = ''
+          let rawAmount = 0
+          let flowRateRaw = 0
+          const isMap = payload && typeof payload === 'object' && !Array.isArray(payload)
+
+          if (type === 'created') {
+            sender      = String(isMap ? (payload.sender || '') : (payload?.[0] || ''))
+            receiver    = String(isMap ? (payload.receiver || '') : (payload?.[1] || ''))
+            rawAmount   = isMap ? (payload.deposit_amount || 0) : (payload?.[2] || 0)
+            flowRateRaw = isMap ? (payload.flow_rate || 0) : (payload?.[3] || 0)
+          } else if (type === 'withdrawal') {
+            receiver    = String(isMap ? (payload.receiver || '') : (payload?.[0] || ''))
+            rawAmount   = isMap ? (payload.withdrawable || 0) : (payload?.[1] || 0)
+          } else if (type === 'cancelled') {
+            sender      = String(isMap ? (payload.sender || '') : (payload || ''))
+          }
+
+          const amountXlm    = rawAmount ? (Number(rawAmount) / 1e7).toFixed(4) : null
+          const streamId     = Number(topics[1] ?? 0)
+
+          const flowRate    = flowRateRaw ? (Number(flowRateRaw) / 1e7).toFixed(7) : null
+
+          const durationRaw = payload?.duration ?? payload?.end_time ?? 0
+          const duration    = durationRaw > 86400
+            ? `${Math.floor(Number(durationRaw) / 86400)}d`
+            : durationRaw > 3600
+              ? `${Math.floor(Number(durationRaw) / 3600)}h`
+              : durationRaw > 0
+                ? `${Math.floor(Number(durationRaw) / 60)}m`
+                : null
+
+          return {
+            id:        ev.id ?? `${ev.ledger}-${ev.ledgerClosedAt}`,
+            type,
+            txHash:    ev.txHash ?? '',
+            ledger:    ev.ledger ?? 0,
+            timestamp: ev.ledgerClosedAt ? new Date(ev.ledgerClosedAt).getTime() : Date.now(),
+            sender,
+            receiver,
+            streamId,
+            amountXlm,
+            flowRate,
+            duration,
+          }
+        } catch {
+          return null
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.timestamp - a.timestamp)
+
+    console.log('Parsed events count:', activities.length)
+    const uniqueUsersCount = new Set(activities.flatMap(a => [a.sender, a.receiver]).filter(Boolean)).size
+    console.log('Unique users count from events:', uniqueUsersCount)
+
+    return activities
+  } catch (err) {
+    console.warn('fetchContractEvents failed:', err)
+    return []
+  }
+}
