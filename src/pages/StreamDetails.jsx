@@ -4,7 +4,7 @@ import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
 import { useToast } from '../components/Toast.jsx'
 
-import { getErrorMessage, truncateAddress, getStream } from '../utils/stellar.js'
+import { getErrorMessage, truncateAddress, getStream, fetchContractEvents, CONTRACT_ID } from '../utils/stellar.js'
 import { getStreamStatus, calculateProgress } from '../utils/time.js'
 import {
   ArrowLeft, Download, XCircle, Clock,
@@ -44,6 +44,7 @@ export default function StreamDetails() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [copied, setCopied] = useState(null)
+  const [txHash, setTxHash] = useState(null)
   const [now, setNow] = useState(Math.floor(Date.now() / 1000))
   const [working, setWorking] = useState(false)
 
@@ -63,6 +64,16 @@ export default function StreamDetails() {
         if (!data) { setError(`Stream #${streamId} not found on Stellar Testnet`); return }
         setStream(data)
         setError(null)
+
+        // Find creation transaction hash if available
+        try {
+          const events = await fetchContractEvents(100)
+          const creation = events.find(e => e.type === 'created' && Number(e.streamId) === streamId)
+          if (creation) setTxHash(creation.txHash)
+        } catch (e) {
+          console.warn('Could not locate creation tx hash.')
+        }
+
       } catch (e) {
         setLoading(false)
         // setError('Failed to load stream: ' + e.message)
@@ -171,10 +182,13 @@ export default function StreamDetails() {
           
           {/* Main Display Card */}
           <div className="card" style={{ padding: '40px 32px', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.10) 0%, transparent 75%)' }}>
-             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '9999px', padding: '4px 14px', marginBottom: '24px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: status === 'Active' ? '#22c55e' : '#6b7280' }} />
-                <span style={{ fontSize: '10px', fontWeight: 700, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.08em' }}>Stream #{streamId} · {status}</span>
-             </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(31,41,55,0.4)', borderRadius: '99px', border: '1px solid #374151' }}>
+                <div style={{ 
+                  width: '6px', height: '6px', borderRadius: '50%', 
+                  background: status === 'Active' ? '#22c55e' : status === 'Completed' ? '#8b5cf6' : '#ef4444' 
+                }} />
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff', textTransform: 'capitalize' }}>{status}</span>
+              </div>
 
              <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Withdrawable Now</div>
              <div style={{ fontFamily: 'var(--font-brand)', fontSize: '48px', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '8px' }}>
@@ -298,7 +312,7 @@ export default function StreamDetails() {
               </div>
            </div>
 
-           <a href={`https://stellar.expert/explorer/testnet/`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ justifyContent: 'center', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+           <a href={txHash ? `https://stellar.expert/explorer/testnet/tx/${txHash}` : `https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ justifyContent: 'center', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               View on Explorer <ExternalLink size={14} />
            </a>
         </div>

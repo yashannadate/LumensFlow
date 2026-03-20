@@ -1,5 +1,6 @@
 import { CheckCircle, PauseCircle, Plus, ArrowDownLeft, TrendingUp, HelpCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { CONTRACT_ID } from '../utils/stellar.js'
 
 const ICONS = {
   'created': { icon: Plus, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
@@ -49,28 +50,32 @@ export default function ActivityFeed({ activities, loading }) {
                 }}>
                   <Icon size={14} color={config.color} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '12.5px', fontWeight: 500, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {activity.type === 'created' ? (
-                      <span style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
-                        <span>Created Stream #{activity.streamId || ''}</span>
-                        <span style={{ color: '#8b5cf6', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>{shortAddr(activity.sender)} → {shortAddr(activity.receiver)}</span>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>
+                      {activity.type === 'created' ? `Created Stream #${activity.streamId}` : 
+                       activity.type === 'withdrawal' ? `Withdrew Funds #${activity.streamId}` : 
+                       activity.type === 'cancelled' ? `Cancelled Stream #${activity.streamId}` : activity.type}
+                    </span>
+                    {activity.amountXlm && (
+                      <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: config.color }}>
+                        {activity.type === 'withdrawal' ? `-${activity.amountXlm}` : `+${activity.amountXlm}`} XLM
                       </span>
-                    ) : activity.type === 'withdrawal' ? (
-                      <span style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
-                        <span>Withdrew from Stream #{activity.streamId || ''}</span>
-                        <span style={{ color: '#22c55e', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>{shortAddr(activity.receiver)}</span>
-                      </span>
-                    ) : activity.type === 'cancelled' ? (
-                      <span style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
-                        <span>Cancelled Stream #{activity.streamId || ''}</span>
-                        <span style={{ color: '#94a3b8', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>{shortAddr(activity.sender)}</span>
-                      </span>
-                    ) : activity.type}
+                    )}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                    <span>{formatDistanceToNow(activity.timestamp, { addSuffix: true })}</span>
-                    {activity.amountXlm && <span style={{ fontFamily: 'var(--font-mono)', color: config.color }}>{activity.type === 'withdrawal' ? '' : `+${activity.amountXlm} XLM`}</span>}
+                  
+                  <div style={{ fontSize: '10px', color: '#8b5cf6', fontFamily: 'var(--font-mono)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {activity.type === 'created' ? (
+                      <>{shortAddr(activity.sender)} <span style={{ opacity: 0.5 }}>→</span> {shortAddr(activity.receiver)}</>
+                    ) : activity.type === 'withdrawal' ? (
+                       <>{shortAddr(activity.receiver)} <span style={{ opacity: 0.5 }}>(Recipient)</span></>
+                    ) : (
+                       <>{shortAddr(activity.sender)} <span style={{ opacity: 0.5 }}>(Sender)</span></>
+                    )}
+                  </div>
+
+                  <div style={{ fontSize: '10px', color: '#4b5563', marginTop: '2px' }}>
+                    {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
                   </div>
                 </div>
               </a>
@@ -79,7 +84,7 @@ export default function ActivityFeed({ activities, loading }) {
         )}
       </div>
 
-      <a href={`https://stellar.expert/explorer/testnet/`} target="_blank" rel="noreferrer" style={{ 
+      <a href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} target="_blank" rel="noreferrer" style={{ 
         textAlign: 'center', fontSize: '11px', color: '#8b5cf6', fontWeight: 600, textDecoration: 'none', 
         fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em', paddingTop: '4px' 
       }}>

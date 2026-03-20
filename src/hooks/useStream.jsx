@@ -16,16 +16,18 @@ export function useStream() {
   const [error, setError] = useState(null)
   const [txHash, setTxHash] = useState(null)
 
-  const handleAction = useCallback(async (actionFn) => {
+  const handleAction = useCallback(async (actionFn, actionName) => {
     setLoading(true)
     setError(null)
     setTxHash(null)
+    console.log(`[useStream] Starting action: ${actionName}`);
     try {
       const result = await actionFn()
+      console.log(`[useStream] Action ${actionName} success:`, result);
       if (result?.txHash) setTxHash(result.txHash)
       return result
     } catch (e) {
-      console.error('Stream action failed:', e)
+      console.error(`[useStream] Action ${actionName} FAILED:`, e);
       const errMessage = getErrorMessage(e)
       setError(errMessage)
       throw new Error(errMessage)
@@ -36,17 +38,22 @@ export function useStream() {
 
   const createAction = useCallback((receiver, amountXLM, durationSec) =>
     handleAction(() =>
-      createStream(address, receiver, amountXLM, durationSec, signTransaction)
+      createStream(address, receiver, amountXLM, durationSec, signTransaction),
+      'createStream'
     ),
     [address, signTransaction, handleAction])
 
-  const withdrawAction = useCallback((streamId) =>
-    handleAction(() => withdraw(Number(streamId), address, signTransaction)),
-    [address, signTransaction, handleAction])
+  const withdrawAction = useCallback((streamId) => {
+    const id = Number(streamId)
+    console.log('[useStream] Requesting withdrawal for ID:', id);
+    return handleAction(() => withdraw(id, address, signTransaction), 'withdraw');
+  }, [address, signTransaction, handleAction])
 
-  const cancelAction = useCallback((streamId) =>
-    handleAction(() => cancelStream(Number(streamId), address, signTransaction)),
-    [address, signTransaction, handleAction])
+  const cancelAction = useCallback((streamId) => {
+    const id = Number(streamId)
+    console.log('[useStream] Requesting cancellation for ID:', id);
+    return handleAction(() => cancelStream(id, address, signTransaction), 'cancelStream');
+  }, [address, signTransaction, handleAction])
 
   const fetchStream = useCallback(async (streamId) => {
     try { return await getStream(streamId, address) } catch { return null }

@@ -42,14 +42,14 @@ export default function CreateStream() {
 
     setLoading(true)
     try {
-      const success = await createStream(address, parsedAmount, parseInt(duration))
-      if (success) {
-        toast.success('Stream created successfully!')
+      const result = await createStream(address, parsedAmount, parseInt(duration))
+      if (result) {
+        toast.success('Stream Created Successfully!', 'Your payment stream has been deployed to Stellar.', result?.txHash)
         navigate('/dashboard')
       }
     } catch (error) {
       console.error('Creation error:', error)
-      toast.error('Failed to create stream')
+      toast.error('Failed to create stream', error.message)
     } finally {
       setLoading(false)
     }
