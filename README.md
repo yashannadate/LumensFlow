@@ -1,4 +1,4 @@
-<h1 align="center">⚡ LumensFlow</h1>
+<h1 align="center"><img width="985" alt="LumensFlow Logo" src="https://github.com/user-attachments/assets/2643f2bc-ba65-4da7-bbb7-91d457514ff3" /></h1>
 
 <div align="center">
   <img src="https://img.shields.io/badge/Stellar-7D7D7D?style=for-the-badge&logo=stellar&logoColor=white" alt="Stellar" />
