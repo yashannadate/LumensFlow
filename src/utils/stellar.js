@@ -23,7 +23,6 @@ export const stroopsToXlm = (s) => (Number(s) / 10_000_000).toFixed(7)
 
 // ─── Transaction invoker ──────────────────────────────────────────────────
 async function invokeContract(method, args, sourceAddress, signTransaction) {
-  console.log(`[Stellar] Invoking ${method} with args:`, args.map(a => a?.value?.toString() || a?.toString()));
   const account = await server.getAccount(sourceAddress)
   const contract = new Contract(CONTRACT_ID)
   const tx = new TransactionBuilder(account, {
@@ -35,13 +34,10 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
     .build()
 
   const prepared = await server.prepareTransaction(tx)
-
-  console.log('[Stellar] Prepared transaction, requesting signature...');
   const signed = await signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
   })
   const signedXdr = signed?.signedTxXdr ?? signed
-  console.log('[Stellar] Signed transaction received, submitting...');
 
   const submitted = await server.sendTransaction(
     TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
@@ -67,7 +63,6 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
   }
 
   if (result.status === 'FAILED') {
-    console.error('[Stellar] Transaction FAILED on-chain:', result);
     throw new Error('Transaction failed on-chain: ' + JSON.stringify(result))
   }
 

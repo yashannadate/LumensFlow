@@ -20,14 +20,11 @@ export function useStream() {
     setLoading(true)
     setError(null)
     setTxHash(null)
-    console.log(`[useStream] Starting action: ${actionName}`);
     try {
       const result = await actionFn()
-      console.log(`[useStream] Action ${actionName} success:`, result);
       if (result?.txHash) setTxHash(result.txHash)
       return result
     } catch (e) {
-      console.error(`[useStream] Action ${actionName} FAILED:`, e);
       const errMessage = getErrorMessage(e)
       setError(errMessage)
       throw new Error(errMessage)
@@ -45,13 +42,11 @@ export function useStream() {
 
   const withdrawAction = useCallback((streamId) => {
     const id = Number(streamId)
-    console.log('[useStream] Requesting withdrawal for ID:', id);
     return handleAction(() => withdraw(id, address, signTransaction), 'withdraw');
   }, [address, signTransaction, handleAction])
 
   const cancelAction = useCallback((streamId) => {
     const id = Number(streamId)
-    console.log('[useStream] Requesting cancellation for ID:', id);
     return handleAction(() => cancelStream(id, address, signTransaction), 'cancelStream');
   }, [address, signTransaction, handleAction])
 

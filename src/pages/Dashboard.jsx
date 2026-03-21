@@ -59,7 +59,7 @@ export default function Dashboard() {
           {badge}
        </div>
        <div>
-          <div style={{ fontSize: '26px', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em', marginBottom: '2px' }}>
+          <div style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em', marginBottom: '2px' }}>
             {loading ? '—' : value}
           </div>
           <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
@@ -78,12 +78,21 @@ export default function Dashboard() {
   )
 
   return (
-    <div style={{ padding: '40px 32px 80px', maxWidth: '1240px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '48px', position: 'relative', zIndex: 1 }}>
+    <div style={{ 
+      padding: 'var(--dashboard-padding, 40px 32px 80px)', 
+      maxWidth: '1240px', 
+      margin: '0 auto', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '40px', 
+      position: 'relative', 
+      zIndex: 1 
+    }} className="dashboard-container">
 
       {/* ── Page header ───────────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '38px', letterSpacing: '-0.04em' }}>Dashboard</h1>
+          <h1 style={{ fontSize: 'clamp(28px, 5vw, 38px)', letterSpacing: '-0.04em' }}>Dashboard</h1>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={load} disabled={loading} className="btn-ghost" style={{ padding: '12px 24px', fontSize: '13px', borderRadius: '9999px' }}>

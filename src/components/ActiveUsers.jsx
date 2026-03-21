@@ -46,7 +46,7 @@ export default function ActiveUsers({ activities = [] }) {
   }
 
   const shortAddr = (addr) =>
-    addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : 'Unknown'
+    addr ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : 'Unknown'
 
   const getTime = (timestamp) => {
     try {
@@ -63,8 +63,9 @@ export default function ActiveUsers({ activities = [] }) {
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fff' }}>
-          Active Protocol Users
+        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fff', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          Testnet Network Pulse
+          <span style={{ fontSize: '9px', fontWeight: 500, color: '#6b7280', letterSpacing: 'normal', textTransform: 'none' }}>Data directly from public Stellar Testnet</span>
         </h3>
 
         {/* ✅ Correct LIVE count */}
@@ -131,7 +132,7 @@ export default function ActiveUsers({ activities = [] }) {
       }}>
         <Users size={14} color="#8b5cf6" />
         <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>
-          Protocol Users (Live from Contract)
+          Protocol Pulse (Live from Contract)
         </span>
       </div>
 

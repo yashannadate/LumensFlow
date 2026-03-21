@@ -16,7 +16,4 @@ export default defineConfig({
       buffer: 'buffer',
     },
   },
-  optimizeDeps: {
-    include: ['buffer'],
-  },
 })

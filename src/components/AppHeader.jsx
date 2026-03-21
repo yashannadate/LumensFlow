@@ -1,9 +1,9 @@
-import { Search, Wallet, ChevronDown, Bell, LogOut } from 'lucide-react'
+import { Search, Wallet, ChevronDown, Bell, LogOut, Menu } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
 import { useState } from 'react'
 
-export default function AppHeader() {
-  const { isConnected, address, balance, disconnect } = useWallet()
+export default function AppHeader({ onMenuClick }) {
+  const { isConnected, address, balance, disconnect, connect } = useWallet()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const shortAddress = address ? `${address.slice(0, 4)}...${address.slice(-4)}` : ''
@@ -23,26 +23,27 @@ export default function AppHeader() {
       zIndex: 100
     }}>
       
-      {/* Search */}
-      <div style={{ position: 'relative', width: '320px' }}>
-        <Search size={16} color="#6b7280" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
-        <input 
-          type="text" 
-          placeholder="Search streams or addresses..." 
-          style={{
-            width: '100%', padding: '10px 18px 10px 42px', 
-            background: '#111827', border: '1px solid #1f2937', 
-            borderRadius: '12px', color: '#fff', fontSize: '13px',
-            fontFamily: 'var(--font-body)', outline: 'none'
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Mobile Toggle */}
+        <button 
+          className="show-mobile"
+          onClick={onMenuClick}
+          style={{ 
+            background: 'none', border: 'none', color: '#fff', 
+            cursor: 'pointer', padding: '8px', marginLeft: '-8px'
           }}
-        />
+        >
+          <Menu size={24} />
+        </button>
+
+        {/* Search feature temporarily disabled until global search logic exists */}
       </div>
 
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         
-        {/* Network status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.12)', borderRadius: '9999px' }}>
+        {/* Network status - Hidden on mobile */}
+        <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.12)', borderRadius: '9999px' }}>
            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', animation: 'pulse 2s infinite' }} />
            <span style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Testnet <span style={{ color: '#22c55e' }}>Optimal</span>
@@ -97,7 +98,7 @@ export default function AppHeader() {
              )}
           </div>
         ) : (
-          <button className="btn-primary" style={{ borderRadius: '9999px', padding: '10px 24px', fontSize: '13px' }}>
+          <button onClick={connect} className="btn-primary" style={{ borderRadius: '9999px', padding: '10px 24px', fontSize: '13px' }}>
             Connect Wallet
           </button>
         )}

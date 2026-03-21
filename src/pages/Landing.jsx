@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
-import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock, ShieldCheck, Gauge, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 // ── Particle component ──────────────────────────────────────────────────────
@@ -47,11 +47,13 @@ export default function Landing() {
   const [wordVisible, setWordVisible] = useState(true)
 
   const handleStart = async () => {
-    if (!isConnected) await connect()
+    if (!isConnected) {
+      const success = await connect()
+      if (!success) return
+    }
     navigate('/dashboard')
   }
 
-  // Cycling text with slide-up animation
   useEffect(() => {
     const words = ['Second', 'Minute', 'Hour', 'Day']
     let index = 0
@@ -205,19 +207,25 @@ export default function Landing() {
         <div className="page-wrap">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', textAlign: 'center' }}>
             {[
-              { n: '<0.003 XLM', s: 'Per Transaction' },
-              { n: '100%', s: 'On-Chain & Trustless' },
-              { n: 'Real-Time', s: 'Second-by-Second' },
-            ].map((stat, i) => (
-              <div key={i} style={{ padding: '0 16px', borderRight: i < 2 ? '1px solid #1f2937' : 'none' }}>
-                <div style={{ fontSize: 'clamp(22px,3.5vw,30px)', fontWeight: 700, fontFamily: 'var(--font-brand)', color: '#fff', marginBottom: '6px' }}>
-                  {stat.n}
+              { icon: Gauge, n: '<0.003 XLM', s: 'Per Transaction' },
+              { icon: ShieldCheck, n: '100% On-Chain', s: 'Verified' },
+              { icon: RefreshCcw, n: 'Real-Time', s: 'Every Second' },
+            ].map((stat, i) => {
+              const Icon = stat.icon
+              return (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '0 16px' }}>
+                  <Icon size={18} color="#86EE1E" />
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
+                      {stat.n}
+                    </span>
+                    <span style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)', fontWeight: 500 }}>
+                      {stat.s}
+                    </span>
+                  </div>
                 </div>
-                <div style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)' }}>
-                  {stat.s}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -229,17 +237,17 @@ export default function Landing() {
             <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
               Getting Started
             </div>
-            <h2>How It Works</h2>
+            <h2 style={{ color: '#ffffffff' }}>How It Works</h2>
           </div>
 
           {/* Cards with dashed connector */}
-          <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+          <div className="grid-3" style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
             {/* Dashed connector line */}
-            <div style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
+            <div className="hide-mobile" style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
 
             {[
               { num: '01', Icon: Shield, title: 'Connect Wallet', desc: 'Link your Stellar wallet (Freighter / xBull) in one click.', iconColor: '#8b5cf6' },
-              { num: '02', Icon: Zap, title: 'Create Stream', desc: 'Set recipient, amount per second, and duration. Done in seconds.', iconColor: '#8b5cf6' },
+              { num: '02', Icon: Zap, title: 'Create Stream', desc: 'Set recipient, amount per second, and duration. Done in seconds.', iconColor: '#86EE1E' },
               { num: '03', Icon: BarChart3, title: 'Earn Live', desc: 'Watch XLM flow in real-time. Withdraw any time.', iconColor: '#22c55e' },
             ].map((step, i) => {
               const Icon = step.Icon
@@ -260,7 +268,7 @@ export default function Landing() {
                     </div>
                   </div>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: '8px' }}>STEP {step.num}</div>
-                  <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px' }}>{step.title}</h3>
+                  <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px', color: '#86EE1E' }}>{step.title}</h3>
                   <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.65, fontFamily: 'var(--font-body)' }}>{step.desc}</p>
                 </div>
               )
@@ -276,7 +284,7 @@ export default function Landing() {
             <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
               Built Different
             </div>
-            <h2>Everything You Need</h2>
+            <h2 style={{ color: '#ffffffff' }}>Everything You Need</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '18px', maxWidth: '1060px', margin: '0 auto' }}>
@@ -300,7 +308,7 @@ export default function Landing() {
                 }}>
                   <Icon size={24} color="#8b5cf6" />
                 </div>
-                <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px' }}>{title}</h3>
+                <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px', color: '#86EE1E' }}>{title}</h3>
                 <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>{desc}</p>
               </div>
             ))}

@@ -1,4 +1,4 @@
-import { CheckCircle, PauseCircle, Plus, ArrowDownLeft, TrendingUp, HelpCircle } from 'lucide-react'
+import { CheckCircle, PauseCircle, Plus, ArrowDownLeft, TrendingUp, HelpCircle, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { CONTRACT_ID } from '../utils/stellar.js'
 
@@ -13,8 +13,9 @@ export default function ActivityFeed({ activities, loading }) {
     <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}>
-          Recent Activity
+        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          Live Testnet Ledger
+          <span style={{ fontSize: '9px', fontWeight: 500, color: '#6b7280', letterSpacing: 'normal', textTransform: 'none' }}>Data directly from public Stellar Testnet</span>
         </h3>
         <HelpCircle size={14} color="#6b7280" />
       </div>
@@ -42,7 +43,7 @@ export default function ActivityFeed({ activities, loading }) {
             const shortAddr = (addr) => addr ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : ''
 
             return (
-              <a key={i} href={`https://stellar.expert/explorer/testnet/tx/${activity.txHash}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'flex', gap: '12px', alignItems: 'center', paddingBottom: i < 9 ? '16px' : '0', borderBottom: i < 9 ? '1px solid rgba(31,41,55,0.6)' : 'none' }}>
+              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', paddingBottom: i < 9 ? '16px' : '0', borderBottom: i < 9 ? '1px solid rgba(31,41,55,0.6)' : 'none' }}>
                 <div style={{ 
                   width: '28px', height: '28px', borderRadius: '50%', 
                   background: config.bg, border: `1px solid ${config.color}33`,
@@ -57,11 +58,9 @@ export default function ActivityFeed({ activities, loading }) {
                        activity.type === 'withdrawal' ? `Withdrew Funds #${activity.streamId}` : 
                        activity.type === 'cancelled' ? `Cancelled Stream #${activity.streamId}` : activity.type}
                     </span>
-                    {activity.amountXlm && (
-                      <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: config.color }}>
-                        {activity.type === 'withdrawal' ? `-${activity.amountXlm}` : `+${activity.amountXlm}`} XLM
-                      </span>
-                    )}
+                    <a href={`https://stellar.expert/explorer/testnet/tx/${activity.txHash}`} target="_blank" rel="noreferrer" style={{ color: '#4b5563', display: 'flex', alignItems: 'center', transition: 'color 0.2s', cursor: 'pointer' }} title="View on Block Explorer">
+                      <ExternalLink size={12} />
+                    </a>
                   </div>
                   
                   <div style={{ fontSize: '10px', color: '#8b5cf6', fontFamily: 'var(--font-mono)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -78,7 +77,7 @@ export default function ActivityFeed({ activities, loading }) {
                     {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
                   </div>
                 </div>
-              </a>
+              </div>
             )
           })
         )}

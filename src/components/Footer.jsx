@@ -28,7 +28,7 @@ export default function Footer() {
               <Zap size={18} color="white" />
             </div>
             <span style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em' }}>
-              LumensFlow
+              Lumens<span style={{ color: '#86EE1E' }}>Flow</span>
             </span>
           </div>
           <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '280px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>
@@ -66,7 +66,7 @@ export default function Footer() {
       </div>
 
       <div style={{ maxWidth: '1100px', margin: '64px auto 0', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>© 2026 LUMENSFLOW PROTOCOL</div>
+        <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>© 2026 LUMENS<span style={{ color: '#86EE1E' }}>FLOW</span> PROTOCOL</div>
         <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', gap: '20px' }}>
         </div>
       </div>

@@ -52,21 +52,21 @@ export default function StreamCard({ stream, onAction }) {
   const flowRate = (Number(stream.deposit_amount) / (Number(stream.end_time) - Number(stream.start_time)) / 1e7).toFixed(5)
 
   return (
-    <Link to={`/stream/${stream.id}`} className="card" style={{
-      padding: '20px 24px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '24px',
-      background: 'rgba(13, 17, 23, 0.70)',
-      backdropFilter: 'blur(16px)',
-      border: '1px solid #1f2937',
-      borderRadius: '24px',
-      transition: 'all 0.25s ease',
-      position: 'relative',
-      overflow: 'hidden',
-      textDecoration: 'none',
-      cursor: 'pointer'
-    }}
+    <Link 
+      to={`/stream/${stream.id}`} 
+      className="card stream-card-container" 
+      style={{
+        padding: '20px 24px',
+        background: 'rgba(13, 17, 23, 0.70)',
+        backdropFilter: 'blur(16px)',
+        border: '1px solid #1f2937',
+        borderRadius: '24px',
+        transition: 'all 0.25s ease',
+        position: 'relative',
+        overflow: 'hidden',
+        textDecoration: 'none',
+        cursor: 'pointer'
+      }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.12)';
@@ -77,7 +77,7 @@ export default function StreamCard({ stream, onAction }) {
       }}
     >
       {/* SECTION A: Recipient Info */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '180px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '1 0 180px' }}>
         <div style={{
           width: '44px', height: '44px', borderRadius: '50%',
           background: 'linear-gradient(135deg, #1a2030, #0d1117)',
@@ -113,7 +113,7 @@ export default function StreamCard({ stream, onAction }) {
       </div>
 
       {/* SECTION C: Live Counter */}
-      <div style={{ textAlign: 'right', minWidth: '160px' }}>
+      <div style={{ textAlign: 'right', flex: '1 0 160px' }}>
         <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '2px' }}>
           Total Available
         </div>

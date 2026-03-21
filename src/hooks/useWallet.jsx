@@ -16,6 +16,9 @@ function initKit() {
     modules: [new FreighterModule(), new xBullModule(), new LobstrModule()],
     selectedWalletId: 'freighter',
     network: NETWORK_PASSPHRASE,
+    authModal: {
+      hideUnsupportedWallets: false
+    }
   })
 }
 

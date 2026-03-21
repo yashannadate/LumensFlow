@@ -170,13 +170,13 @@ export default function StreamDetails() {
   const canCancel = isSender && status === 'Active'
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 32px 100px', position: 'relative', zIndex: 1 }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: 'var(--dashboard-padding, 40px 32px 100px)', position: 'relative', zIndex: 1 }}>
       
       <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#6b7280', textDecoration: 'none', fontSize: '13px', fontWeight: 600, marginBottom: '32px', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         <ArrowLeft size={14} /> Back to Dashboard
       </Link>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="dashboard-two-col" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '32px', alignItems: 'start' }}>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
@@ -191,8 +191,8 @@ export default function StreamDetails() {
               </div>
 
              <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Withdrawable Now</div>
-             <div style={{ fontFamily: 'var(--font-brand)', fontSize: '48px', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '8px' }}>
-                {withdrawable.toFixed(7)} <span style={{ fontSize: '20px', opacity: 0.5, fontWeight: 400 }}>XLM</span>
+             <div style={{ fontFamily: 'var(--font-brand)', fontSize: 'clamp(32px, 8vw, 48px)', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '8px' }}>
+                {withdrawable.toFixed(7)} <span style={{ fontSize: '0.45em', opacity: 0.5, fontWeight: 400 }}>XLM</span>
              </div>
              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#22c55e', fontSize: '13px', fontWeight: 600, marginBottom: '32px' }}>
                 <Zap size={14} /> +{flowRate.toFixed(6)} XLM/s Flow

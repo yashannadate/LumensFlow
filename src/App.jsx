@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { WalletProvider, useWallet } from './hooks/useWallet.jsx'
 import { ToastProvider } from './components/Toast.jsx'
@@ -26,13 +27,28 @@ function AppRoutes() {
   const location = useLocation()
   const isAppRoute = APP_ROUTES.some(r => location.pathname.startsWith(r))
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  
+  // Close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false)
+  }, [location.pathname])
+
   if (isAppRoute) {
-    // Authenticated sidebar+header shell
     return (
       <div className="app-authenticated">
-        <Sidebar />
+        {/* Mobile Backdrop */}
+        {isSidebarOpen && (
+          <div 
+            className="sidebar-backdrop show-mobile" 
+            onClick={() => setIsSidebarOpen(false)} 
+          />
+        )}
+        
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        
         <div className="app-content">
-          <AppHeader />
+          <AppHeader onMenuClick={() => setIsSidebarOpen(true)} />
           <main className="app-main">
             <Routes>
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
