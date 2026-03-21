@@ -1,0 +1,24 @@
+# 💬 LumensFlow — User Feedback
+
+> **Validation Status: 2/5 Participants Completed (Active Testing Phase)**
+
+## Testing Participants
+
+| # | Wallet Address (Testnet) | Role | Status | Verification |
+|---|---|---|---|---|
+| 1 | `GB4AZ4KLH746OLPIDH74CKNCHRT2C3EXK5PQ2NL2UBBMZMS7OAGYDGKJ` | Sender | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GB4AZ4KLH746OLPIDH74CKNCHRT2C3EXK5PQ2NL2UBBMZMS7OAGYDGKJ) |
+| 2 | `GBXFG7LVJQZXHBYGB4VIFP6XLD3UGUEKMRFJGFGJPW2JEUYN5KPGNEL4` | Recipient | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GBXFG7LVJQZXHBYGB4VIFP6XLD3UGUEKMRFJGFGJPW2JEUYN5KPGNEL4) |
+| 3 | `(Pending)` | Sender | ⏳ *Awaiting* | — |
+| 4 | `(Pending)` | Recipient | ⏳ *Awaiting* | — |
+| 5 | `(Pending)` | Observer | ⏳ *Awaiting* | — |
+
+---
+
+## Summary of Iterations Based on Feedback
+
+| Feedback | Change Made |
+|---|---|
+| Wallet modal hidden unsupported wallets | Forced visibility of all wallets via `hideUnsupportedWallets: false` |
+| Sensitive amounts visible in public feed | Removed amounts from activity feed; truncated addresses to `GB4A...DGKJ` |
+| Closing connect popup caused redirect | Added route guards in Landing.jsx to prevent empty dashboard redirect |
+| Lack of Explorer visibility | Added `[↗]` icon to every activity card for direct on-chain verification |
