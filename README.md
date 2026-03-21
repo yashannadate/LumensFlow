@@ -1,58 +1,94 @@
-# 🌊 LumensFlow
+# ⚡ LumensFlow
 
-![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-86EE1E?style=flat-square&logo=stellar&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![Soroban](https://img.shields.io/badge/Smart%20Contract-Soroban-FF6B35?style=flat-square&logo=stellar&logoColor=white)
-![Deployed](https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
+![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-86EE1E?style=flat-square&logo=stellar&logoColor=black)
+![React](https://img.shields.io/badge/Frontend-React_Vite-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Soroban](https://img.shields.io/badge/Smart%20Contract-Soroban-8b5cf6?style=flat-square&logo=stellar&logoColor=white)
+[![CI Status](https://github.com/yashannadate/LumensFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/yashannadate/LumensFlow/actions)
 
-> **Continuous, Second-by-Second Payment Streaming Protocol on Stellar Soroban.**
+> Real-time payment streaming on the Stellar Network — powered by Soroban Smart Contracts.
 
-LumensFlow is a non-custodial real-time payment protocol that enables continuous XLM flows between participants. Built on the Stellar Network using Soroban smart contracts, LumensFlow ensures mathematical precision and instant liquidity for payroll, subscriptions, and vesting.
-
----
-
-## 🟢 Live Demo
-**[https://lumens-flow-app.vercel.app/](https://lumens-flow-app.vercel.app/)** *(Placeholder)*
+LumensFlow enables continuous, second-by-second XLM payment streaming. Funds are locked in a non-custodial Soroban smart contract and flow in realtime to the recipient. From payroll to token vesting — every second earns.
 
 ---
 
-## 🚀 Key Features
+## 🔴 Live Demo
 
-### 🕒 Real-Time Streaming
-Payments flow incrementally every second. Recipients can withdraw accrued funds instantly at any time, while senders maintain full control with on-chain cancellation and auto-refund logic.
-
-### 🛡️ Non-Custodial Architecture
-LumensFlow leverages Soroban smart contracts to hold funds in escrow. No central party ever has access to the capital — it is locked and managed entirely by the protocol logic.
-
-### 📊 Live Analytics Dashboard
-- **Activity Feed**: Real-time tracking of protocol-wide events (Stream Creation, Withdrawals, Cancellations).
-- **Precise Counters**: Frontend engine calculates withdrawable balances down to 7 decimal places in real-time.
-- **Protocol Insights**: Track unique users and total protocol liquidity live from the ledger.
-
-### 📱 Premium Mobile Experience
-Fully responsive design with a dedicated mobile drawer navigation, hamburger menus, and fluid scaling across all device viewports.
+**[▶ Launch LumensFlow](https://your-vercel-link.vercel.app)** ← *Add your deployment link here*
 
 ---
 
-## 📝 Smart Contract Interface
+## 🎥 Demo Video
 
-The LumensFlow core contract manages the logic of every stream, ensuring that funds are distributed accurately according to the defined flow rate.
-
-| Function | Description |
-|---|---|
-| `create_stream` | Initializes a new stream by locking XLM in a non-custodial escrow. |
-| `withdraw` | Allows the recipient to pull accrued funds to their wallet instantly. |
-| `cancel_stream` | Stops the flow; pays pending funds to recipient and refunds the rest to sender. |
-| `get_stream` | Retrieves on-chain state, timestamps, and contract balances. |
-
-**Contract ID:** `CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR`  
-🔍 [View on StellarExpert ↗](https://stellar.expert/explorer/testnet/contract/CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR)
+**[▶ Watch 2-Minute Demo](https://youtube.com/your-link)** ← *Add your demo video link here*
 
 ---
 
-## 📸 Dashboard Preview
+## 📸 Application Screenshots
 
-*(Insert Dashboard Screenshot Here)*
+### 🏠 Landing Page
+> *Insert your landing page screenshot here*
+<!-- ![Landing Page](https://github.com/user-attachments/assets/YOUR-SCREENSHOT-ID) -->
+
+### ❓ How It Works
+> *Insert your How It Works page screenshot here*
+<!-- ![How It Works](https://github.com/user-attachments/assets/YOUR-SCREENSHOT-ID) -->
+
+### ⚡ LumensFlow Features
+> *Insert your Features section screenshot here*
+<!-- ![Features](https://github.com/user-attachments/assets/YOUR-SCREENSHOT-ID) -->
+
+### 📊 Main Dashboard
+> *Insert your Dashboard screenshot here*
+<!-- ![Dashboard](https://github.com/user-attachments/assets/YOUR-SCREENSHOT-ID) -->
+
+### ➕ Create Stream
+> *Insert your Create Stream page screenshot here*
+<!-- ![Create Stream](https://github.com/user-attachments/assets/YOUR-SCREENSHOT-ID) -->
+
+---
+
+## ⚡ Core Features
+
+**Real-Time Payment Streaming**
+Set a deposit amount and a duration. The smart contract calculates the per-second flow rate and unlocks funds dynamically every second.
+
+**Multi-Wallet Support**
+Integrated with `@creit.tech/stellar-wallets-kit`. LumensFlow supports **Freighter**, **xBull**, and **LOBSTR** out of the box.
+
+**100% On-Chain & Verifiable**
+Every stream is deployed as an immutable Soroban contract invocation. The dashboard shows a **Live Testnet Ledger** anyone can verify on Stellar Expert.
+
+**Privacy-Conscious UI**
+Public keys are truncated and amounts are hidden from the public feed. Explorer links are available for independent verification via a subtle icon.
+
+**Flexible Durations**
+Stream XLM for 1 hour, 1 day, 7 days, or 30 days. Cancel anytime — remaining funds are auto-refunded instantly.
+
+---
+
+## 📝 Soroban Contract
+
+| Contract | ID | Explorer |
+|---|---|---|
+| **LumensFlow Core** | `CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR` | [View ↗](https://stellar.expert/explorer/testnet/contract/CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR) |
+
+For a full breakdown of the system design, data flow, and file structure — see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+## 👥 Testnet Participants
+
+The following Stellar Testnet addresses were used for live testing and verification:
+
+| # | Wallet Address | Role |
+|---|---|---|
+| 1 | *(add address)* | Sender |
+| 2 | *(add address)* | Recipient |
+| 3 | *(add address)* | Sender |
+| 4 | *(add address)* | Recipient |
+| 5 | *(add address)* | Observer |
+
+User feedback and iteration log: [docs/FEEDBACK.md](docs/FEEDBACK.md)
 
 ---
 
@@ -60,20 +96,15 @@ The LumensFlow core contract manages the logic of every stream, ensuring that fu
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) v18+
-- [Freighter Wallet](https://www.freighter.app/) or [xBull](https://xbull.app/)
-- Network: **Stellar Testnet**
-- Testnet XLM: Fund via [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
+- A Stellar Wallet: [Freighter](https://www.freighter.app/), [xBull](https://xbull.app/) or [LOBSTR](https://lobstr.co/)
+- Set your wallet to **Testnet**
+- Fund with Testnet XLM via the [Stellar Laboratory Faucet](https://laboratory.stellar.org/#account-creator?network=test)
 
 ### Run Locally
 ```bash
-# Clone the repository
-git clone https://github.com/yashannadate/lumensflow.git
-cd lumensflow
-
-# Install dependencies
+git clone https://github.com/yashannadate/LumensFlow.git
+cd LumensFlow
 npm install
-
-# Start development server
 npm run dev
 ```
 
@@ -83,14 +114,13 @@ npm run dev
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React v18 + Vite |
-| **Logic** | Vanilla JavaScript (ES6+) |
-| **Styling** | Modern CSS + Responsive Framework |
-| **Smart Contracts** | Rust + Soroban SDK |
-| **Wallet Integration** | Stellar Wallets Kit |
+| **Frontend** | React, Vite |
+| **Smart Contracts** | Rust, Soroban SDK |
+| **Wallet Layer** | `@creit.tech/stellar-wallets-kit` |
 | **Network** | Stellar Testnet |
-| **Icons** | Lucide React |
+| **Styling** | Vanilla CSS (Dark/Neon Theme) |
+| **CI/CD** | GitHub Actions |
 
 ---
 
-<p align="center">Built with 🤍 for the Stellar Ecosystem | 2026</p>
+<p align="center">Built with ⚡ on the Stellar Network</p>

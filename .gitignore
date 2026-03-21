@@ -35,5 +35,9 @@ test_snapshots/
 .env.local
 .env.*.local
 
+# Dev artifacts
+build_output.log
+kit-info.json
+
 # Vercel
 .vercel
