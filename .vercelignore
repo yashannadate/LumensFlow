@@ -1,0 +1,11 @@
+node_modules
+target
+dist
+contracts
+.git
+*.log
+kit-info.json
+docs
+ARCHITECTURE.md
+FEEDBACK.md
+README.md

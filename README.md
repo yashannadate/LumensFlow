@@ -1,15 +1,12 @@
 <h1 align="center">⚡ LumensFlow</h1>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Network-Stellar%20Testnet-86EE1E?style=for-the-badge&logo=stellar&logoColor=black" alt="Network" />
-  <img src="https://img.shields.io/badge/Smart%20Contracts-Soroban-8b5cf6?style=for-the-badge&logo=stellar&logoColor=white" alt="Soroban" />
-  <img src="https://img.shields.io/badge/Frontend-React_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Stellar-7D7D7D?style=for-the-badge&logo=stellar&logoColor=white" alt="Stellar" />
+  <img src="https://img.shields.io/badge/Soroban-8b5cf6?style=for-the-badge&logo=stellar&logoColor=white" alt="Soroban" />
+  <img src="https://img.shields.io/badge/React_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
   <img src="https://img.shields.io/badge/Level_5-Blue_Belt-3B82F6?style=for-the-badge" alt="Blue Belt" />
   <br />
-  <img src="https://img.shields.io/badge/Freighter-Supported-black?style=flat-square&logo=stellar" alt="Freighter" />
-  <img src="https://img.shields.io/badge/xBull-Supported-red?style=flat-square" alt="xBull" />
-  <img src="https://img.shields.io/badge/LOBSTR-Supported-083163?style=flat-square" alt="LOBSTR" />
-  <br />
+  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
   <a href="https://github.com/yashannadate/LumensFlow/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/yashannadate/LumensFlow/ci.yml?branch=main&style=for-the-badge&logo=github" alt="CI Status" />
   </a>
@@ -25,7 +22,7 @@
   LumensFlow is a decentralized, non-custodial payment streaming protocol built from the ground up using Soroban smart contracts. It transforms static XLM transfers into fluid, second-by-second micro-transactions. Lock funds in verifiable on-chain escrows, and watch balances accurately grow in real-time—because every second counts.
   <br />
   <br />
-  <a href=""><strong>🔴 Launch Live Demo</strong></a> · <a href="https://drive.google.com/drive/folders/15zJevSRM9vfUfKXQlHXcSsEZ_ZfhmkP7"><strong>🎥 Watch Demo Video</strong></a>
+  <a href="https://lumensflow.vercel.app"><strong>🔴 Launch Live Demo</strong></a> · <a href="https://drive.google.com/drive/folders/15zJevSRM9vfUfKXQlHXcSsEZ_ZfhmkP7"><strong>🎥 Watch Demo Video</strong></a>
 </p>
 
 ---
