@@ -124,16 +124,16 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
 | 1 | `GB4AZ4KLH746OLPIDH74...` | Sender | Created 3.5 XLM stream; successfully locked funds into custodial-free Soroban contract. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB4AZ4KLH746OLPIDH74CKNCHRT2C3EXK5PQ2NL2UBBMZMS7OAGYDGKJ) |
-| 2 | `GBXFG7LVJQZXHBYGB4VI...` | Recipient | Withdrew 3.5 XLM from active stream; verified real-time settlement on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBXFG7LVJQZXHBYGB4VIFP6XLD3UGUEKMRFJGFGJPW2JEUYN5KPGNEL4) |
+| 2 | `GBXFG7LVJ...` | Recipient | *(Testing Phase: Pending)* | — |
 | 3 | `GALIEC3IEJY5UP3KD...` | Tester | Created multiple streams; successfully tested the cancel stream functionality. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GALIEC3IEJY5UP3KDOF5GV4BTBMAREELZJ2SONU33MGOPX5IB7WINPQL) |
 | 4 | `GBQAQ3MOFYIXGWRHB7...` | Tester | Successfully withdrawn Lumens from locked contract funds. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBQAQ3MOFYIXGWRHB7ROIKQ5UFGDEGGNBXP2P3QB25DTPTR6ISEZKF44) |
-| 5 | `GBMNBVC5...` | Observer | *(Testing Phase: Pending)* | — |
+| 5 | `GB6CD6ZNF...` | Tester | Explored the application and created streams; successfully locked funds on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB6CD6ZNFDAMQFUBDLZTF7QVQZL4ZL3AF43KSFLUDH6C5P53PGKEEJ3P) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
 - **[📊 Feedback Responses Spreadsheet](Pending Phase)**
 
-*Testnet participants actively provided feedback to shape the privacy features (address truncation) built into version `1.0`. Full testing iteration logs reside in `docs/FEEDBACK.md`.*
+*Testnet participants actively provided feedback to shape the privacy features (address truncation) built into version `1.0`. Full testing iteration logs reside in [docs/FEEDBACK.md](./docs/FEEDBACK.md).*
 
 ---
 
