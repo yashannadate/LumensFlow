@@ -128,6 +128,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 3 | `GALIEC3IEJY5UP3KD...` | Tester | Created multiple streams; successfully tested the cancel stream functionality. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GALIEC3IEJY5UP3KDOF5GV4BTBMAREELZJ2SONU33MGOPX5IB7WINPQL) |
 | 4 | `GBQAQ3MOFYIXGWRHB7...` | Tester | Successfully withdrawn Lumens from locked contract funds. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBQAQ3MOFYIXGWRHB7ROIKQ5UFGDEGGNBXP2P3QB25DTPTR6ISEZKF44) |
 | 5 | `GB6CD6ZNF...` | Tester | Explored the application and created streams; successfully locked funds on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB6CD6ZNFDAMQFUBDLZTF7QVQZL4ZL3AF43KSFLUDH6C5P53PGKEEJ3P) |
+| 6 | `GACXDFSKX...` | Tester | Successfully created and tested multiple payment streams; verified on-chain settlement. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GACXDFSKXNL5BN76JZWQESBAHEY4OA57OAJZXY5FH7OPTLIWFNJ6427N) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
