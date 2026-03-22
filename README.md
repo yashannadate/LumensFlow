@@ -124,7 +124,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
 | 1 | `GB4AZ4KLH746OLPIDH74...` | Sender | Created 3.5 XLM stream; successfully locked funds into custodial-free Soroban contract. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB4AZ4KLH746OLPIDH74CKNCHRT2C3EXK5PQ2NL2UBBMZMS7OAGYDGKJ) |
-| 2 | `GBXFG7LVJ...` | Recipient | *(Testing Phase: Pending)* | — |
+| 2 | `GDDZIUEPJ...` | Sender | Locked (Sent) 10 XLM to the contract owner; explored the app and verified the transaction. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDDZIUEPJYRZDMGQ45TELZLYN24AWS6KYAMXCLDXNSFNMYSIND3CYJMA) |
 | 3 | `GALIEC3IEJY5UP3KD...` | Tester | Created multiple streams; successfully tested the cancel stream functionality. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GALIEC3IEJY5UP3KDOF5GV4BTBMAREELZJ2SONU33MGOPX5IB7WINPQL) |
 | 4 | `GBQAQ3MOFYIXGWRHB7...` | Tester | Successfully withdrawn Lumens from locked contract funds. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBQAQ3MOFYIXGWRHB7ROIKQ5UFGDEGGNBXP2P3QB25DTPTR6ISEZKF44) |
 | 5 | `GB6CD6ZNF...` | Tester | Explored the application and created streams; successfully locked funds on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB6CD6ZNFDAMQFUBDLZTF7QVQZL4ZL3AF43KSFLUDH6C5P53PGKEEJ3P) |
