@@ -129,6 +129,9 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 4 | `GBQAQ3MOFYIXGWRHB7...` | Tester | Successfully withdrawn Lumens from locked contract funds. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBQAQ3MOFYIXGWRHB7ROIKQ5UFGDEGGNBXP2P3QB25DTPTR6ISEZKF44) |
 | 5 | `GB6CD6ZNF...` | Tester | Explored the application and created streams; successfully locked funds on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB6CD6ZNFDAMQFUBDLZTF7QVQZL4ZL3AF43KSFLUDH6C5P53PGKEEJ3P) |
 | 6 | `GACXDFSKX...` | Tester | Successfully created and tested multiple payment streams; verified on-chain settlement. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GACXDFSKXNL5BN76JZWQESBAHEY4OA57OAJZXY5FH7OPTLIWFNJ6427N) |
+| 7 | `GDHPNSQIN...` | Tester | Created multiple streams; explored and verified professional UI responsiveness. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDHPNSQINMCUNO6DOWO7HSAW5NTNO2MDY6LDHGKPJMGLUSUMLVWBJKJ6) |
+| 8 | `GA7U4LNT7...` | Tester | Stress-tested the payment flow and verified transaction finality on Stellar Expert. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6) |
+| 9 | `GAYJALSDD...` | Tester | Validated stream lifecycle (creation, withdrawal, and cancellation logic). | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
