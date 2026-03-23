@@ -18,6 +18,7 @@ export default function Navbar() {
 
   const navLinks = [
     { label: 'How It Works', to: '/how-it-works' },
+    { label: 'Docs', to: '/docs' },
     { label: 'Protocol', to: 'https://soroban.stellar.org', external: true },
   ]
 

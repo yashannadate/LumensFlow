@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import CreateStream from './pages/CreateStream.jsx'
 import StreamDetails from './pages/StreamDetails.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
+import Docs from './pages/Docs.jsx'
 
 // Routes that use the sidebar shell layout
 const APP_ROUTES = ['/dashboard', '/create', '/stream']
@@ -69,6 +70,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/"             element={<Landing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/docs"         element={<Docs />} />
           {/* Catch-all: redirect to dashboard or home */}
           <Route path="*"             element={<Navigate to="/" replace />} />
         </Routes>
