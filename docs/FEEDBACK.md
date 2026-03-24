@@ -20,7 +20,7 @@
 
 ## 🔗 Project Insights
 - **[📝 Official Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
-- **[📊 Responses Spreadsheet](Pending Phase)**
+- **[📊 Responses Spreadsheet](https://docs.google.com/spreadsheets/d/1vS4LrcrGObBwGvAJduHcXkqA9MUO1aLDiEvXXnIrWYw/edit?usp=sharing)**
 
 ---
 
