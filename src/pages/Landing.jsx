@@ -164,15 +164,15 @@ export default function Landing() {
         </p>
 
         {/* CTAs */}
-        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
+        <div className="flex-col-mobile mobile-gap-sm" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
           <button
             onClick={handleStart}
-            className="cta-btn-primary"
+            className="cta-btn-primary mobile-w-full"
             style={{
               background: '#8b5cf6', color: '#fff', border: 'none',
               borderRadius: '9999px', padding: '14px 32px',
               fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
-              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px',
+              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               boxShadow: '0 4px 20px rgba(139,92,246,0.35)',
               transition: 'transform 0.2s, box-shadow 0.2s',
             }}
@@ -181,13 +181,14 @@ export default function Landing() {
           </button>
           <button
             onClick={() => navigate('/how-it-works')}
-            className="cta-btn-ghost"
+            className="cta-btn-ghost mobile-w-full"
             style={{
               background: 'transparent', color: '#8b5cf6',
               border: '1px solid rgba(139,92,246,0.40)',
               borderRadius: '9999px', padding: '14px 32px',
               fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
               cursor: 'pointer', transition: 'background 0.2s, border-color 0.2s',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
             How It Works
@@ -205,7 +206,7 @@ export default function Landing() {
       {/* ══ STATS BAR ═════════════════════════════════════════════════════ */}
       <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1f2937', borderBottom: '1px solid #1f2937', background: 'rgba(17,24,39,0.70)', backdropFilter: 'blur(20px)', padding: '32px 0', marginBottom: '0' }}>
         <div className="page-wrap">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', textAlign: 'center' }}>
+          <div className="grid-3" style={{ display: 'grid', gap: '24px', textAlign: 'center' }}>
             {[
               { icon: Gauge, n: '<0.003 XLM', s: 'Per Transaction' },
               { icon: ShieldCheck, n: '100% On-Chain', s: 'Verified' },
@@ -241,7 +242,7 @@ export default function Landing() {
           </div>
 
           {/* Cards with dashed connector */}
-          <div className="grid-3" style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+          <div className="grid-3" style={{ position: 'relative', display: 'grid', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
             {/* Dashed connector line */}
             <div className="hide-mobile" style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
 

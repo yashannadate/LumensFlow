@@ -51,19 +51,19 @@ export default function Dashboard() {
   /* ── Sub-components ────────────────────────────────────────── */
   const StatCard = ({ icon, label, value, badge, accent = 'var(--primary)' }) => (
     <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative' }}>
-       <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg,transparent,rgba(139,92,246,0.30),transparent)', pointerEvents: 'none' }} />
-       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </div>
-          {badge}
-       </div>
-       <div>
-          <div style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em', marginBottom: '2px' }}>
-            {loading ? '—' : value}
-          </div>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
-       </div>
+      <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg,transparent,rgba(139,92,246,0.30),transparent)', pointerEvents: 'none' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {icon}
+        </div>
+        {badge}
+      </div>
+      <div>
+        <div style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em', marginBottom: '2px' }}>
+          {loading ? '—' : value}
+        </div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
+      </div>
     </div>
   )
 
@@ -78,28 +78,28 @@ export default function Dashboard() {
   )
 
   return (
-    <div style={{ 
-      padding: 'var(--dashboard-padding, 40px 32px 80px)', 
-      maxWidth: '1240px', 
-      margin: '0 auto', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      gap: '40px', 
-      position: 'relative', 
-      zIndex: 1 
+    <div style={{
+      padding: 'var(--dashboard-padding, 40px 32px 80px)',
+      maxWidth: '1240px',
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '40px',
+      position: 'relative',
+      zIndex: 1
     }} className="dashboard-container">
 
       {/* ── Page header ───────────────────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
+      <div className="flex-col-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
         <div>
           <h1 style={{ fontSize: 'clamp(28px, 5vw, 38px)', letterSpacing: '-0.04em' }}>Dashboard</h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={load} disabled={loading} className="btn-ghost" style={{ padding: '12px 24px', fontSize: '13px', borderRadius: '9999px' }}>
+        <div className="mobile-w-full" style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={load} disabled={loading} className="btn-ghost mobile-w-full" style={{ padding: '12px 24px', fontSize: '13px', borderRadius: '9999px', justifyContent: 'center' }}>
             <RefreshCw size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} /> Refresh
           </button>
-          <Link to="/create" style={{ textDecoration: 'none' }}>
-            <button className="btn-primary" style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '9999px' }}>
+          <Link to="/create" className="mobile-w-full" style={{ textDecoration: 'none' }}>
+            <button className="btn-primary mobile-w-full" style={{ padding: '12px 24px', fontSize: '14px', borderRadius: '9999px', justifyContent: 'center' }}>
               <Plus size={16} /> Create Stream
             </button>
           </Link>
@@ -107,22 +107,22 @@ export default function Dashboard() {
       </div>
 
       {/* ── Stat row ──────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px' }} className="stats-3-grid">
-        <StatCard 
-          icon={<Activity size={16} color="var(--primary)" />}  
-          label="Total Streams" 
+      <div style={{ display: 'grid', gap: '16px' }} className="stats-3-grid">
+        <StatCard
+          icon={<Activity size={16} color="var(--primary)" />}
+          label="Total Streams"
           value={streams.length}
           badge={<div style={{ fontSize: '10px', color: '#22c55e', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>+12.4%</div>}
         />
-        <StatCard 
-          icon={<Zap size={16} color="#86EE1E" />} 
-          label="Active Payment Streams" 
+        <StatCard
+          icon={<Zap size={16} color="#86EE1E" />}
+          label="Active Payment Streams"
           value={activeCount}
           badge={<div style={{ fontSize: '10px', color: '#86EE1E', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>LIVE</div>}
         />
-        <StatCard 
-          icon={<Droplets size={16} color="#a78bfa" />}  
-          label="Estimated Flow Value"     
+        <StatCard
+          icon={<Droplets size={16} color="#a78bfa" />}
+          label="Estimated Flow Value"
           value={`${totalXlm.toFixed(2)}`}
           badge={<div style={{ fontSize: '10px', color: '#a78bfa', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>XLM</div>}
         />
@@ -163,18 +163,18 @@ export default function Dashboard() {
 
         {/* Sidebar panels */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-           <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Quick Actions</div>
-              <Link to="/create" style={{ textDecoration: 'none' }}>
-                <button className="btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '9999px', fontSize: '14px', fontWeight: 700, fontFamily: 'var(--font-brand)' }}>
-                   ＋ Create Stream
-                </button>
-              </Link>
-           </div>
+          <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Quick Actions</div>
+            <Link to="/create" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ width: '100%', padding: '14px', borderRadius: '9999px', fontSize: '14px', fontWeight: 700, fontFamily: 'var(--font-brand)' }}>
+                ＋ Create Stream
+              </button>
+            </Link>
+          </div>
 
-           <ActivityFeed activities={activities} loading={feedLoading} />
-           
-           <ActiveUsers streams={streams} />
+          <ActivityFeed activities={activities} loading={feedLoading} />
+
+          <ActiveUsers streams={streams} />
         </div>
 
       </div>

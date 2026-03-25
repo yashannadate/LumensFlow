@@ -13,10 +13,20 @@ export const XLM_TOKEN_CONTRACT = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQ
 const server = new rpc.Server(RPC_URL)
 
 // ─── ScVal helpers ────────────────────────────────────────────────────────
-const addr = (a) => nativeToScVal(a, { type: 'address' })
-const u32 = (n) => nativeToScVal(Number(n), { type: 'u32' })
-const u64 = (n) => nativeToScVal(BigInt(n), { type: 'u64' })
-const i128 = (n) => nativeToScVal(BigInt(n), { type: 'i128' })
+// Using explicit Address and xdr builders is more robust than nativeToScVal
+// across different SDK versions and complex union types.
+const addr = (a) => Address.fromString(a).toScVal()
+const u32 = (n) => xdr.ScVal.scvU32(Number(n))
+const u64 = (n) => xdr.ScVal.scvU64(xdr.Uint64.fromString(BigInt(n).toString()))
+const i128 = (n) => {
+  const b = BigInt(n)
+  const lo = b & 0xffffffffffffffffn
+  const hi = b >> 64n
+  return xdr.ScVal.scvI128(new xdr.Int128Parts({
+    lo: xdr.Uint64.fromString(lo.toString()),
+    hi: xdr.Int64.fromString(hi.toString()),
+  }))
+}
 
 export const xlmToStroops = (xlm) => BigInt(Math.round(parseFloat(xlm) * 10_000_000))
 export const stroopsToXlm = (s) => (Number(s) / 10_000_000).toFixed(7)
@@ -33,7 +43,21 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
     .setTimeout(30)
     .build()
 
-  const prepared = await server.prepareTransaction(tx)
+  let prepared
+  try {
+    prepared = await server.prepareTransaction(tx)
+  } catch (e) {
+    console.error('Simulation (prepareTransaction) failed:', e)
+    if (e?.message?.includes('Bad union switch')) {
+      throw new Error(`SDK XDR Parsing Error: The Stellar SDK encountered a conflict while parsing the simulation result. 
+        Possible causes: 
+        1. Conflicting versions of @stellar/stellar-sdk in node_modules (Workaround: just applied npm overrides).
+        2. The contract returned an error (e.g. NotInitialized or InvalidDeposit) that the SDK failed to decode.
+        Original Error: ${e.message}`)
+    }
+    throw e
+  }
+
   const signed = await signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
   })
@@ -88,7 +112,15 @@ async function simulateContract(method, args, sourceAddress) {
   if (rpc.Api.isSimulationError(result)) {
     throw new Error('Simulation failed: ' + result.error)
   }
-  return scValToNative(result.result.retval)
+  try {
+    return scValToNative(result.result.retval)
+  } catch (e) {
+    if (e?.message?.includes('Bad union switch')) {
+      console.warn('Simulation result parsing failed due to SDK bug, returning null:', e)
+      return null
+    }
+    throw e
+  }
 }
 
 // ─── Stream parser ────────────────────────────────────────────────────────

@@ -66,7 +66,7 @@ export default function CreateStream() {
         <p style={{ color: '#9ca3af', fontSize: '16px', maxWidth: '480px', margin: '0 auto' }}>Deploy a real-time payment streaming contract on the Stellar network.</p>
       </div>
 
-      <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-2 dashboard-two-col" style={{ display: 'grid', gap: '32px', alignItems: 'start' }}>
 
         {/* Form panel */}
         <form onSubmit={handleSubmit} className="card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
@@ -134,8 +134,8 @@ export default function CreateStream() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary"
-            style={{ width: '100%', padding: '18px', borderRadius: '9999px', fontSize: '15px', fontWeight: 700, fontFamily: 'var(--font-brand)', marginTop: '8px' }}
+            className="btn-primary mobile-w-full"
+            style={{ width: '100%', padding: '18px', borderRadius: '9999px', fontSize: '15px', fontWeight: 700, fontFamily: 'var(--font-brand)', marginTop: '8px', justifyContent: 'center' }}
           >
             {loading ? 'Deploying Contract...' : isConnected ? 'Deploy Stream' : 'Connect Wallet to Stream'}
           </button>
