@@ -16,6 +16,7 @@
 | 8 | `GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6) |
 | 9 | `GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
 | 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN) |
+| 11 | `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ) |
 
 ---
 
@@ -34,3 +35,4 @@
 | Closing connect popup caused redirect | Added route guards in Landing.jsx to prevent empty dashboard redirect |
 | Lack of Explorer visibility | Added `[↗]` icon to every activity card for direct on-chain verification |
 | UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
+| Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
