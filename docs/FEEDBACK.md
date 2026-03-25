@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 10/5 Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 11/5 Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -36,3 +36,46 @@
 | Lack of Explorer visibility | Added `[↗]` icon to every activity card for direct on-chain verification |
 | UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
 | Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
+
+---
+
+## 🎯 Selected User Feedback & Implementation Details
+
+Based on collected feedback, the following two key suggestions were selected and implemented:
+
+---
+
+### 🔹 Feedback 1: Mobile Responsiveness Issue
+
+**Wallet Address:** `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN`  
+
+**Feedback Statement:**  
+"Please fix the UI responsiveness on mobile, it is slightly conflicting. Overall, the application works well on PC."
+
+**Implementation:**  
+Improved mobile responsiveness by restructuring layout components, optimizing spacing, and ensuring proper rendering across different screen sizes using a granular utility-first CSS approach.
+
+**Commit ID:** `d6f14d7`  
+
+---
+
+### 🔹 Feedback 2: Documentation Clarity
+
+**Wallet Address:** `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ`  
+
+**Feedback Statement:**  
+"The documentation should be clearer and easier for new users. Adding a workflow example would improve understanding."
+
+**Implementation:**  
+Enhanced documentation by adding a step-by-step workflow along with example visuals (e.g., "Alice & Bob") to simplify onboarding for new users in `Docs.jsx`.
+
+**Commit ID:** `88c833b`  
+
+---
+
+### ✅ Impact
+- Improved mobile usability  
+- Better onboarding experience  
+- Direct integration of real user feedback into the product  
+
+These improvements directly reflect selected user feedback and enhance the overall platform experience.
