@@ -132,14 +132,13 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 7 | `GDHPNSQIN...` | Tester | Created multiple streams; explored and verified professional UI responsiveness. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDHPNSQINMCUNO6DOWO7HSAW5NTNO2MDY6LDHGKPJMGLUSUMLVWBJKJ6) |
 | 8 | `GA7U4LNT7...` | Tester | Stress-tested the payment flow and verified transaction finality on Stellar Expert. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6) |
 | 9 | `GAYJALSDD...` | Tester | Validated stream lifecycle (creation, withdrawal, and cancellation logic). | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
+| 10 | `GC7DC266Y...` | Tester | Verified mobile responsiveness and validated stream accrual on diverse viewport sizes. Fixed ✅ (Commit: `d6f14d7`) | [Verify ↗](https://stellar.expert/explorer/testnet/account/GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
 - **[📊 Feedback Responses Spreadsheet](https://docs.google.com/spreadsheets/d/1vS4LrcrGObBwGvAJduHcXkqA9MUO1aLDiEvXXnIrWYw/edit?usp=sharing)**
 
 *Testnet participants actively provided feedback to shape the privacy features (address truncation) built into version `1.0`. Full testing iteration logs reside in [docs/FEEDBACK.md](./docs/FEEDBACK.md).*
-
----
 
 ---
 

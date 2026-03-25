@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 9/5 Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 10/5 Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -15,6 +15,7 @@
 | 7 | `GDHPNSQINMCUNO6DOWO7HSAW5NTNO2MDY6LDHGKPJMGLUSUMLVWBJKJ6` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDHPNSQINMCUNO6DOWO7HSAW5NTNO2MDY6LDHGKPJMGLUSUMLVWBJKJ6) |
 | 8 | `GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6) |
 | 9 | `GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
+| 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN) |
 
 ---
 
@@ -32,3 +33,4 @@
 | Sensitive amounts visible in public feed | Removed amounts from activity feed; truncated addresses to `GB4A...DGKJ` |
 | Closing connect popup caused redirect | Added route guards in Landing.jsx to prevent empty dashboard redirect |
 | Lack of Explorer visibility | Added `[↗]` icon to every activity card for direct on-chain verification |
+| UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
