@@ -33,21 +33,21 @@ export function useStream() {
     }
   }, [])
 
-  const createAction = useCallback((receiver, amountXLM, durationSec) =>
+  const createAction = useCallback((receiver, amountXLM, durationSec, opts = {}) =>
     handleAction(() =>
-      createStream(address, receiver, amountXLM, durationSec, signTransaction),
+      createStream(address, receiver, amountXLM, durationSec, signTransaction, opts),
       'createStream'
     ),
     [address, signTransaction, handleAction])
 
-  const withdrawAction = useCallback((streamId) => {
+  const withdrawAction = useCallback((streamId, opts = { sponsored: true }) => {
     const id = Number(streamId)
-    return handleAction(() => withdraw(id, address, signTransaction), 'withdraw');
+    return handleAction(() => withdraw(id, address, signTransaction, opts), 'withdraw');
   }, [address, signTransaction, handleAction])
 
-  const cancelAction = useCallback((streamId) => {
+  const cancelAction = useCallback((streamId, opts = { sponsored: true }) => {
     const id = Number(streamId)
-    return handleAction(() => cancelStream(id, address, signTransaction), 'cancelStream');
+    return handleAction(() => cancelStream(id, address, signTransaction, opts), 'cancelStream');
   }, [address, signTransaction, handleAction])
 
   const fetchStream = useCallback(async (streamId) => {

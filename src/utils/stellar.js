@@ -2,6 +2,8 @@ import {
   Contract, TransactionBuilder, BASE_FEE,
   rpc, scValToNative, nativeToScVal, Address, xdr,
 } from '@stellar/stellar-sdk'
+import { isSponsorshipEnabled, buildFeeBumpTransaction, SPONSOR_PUBLIC_KEY } from './sponsorService.js'
+import { logger, trackTransaction } from './logger.js'
 
 export const CONTRACT_ID = 'CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR'
 export const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
@@ -32,22 +34,25 @@ export const xlmToStroops = (xlm) => BigInt(Math.round(parseFloat(xlm) * 10_000_
 export const stroopsToXlm = (s) => (Number(s) / 10_000_000).toFixed(7)
 
 // ─── Transaction invoker ──────────────────────────────────────────────────
-async function invokeContract(method, args, sourceAddress, signTransaction) {
-  const account = await server.getAccount(sourceAddress)
-  const contract = new Contract(CONTRACT_ID)
+// Method call with optional Fee Sponsorship (FeeBumpTransaction)
+async function invokeContract(method, args, sourceAddress, signTransaction, options = {}) {
+  const { sponsored = false } = options;
+  const account = await server.getAccount(sourceAddress);
+  const contract = new Contract(CONTRACT_ID);
+  
   const tx = new TransactionBuilder(account, {
-    fee: BASE_FEE,
+    fee: sponsored ? '100' : BASE_FEE,
     networkPassphrase: NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(method, ...args))
     .setTimeout(30)
-    .build()
+    .build();
 
-  let prepared
+  let prepared;
   try {
-    prepared = await server.prepareTransaction(tx)
+    prepared = await server.prepareTransaction(tx);
   } catch (e) {
-    console.error('Simulation (prepareTransaction) failed:', e)
+    logger.error('RPC', `Simulation failed for ${method}`, { error: e.message });
     if (e?.message?.includes('Bad union switch')) {
       throw new Error(`SDK XDR Parsing Error: The Stellar SDK encountered a conflict while parsing the simulation result. 
         Possible causes: 
@@ -55,44 +60,61 @@ async function invokeContract(method, args, sourceAddress, signTransaction) {
         2. The contract returned an error (e.g. NotInitialized or InvalidDeposit) that the SDK failed to decode.
         Original Error: ${e.message}`)
     }
-    throw e
+    throw e;
   }
 
   const signed = await signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
-  })
-  const signedXdr = signed?.signedTxXdr ?? signed
+  });
+  const signedXdr = signed?.signedTxXdr ?? signed;
 
-  const submitted = await server.sendTransaction(
-    TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
-  )
+  let finalXDR = signedXdr;
+  let actuallySponsored = false;
 
-  if (submitted.status === 'ERROR') {
-    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted))
+  if (sponsored) {
+    try {
+      const feeBumpTx = await buildFeeBumpTransaction(signedXdr);
+      finalXDR = feeBumpTx.toXDR();
+      actuallySponsored = true;
+      logger.info('SPONSOR', `FeeBump applied for ${method}`);
+    } catch (e) {
+      logger.warn('SPONSOR', 'FeeBump failed, falling back', { error: e.message });
+      actuallySponsored = false;
+    }
   }
 
-  let result = submitted
+  const submitted = await server.sendTransaction(
+    TransactionBuilder.fromXDR(finalXDR, NETWORK_PASSPHRASE)
+  );
+
+  if (submitted.status === 'ERROR') {
+    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted));
+  }
+
+  let result = submitted;
   while (result.status === 'PENDING' || result.status === 'NOT_FOUND') {
-    await new Promise(r => setTimeout(r, 1500))
+    await new Promise(r => setTimeout(r, 1500));
     try {
-      result = await server.getTransaction(submitted.hash)
+      result = await server.getTransaction(submitted.hash);
     } catch (e) {
       if (e?.message?.includes('Bad union switch')) {
-        console.warn('Swallowed SDK XDR parsing bug for confirmed transaction:', e)
-        result = { status: 'SUCCESS', hash: submitted.hash }
-        break
+        console.warn('Swallowed SDK XDR parsing bug for confirmed transaction:', e);
+        result = { status: 'SUCCESS', hash: submitted.hash };
+        break;
       }
-      throw e
+      throw e;
     }
   }
 
   if (result.status === 'FAILED') {
-    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result))
+    trackTransaction(method, false, submitted.hash, new Error('On-chain failure'));
+    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result));
   }
 
-  // Attach the tx hash to the result for UI display
-  result.txHash = submitted.hash
-  return result
+  trackTransaction(method, true, submitted.hash);
+  result.txHash = submitted.hash;
+  result.sponsored = actuallySponsored;
+  return result;
 }
 
 // ─── Simulator for read-only calls ───────────────────────────────────────
@@ -162,30 +184,22 @@ export async function createStream(
   amountXLM, durationSeconds, signTransaction
 ) {
   const stroops = xlmToStroops(amountXLM)
-  return invokeContract(
-    'create_stream',
-    [addr(senderAddress), addr(receiverAddress), i128(stroops), u64(durationSeconds)],
-    senderAddress,
-    signTransaction,
-  )
+  const args = [addr(senderAddress), addr(receiverAddress), i128(stroops), u64(durationSeconds)]
+  const invoke = isSponsorshipEnabled() ? invokeSponsoredContract : invokeContract
+  logger.info('TX', `Creating stream (sponsored=${isSponsorshipEnabled()})`, { amountXLM, durationSeconds })
+  return invoke('create_stream', args, senderAddress, signTransaction)
 }
 
 export async function withdraw(streamId, receiverAddress, signTransaction) {
-  return invokeContract(
-    'withdraw',
-    [u32(streamId), addr(receiverAddress)],
-    receiverAddress,
-    signTransaction,
-  )
+  const invoke = isSponsorshipEnabled() ? invokeSponsoredContract : invokeContract
+  logger.info('TX', `Withdraw stream ${streamId} (sponsored=${isSponsorshipEnabled()})`)
+  return invoke('withdraw', [u32(streamId), addr(receiverAddress)], receiverAddress, signTransaction)
 }
 
 export async function cancelStream(streamId, senderAddress, signTransaction) {
-  return invokeContract(
-    'cancel_stream',
-    [u32(streamId), addr(senderAddress)],
-    senderAddress,
-    signTransaction,
-  )
+  const invoke = isSponsorshipEnabled() ? invokeSponsoredContract : invokeContract
+  logger.info('TX', `Cancel stream ${streamId} (sponsored=${isSponsorshipEnabled()})`)
+  return invoke('cancel_stream', [u32(streamId), addr(senderAddress)], senderAddress, signTransaction)
 }
 
 // ─── READ functions ───────────────────────────────────────────────────────
