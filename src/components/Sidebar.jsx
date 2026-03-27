@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Waves, HelpCircle, Plus, Zap, X } from 'lucide-react'
+import { LayoutDashboard, Waves, HelpCircle, Plus, Zap, X, BarChart3 } from 'lucide-react'
 
 const NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
   { icon: Waves, label: 'Create Stream', to: '/create' },
+  { icon: BarChart3, label: 'Metrics', to: '/metrics' },
   { icon: HelpCircle, label: 'How It Works', to: '/how-it-works' },
 ]
 

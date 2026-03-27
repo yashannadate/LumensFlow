@@ -13,9 +13,10 @@ import CreateStream from './pages/CreateStream.jsx'
 import StreamDetails from './pages/StreamDetails.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
 import Docs from './pages/Docs.jsx'
+import Metrics from './pages/Metrics.jsx'
 
 // Routes that use the sidebar shell layout
-const APP_ROUTES = ['/dashboard', '/create', '/stream']
+const APP_ROUTES = ['/dashboard', '/create', '/stream', '/metrics']
 
 function ProtectedRoute({ children }) {
   const { isConnected } = useWallet()
@@ -55,6 +56,7 @@ function AppRoutes() {
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/create"    element={<ProtectedRoute><CreateStream /></ProtectedRoute>} />
               <Route path="/stream/:id" element={<ProtectedRoute><StreamDetails /></ProtectedRoute>} />
+              <Route path="/metrics"   element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
             </Routes>
           </main>
         </div>
