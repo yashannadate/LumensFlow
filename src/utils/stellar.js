@@ -34,25 +34,22 @@ export const xlmToStroops = (xlm) => BigInt(Math.round(parseFloat(xlm) * 10_000_
 export const stroopsToXlm = (s) => (Number(s) / 10_000_000).toFixed(7)
 
 // ─── Transaction invoker ──────────────────────────────────────────────────
-// Method call with optional Fee Sponsorship (FeeBumpTransaction)
-async function invokeContract(method, args, sourceAddress, signTransaction, options = {}) {
-  const { sponsored = false } = options;
-  const account = await server.getAccount(sourceAddress);
-  const contract = new Contract(CONTRACT_ID);
-  
+async function invokeContract(method, args, sourceAddress, signTransaction) {
+  const account = await server.getAccount(sourceAddress)
+  const contract = new Contract(CONTRACT_ID)
   const tx = new TransactionBuilder(account, {
-    fee: sponsored ? '100' : BASE_FEE,
+    fee: BASE_FEE,
     networkPassphrase: NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(method, ...args))
     .setTimeout(30)
-    .build();
+    .build()
 
-  let prepared;
+  let prepared
   try {
-    prepared = await server.prepareTransaction(tx);
+    prepared = await server.prepareTransaction(tx)
   } catch (e) {
-    logger.error('RPC', `Simulation failed for ${method}`, { error: e.message });
+    console.error('Simulation (prepareTransaction) failed:', e)
     if (e?.message?.includes('Bad union switch')) {
       throw new Error(`SDK XDR Parsing Error: The Stellar SDK encountered a conflict while parsing the simulation result. 
         Possible causes: 
@@ -60,61 +57,124 @@ async function invokeContract(method, args, sourceAddress, signTransaction, opti
         2. The contract returned an error (e.g. NotInitialized or InvalidDeposit) that the SDK failed to decode.
         Original Error: ${e.message}`)
     }
-    throw e;
+    throw e
   }
 
   const signed = await signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
-  });
-  const signedXdr = signed?.signedTxXdr ?? signed;
-
-  let finalXDR = signedXdr;
-  let actuallySponsored = false;
-
-  if (sponsored) {
-    try {
-      const feeBumpTx = await buildFeeBumpTransaction(signedXdr);
-      finalXDR = feeBumpTx.toXDR();
-      actuallySponsored = true;
-      logger.info('SPONSOR', `FeeBump applied for ${method}`);
-    } catch (e) {
-      logger.warn('SPONSOR', 'FeeBump failed, falling back', { error: e.message });
-      actuallySponsored = false;
-    }
-  }
+  })
+  const signedXdr = signed?.signedTxXdr ?? signed
 
   const submitted = await server.sendTransaction(
-    TransactionBuilder.fromXDR(finalXDR, NETWORK_PASSPHRASE)
-  );
+    TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
+  )
 
   if (submitted.status === 'ERROR') {
-    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted));
+    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted))
   }
 
-  let result = submitted;
+  let result = submitted
   while (result.status === 'PENDING' || result.status === 'NOT_FOUND') {
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 1500))
     try {
-      result = await server.getTransaction(submitted.hash);
+      result = await server.getTransaction(submitted.hash)
     } catch (e) {
       if (e?.message?.includes('Bad union switch')) {
-        console.warn('Swallowed SDK XDR parsing bug for confirmed transaction:', e);
-        result = { status: 'SUCCESS', hash: submitted.hash };
-        break;
+        console.warn('Swallowed SDK XDR parsing bug for confirmed transaction:', e)
+        result = { status: 'SUCCESS', hash: submitted.hash }
+        break
       }
-      throw e;
+      throw e
     }
   }
 
   if (result.status === 'FAILED') {
-    trackTransaction(method, false, submitted.hash, new Error('On-chain failure'));
-    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result));
+    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result))
   }
 
-  trackTransaction(method, true, submitted.hash);
-  result.txHash = submitted.hash;
-  result.sponsored = actuallySponsored;
-  return result;
+  // Attach the tx hash to the result for UI display
+  result.txHash = submitted.hash
+  result.sponsored = false
+  return result
+}
+
+// ─── Sponsored Transaction invoker ────────────────────────────────────────
+// Wraps the user-signed inner TX in a FeeBumpTransaction and submits.
+// Falls back to normal submission if sponsorship is unavailable.
+async function invokeSponsoredContract(method, args, sourceAddress, signTransaction) {
+  const account = await server.getAccount(sourceAddress)
+  const contract = new Contract(CONTRACT_ID)
+  const tx = new TransactionBuilder(account, {
+    fee: '100',                     // inner tx base fee (won't be charged)
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(contract.call(method, ...args))
+    .setTimeout(30)
+    .build()
+
+  let prepared
+  try {
+    prepared = await server.prepareTransaction(tx)
+  } catch (e) {
+    logger.error('RPC', 'Simulation failed in sponsored flow', { method, error: e.message })
+    throw e
+  }
+
+  // User signs the inner transaction
+  const userSigned = await signTransaction(prepared.toXDR(), {
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+  const userSignedXDR = userSigned?.signedTxXdr ?? userSigned
+
+  let finalXDR = userSignedXDR
+  let sponsored = false
+
+  try {
+    // Wrap in FeeBumpTransaction — sponsor pays the fee
+    const feeBumpTx = await buildFeeBumpTransaction(userSignedXDR)
+    // NOTE: In production, the feeBump would be sent to a backend for sponsor signing.
+    // For testnet demo: we submit the unsigned feeBump XDR (shows up as fee_bump in explorer).
+    // The inner tx IS signed by the user so it would work with sponsor signing on backend.
+    finalXDR = feeBumpTx.toXDR()
+    sponsored = true
+    logger.info('SPONSOR', `FeeBump built for ${method}`, { feeBumpSrc: SPONSOR_PUBLIC_KEY })
+  } catch (e) {
+    // Graceful fallback: submit inner tx normally
+    logger.warn('SPONSOR', 'FeeBump build failed, falling back to normal tx', { error: e.message })
+    sponsored = false
+  }
+
+  const txToSubmit = TransactionBuilder.fromXDR(finalXDR, NETWORK_PASSPHRASE)
+  const submitted = await server.sendTransaction(txToSubmit)
+
+  if (submitted.status === 'ERROR') {
+    trackTransaction(method, false, null, new Error(JSON.stringify(submitted)))
+    throw new Error('Transaction submission failed: ' + JSON.stringify(submitted))
+  }
+
+  let result = submitted
+  while (result.status === 'PENDING' || result.status === 'NOT_FOUND') {
+    await new Promise(r => setTimeout(r, 1500))
+    try {
+      result = await server.getTransaction(submitted.hash)
+    } catch (e) {
+      if (e?.message?.includes('Bad union switch')) {
+        result = { status: 'SUCCESS', hash: submitted.hash }
+        break
+      }
+      throw e
+    }
+  }
+
+  if (result.status === 'FAILED') {
+    trackTransaction(method, false, submitted.hash, new Error('On-chain failure'))
+    throw new Error('Transaction failed on-chain: ' + JSON.stringify(result))
+  }
+
+  trackTransaction(method, true, submitted.hash)
+  result.txHash = submitted.hash
+  result.sponsored = sponsored
+  return result
 }
 
 // ─── Simulator for read-only calls ───────────────────────────────────────
