@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
 import { useStream } from '../hooks/useStream'
-import { ArrowRight, Zap, Info, ShieldCheck, Clock, Wallet, CheckCircle2, ChevronRight } from 'lucide-react'
+import { Zap, Info, ShieldCheck, ChevronRight } from 'lucide-react'
 import { useToast } from '../components/Toast.jsx'
+import { GaslessBadge, SponsorshipBanner, FeeComparisonRow } from '../components/GaslessBadge.jsx'
 
 export default function CreateStream() {
   const { isConnected, connect, address: userAddress } = useWallet()
@@ -62,6 +63,9 @@ export default function CreateStream() {
 
       {/* Header */}
       <div style={{ marginBottom: '48px', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
+          <GaslessBadge />
+        </div>
         <h1 style={{ fontSize: 'clamp(28px, 6vw, 42px)', letterSpacing: '-0.04em', marginBottom: '12px' }}>Create New Stream</h1>
         <p style={{ color: '#9ca3af', fontSize: '16px', maxWidth: '480px', margin: '0 auto' }}>Deploy a real-time payment streaming contract on the Stellar network.</p>
       </div>
@@ -70,6 +74,9 @@ export default function CreateStream() {
 
         {/* Form panel */}
         <form onSubmit={handleSubmit} className="card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+          {/* Sponsorship Banner */}
+          <SponsorshipBanner />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <label style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Recipient Address</label>
@@ -157,10 +164,7 @@ export default function CreateStream() {
                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Total Duration</span>
                 <span style={{ fontSize: '13px', color: '#fff', fontWeight: 600 }}>{durations.find(d => d.value === duration)?.label}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', color: '#6b7280' }}>Network Fee</span>
-                <span style={{ fontSize: '12px', color: '#fff', opacity: 0.6 }}>~0.003 XLM</span>
-              </div>
+              <FeeComparisonRow />
             </div>
             <div style={{ marginTop: '32px', padding: '16px', background: 'rgba(139,92,246,0.06)', borderRadius: '12px', display: 'flex', gap: '12px' }}>
               <Info size={16} color="#8b5cf6" style={{ marginTop: '2px' }} />
