@@ -7,7 +7,9 @@
   <img src="https://img.shields.io/badge/Level_5-Blue_Belt-3B82F6?style=for-the-badge" alt="Blue Belt" />
   <img src="https://img.shields.io/badge/Level_6-Black_Belt-111111?style=for-the-badge" alt="Black Belt" />
   <br />
-  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+  <a href="https://lumensflow.vercel.app">
+    <img src="https://img.shields.io/badge/Deployed-Live%20on%20Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+  </a>
   <a href="https://github.com/yashannadate/LumensFlow/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/yashannadate/LumensFlow/ci.yml?branch=main&style=for-the-badge&logo=github" alt="CI Status" />
   </a>
@@ -37,6 +39,16 @@
 | <img src="https://github.com/user-attachments/assets/34a04f0e-55dd-49ed-9857-f07254f0c186" width="400" /> | <img src="https://github.com/user-attachments/assets/e239645f-1c15-4563-bc82-c3148134d02a" width="400" /> |
 | **Protocol Features** | **Active Stream Flow** |
 | <img src="https://github.com/user-attachments/assets/5c0ad866-34a4-4598-bcb6-61df05701b85" width="400" /> | <img src="https://github.com/user-attachments/assets/0bae4f72-3fd8-4b93-b24c-416cb7f116d2" width="400" /> |
+| **Protocol Metrics** | **Stream History** |
+| <img src="https://github.com/user-attachments/assets/1ce7f9d1-f68d-465e-8de6-81d4cd82dbbd" width="400" /> | <img src="https://github.com/user-attachments/assets/ad00dd34-6d1e-4c8c-80ef-09b86b0f16c8" width="400" /> |
+
+<div align="center">
+
+**Technical Docs**
+
+<img src="https://github.com/user-attachments/assets/217bcae2-65e1-4970-9880-9ebdbde8e423" width="400" />
+
+</div>
 
 ---
 
