@@ -2,7 +2,7 @@ import {
   Contract, TransactionBuilder, BASE_FEE,
   rpc, scValToNative, nativeToScVal, Address, xdr,
 } from '@stellar/stellar-sdk'
-import { isSponsorshipEnabled, buildFeeBumpTransaction, SPONSOR_PUBLIC_KEY } from './sponsorService.js'
+import { isSponsorshipEnabled, createSponsoredTransaction, SPONSOR_PUBLIC_KEY } from './sponsorService.js'
 import { logger, trackTransaction } from './logger.js'
 
 export const CONTRACT_ID = 'CCNSPD63HFJLCKUJSAJOBRY4HAAOQ2BOS73VIU3S2ZINCVXGDY3B5DWR'
@@ -130,14 +130,10 @@ async function invokeSponsoredContract(method, args, sourceAddress, signTransact
   let sponsored = false
 
   try {
-    // Wrap in FeeBumpTransaction — sponsor pays the fee
-    const feeBumpTx = await buildFeeBumpTransaction(userSignedXDR)
-    // NOTE: In production, the feeBump would be sent to a backend for sponsor signing.
-    // For testnet demo: we submit the unsigned feeBump XDR (shows up as fee_bump in explorer).
-    // The inner tx IS signed by the user so it would work with sponsor signing on backend.
-    finalXDR = feeBumpTx.toXDR()
+    // Wrap in FeeBumpTransaction and sign with sponsor key
+    finalXDR = await createSponsoredTransaction(userSignedXDR)
     sponsored = true
-    logger.info('SPONSOR', `FeeBump built for ${method}`, { feeBumpSrc: SPONSOR_PUBLIC_KEY })
+    logger.info('SPONSOR', `FeeBump built and signed for ${method}`, { feeBumpSrc: SPONSOR_PUBLIC_KEY })
   } catch (e) {
     // Graceful fallback: submit inner tx normally
     logger.warn('SPONSOR', 'FeeBump build failed, falling back to normal tx', { error: e.message })

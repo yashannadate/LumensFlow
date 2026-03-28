@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
 import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock, ShieldCheck, Gauge, RefreshCcw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // ── Particle component ──────────────────────────────────────────────────────
 const PARTICLES = Array.from({ length: 10 }, (_, i) => ({
@@ -163,6 +163,7 @@ export default function Landing() {
           Stream real-time XLM payments on the Stellar Network. Every second earns.
         </p>
 
+
         {/* CTAs */}
         <div className="flex-col-mobile mobile-gap-sm" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
           <button
@@ -204,30 +205,55 @@ export default function Landing() {
       </section>
 
       {/* ══ STATS BAR ═════════════════════════════════════════════════════ */}
-      <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1f2937', borderBottom: '1px solid #1f2937', background: 'rgba(17,24,39,0.70)', backdropFilter: 'blur(20px)', padding: '32px 0', marginBottom: '0' }}>
-        <div className="page-wrap">
-          <div className="grid-3" style={{ display: 'grid', gap: '24px', textAlign: 'center' }}>
-            {[
-              { icon: Gauge, n: '<0.003 XLM', s: 'Per Transaction' },
-              { icon: ShieldCheck, n: '100% On-Chain', s: 'Verified' },
-              { icon: RefreshCcw, n: 'Real-Time', s: 'Every Second' },
-            ].map((stat, i) => {
-              const Icon = stat.icon
-              return (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '0 16px' }}>
-                  <Icon size={18} color="#86EE1E" />
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
-                      {stat.n}
-                    </span>
-                    <span style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)', fontWeight: 500 }}>
-                      {stat.s}
-                    </span>
+      <style>{`
+        .stats-bar-scroll {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          gap: 0;
+          padding: 0 16px;
+        }
+        .stats-bar-scroll::-webkit-scrollbar { display: none; }
+        
+        .stats-bar-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 24px 40px;
+          flex-shrink: 0;
+          justify-content: center;
+        }
+        .stats-bar-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+        
+        @media (min-width: 1024px) {
+          .stats-bar-scroll { justify-content: center; padding: 0; }
+        }
+      `}</style>
+      <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1f2937', borderBottom: '1px solid #1f2937', background: 'rgba(17,24,39,0.70)', backdropFilter: 'blur(20px)' }}>
+        <div className="stats-bar-scroll">
+          {[
+            { icon: RefreshCcw, n: 'Real-Time', s: 'Every Second' },
+            { icon: ShieldCheck, n: '100% On-Chain', s: 'Verified' },
+            { icon: Zap, n: 'Gasless', s: 'Fee Sponsored' },
+            { icon: Gauge, n: '5s Finality', s: 'Stellar Speed' },
+          ].map((stat, i, arr) => {
+            const Icon = stat.icon
+            return (
+              <React.Fragment key={i}>
+                <div className="stats-bar-item">
+                  <Icon size={18} color="#86EE1E" style={{ flexShrink: 0 }} />
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>{stat.n}</span>
+                    <span style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)', fontWeight: 500 }}>{stat.s}</span>
                   </div>
                 </div>
-              )
-            })}
-          </div>
+                {i < arr.length - 1 && <div className="stats-bar-divider" />}
+              </React.Fragment>
+            )
+          })}
         </div>
       </div>
 
@@ -242,9 +268,34 @@ export default function Landing() {
           </div>
 
           {/* Cards with dashed connector */}
-          <div className="grid-3" style={{ position: 'relative', display: 'grid', gap: '24px', maxWidth: '960px', margin: '0 auto' }}>
+          <style>{`
+            .how-it-works-scroll {
+              display: grid;
+              grid-template-columns: repeat(3, minmax(280px, 1fr));
+              gap: 24px;
+              width: 100%;
+              transition: all 0.3s;
+            }
+            @media (max-width: 960px) {
+              .how-it-works-scroll {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 20px 30px;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary) transparent;
+              }
+              .how-it-works-scroll > div {
+                flex: 0 0 calc(100% - 40px);
+                scroll-snap-align: center;
+              }
+              .dashed-line { display: none !important; }
+            }
+          `}</style>
+          
+          <div className="how-it-works-scroll" style={{ position: 'relative', maxWidth: '1060px', margin: '0 auto' }}>
             {/* Dashed connector line */}
-            <div className="hide-mobile" style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
+            <div className="hide-mobile dashed-line" style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
 
             {[
               { num: '01', Icon: Shield, title: 'Connect Wallet', desc: 'Link your Stellar wallet (Freighter / xBull) in one click.', iconColor: '#8b5cf6' },
@@ -292,16 +343,27 @@ export default function Landing() {
             {[
               { Icon: Droplets, title: 'Real-Time Streaming', desc: 'Funds flow every second with zero manual inputs — time does the work.' },
               { Icon: ShieldCheck, title: 'Non-Custodial Escrow', desc: 'Your keys, your funds. Stellar Soroban smart contract holds everything.' },
-              { Icon: Zap, title: 'Soroban Powered', desc: 'Sub-cent fees, instant finality, fully on-chain with Stellar Soroban.' },
+              { Icon: Zap, title: 'Gasless Transactions', desc: 'Fee Sponsorship covers network costs — stream without worrying about gas fees.', isNew: true },
               { Icon: BarChart3, title: 'Live Dashboard', desc: 'Track all streams with real-time metrics and live XLM counters.' },
               { Icon: Globe, title: 'Fully On-Chain', desc: '100% transparent, every action verifiable on the Stellar ledger.' },
               { Icon: Clock, title: 'Flexible Duration', desc: 'Stream for minutes, days, or months. Cancel anytime with auto-refund.' },
-            ].map(({ Icon, title, desc }, i) => (
+            ].map(({ Icon, title, desc, isNew }, i) => (
               <div key={i} className="feature-card" style={{
                 background: 'rgba(17,24,39,0.75)', border: '1px solid #1f2937',
                 borderRadius: '24px', padding: '32px',
                 backdropFilter: 'blur(16px)',
+                position: 'relative',
               }}>
+                {isNew && (
+                  <div style={{
+                    position: 'absolute', top: '20px', right: '20px',
+                    background: 'rgba(134,238,30,0.12)',
+                    border: '1px solid rgba(134,238,30,0.30)',
+                    color: '#86EE1E', fontSize: '9px', fontWeight: 800,
+                    fontFamily: 'var(--font-label)', letterSpacing: '0.12em',
+                    textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px',
+                  }}>NEW</div>
+                )}
                 <div style={{
                   width: '52px', height: '52px', borderRadius: '14px',
                   background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.22)',

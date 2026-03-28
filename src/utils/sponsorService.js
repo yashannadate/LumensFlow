@@ -30,7 +30,8 @@ import {
 // ─── Sponsor Config ───────────────────────────────────────────────────────────
 // This is a TESTNET-ONLY sponsor account funded via Friendbot.
 // On mainnet, sponsorship signing must happen on a secure server.
-export const SPONSOR_PUBLIC_KEY = 'GB6B6QEJFY4HAKATRO6MI77WDZ66W4FFPJN6AYLISJEHTLXYFPHQFFTV'
+export const SPONSOR_PUBLIC_KEY = 'GDKD2P2E5SQWW7L6GBD2AXWVBZ7FVMUJPMVTVWXVPQ7CR2GXKXLVWYFX'
+export const SPONSOR_SECRET_KEY = 'SCKVSEZZUJL4REC3HORBXZU2IG3GR4LZWMVDJGD4TL4U4MKEMSGNAM2J'
 export const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
 
 // Fee the sponsor pays (in stroops). 10x base fee for priority inclusion.
@@ -115,23 +116,9 @@ export async function createSponsoredTransaction(userSignedXDR, sponsorKeypair =
   try {
     const feeBumpTx = await buildFeeBumpTransaction(userSignedXDR)
 
-    if (sponsorKeypair) {
-      // Testnet demo: sign immediately with provided keypair
-      return await signFeeBumpSimulated(feeBumpTx, sponsorKeypair)
-    }
-
-    // Real production flow: POST to /api/sponsor and get back signed XDR
-    // const response = await fetch('/api/sponsor', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ innerXDR: userSignedXDR }),
-    // })
-    // const { signedXDR } = await response.json()
-    // return signedXDR
-
-    // For demo without a real sponsor keypair, return the unsigned FeeBump XDR
-    // so it can at least be inspected
-    return feeBumpTx.toXDR()
+    // Testnet demo: sign immediately with the demo sponsor keypair
+    const keypairToUse = sponsorKeypair || Keypair.fromSecret(SPONSOR_SECRET_KEY)
+    return await signFeeBumpSimulated(feeBumpTx, keypairToUse)
   } finally {
     setSponsorActive(false)
   }

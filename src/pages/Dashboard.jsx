@@ -7,6 +7,7 @@ import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
 import { useActivityFeed } from '../hooks/useActivityFeed.jsx'
 import { Plus, RefreshCw, Activity, Zap, Droplets, Send, Globe, Rocket, Wallet } from 'lucide-react'
+import { GaslessBadge } from '../components/GaslessBadge.jsx'
 
 export default function Dashboard() {
   const { isConnected, address } = useWallet()
@@ -170,6 +171,31 @@ export default function Dashboard() {
                 ＋ Create Stream
               </button>
             </Link>
+
+            {/* Gasless Status */}
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '10px',
+              padding: '12px 14px',
+              background: 'linear-gradient(135deg, rgba(134,238,30,0.06), rgba(134,238,30,0.02))',
+              border: '1px solid rgba(134,238,30,0.18)',
+              borderRadius: '14px',
+            }}>
+              <div style={{
+                width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0,
+                background: 'rgba(134,238,30,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Zap size={14} color="#86EE1E" />
+              </div>
+              <div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#86EE1E', marginBottom: '2px', fontFamily: 'var(--font-label)' }}>
+                  Gasless Mode Active
+                </div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                  Network fees are sponsored. You only spend what you stream.
+                </div>
+              </div>
+            </div>
           </div>
 
           <ActivityFeed activities={activities} loading={feedLoading} />
