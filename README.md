@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/Soroban-8b5cf6?style=for-the-badge&logo=stellar&logoColor=white" alt="Soroban" />
   <img src="https://img.shields.io/badge/React_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
   <img src="https://img.shields.io/badge/Level_5-Blue_Belt-3B82F6?style=for-the-badge" alt="Blue Belt" />
+  <img src="https://img.shields.io/badge/Level_6-Black_Belt-111111?style=for-the-badge" alt="Black Belt" />
   <br />
   <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
   <a href="https://github.com/yashannadate/LumensFlow/actions">
@@ -40,7 +41,6 @@
 ---
 
 ## 🏗 Architecture & Call Flow
-
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     React / Vite Frontend                       │
@@ -74,6 +74,9 @@
 - 📱 **Multi-Wallet Ready** — Deep integration with Stellar Wallets Kit (Freighter, xBull, LOBSTR).
 - 🔒 **Privacy-Forward UI** — Sensitive transfer amounts and public keys are truncated visually.
 - ⚡ **5-Second Finality** — Instant deployment and settlement on the Stellar consensus protocol.
+- ⛽ **Gasless Transactions** — Fee Bump sponsorship means users pay zero XLM in fees.
+- 📊 **Live Metrics Dashboard** — DAU, transaction count, and retention tracking in real-time.
+- 🗂️ **Stream History Indexing** — Full indexed stream lifecycle with search and filter.
 
 ---
 
@@ -85,8 +88,37 @@
 
 ---
 
-## 📁 Project Structure
+## ⬛ Level 6 — Black Belt Features
 
+| Feature | Status | Details |
+|---------|--------|---------|
+| ⛽ Fee Sponsorship (Gasless) | ✅ Live | FeeBump transactions via `sponsorService.js` |
+| 📊 Metrics Dashboard | ✅ Live | DAU, tx count, retention tracking at `/metrics` |
+| 🗂️ Stream History Indexing | ✅ Live | Horizon-indexed history with search/filter at `/history` |
+| 🛡️ Security Checklist | ✅ Done | See [`docs/SECURITY.md`](./docs/SECURITY.md) |
+| 📝 User Guide | ✅ Done | See [`docs/USER_GUIDE.md`](./docs/USER_GUIDE.md) |
+| 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
+| 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
+| 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
+| 👥 30+ Verified Users | 🔄 In Progress | 11 verified · actively onboarding to 30+ |
+| 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
+
+---
+
+## 📚 Documentation
+
+| Document | Description | Link |
+|----------|-------------|------|
+| 📖 User Guide | Step-by-step guide for connecting wallet, creating streams, withdrawing, and more | [Read →](./docs/USER_GUIDE.md) |
+| 📐 Technical Reference | Architecture, smart contract ABI, API reference, and security model | [Read →](./docs/TECHNICAL.md) |
+| 🛡️ Security Checklist | Full Level 6 security audit and checklist | [Read →](./docs/SECURITY.md) |
+| 🧪 Feedback Logs | User testing iterations and fixes applied | [Read →](./docs/FEEDBACK.md) |
+| 🌐 Community Post | Twitter/X community contribution post | [Read →](./docs/COMMUNITY.md) |
+| 🎤 Demo Notes | Demo Day presentation bullet points | [Read →](./docs/DEMO_NOTES.md) |
+
+---
+
+## 📁 Project Structure
 ```text
 LumensFlow/
 ├── .github/workflows/ci.yml       # CI pipeline (Build Verification)
@@ -95,12 +127,26 @@ LumensFlow/
 │       ├── src/lib.rs             # Smart Contract source code
 │       └── Cargo.toml             # Rust dependencies
 ├── docs/
-│   └── FEEDBACK.md                # User testing iteration logs
+│   ├── FEEDBACK.md                # User testing iteration logs
+│   ├── SECURITY.md                # Security checklist (Level 6)
+│   ├── USER_GUIDE.md              # Step-by-step user guide (Level 6)
+│   ├── TECHNICAL.md               # Architecture and API reference (Level 6)
+│   ├── COMMUNITY.md               # Community contribution post (Level 6)
+│   └── DEMO_NOTES.md              # Demo Day presentation notes (Level 6)
 ├── src/
-│   ├── components/                # React UI Components (Dashboard, Feed, Setup)
-│   ├── hooks/                     # Custom React hooks (useWallet)
-│   ├── pages/                     # Routing structure (Landing, Dashboard)
-│   ├── utils/                     # Math formatting, Horizon connections
+│   ├── components/                # React UI Components
+│   │   ├── GaslessBadge.jsx       # Fee sponsorship UI (Level 6)
+│   │   └── ...                    # AppHeader, Sidebar, StreamCard, Toast
+│   ├── hooks/                     # Custom React hooks (useWallet, useStream)
+│   ├── pages/                     # Routing structure
+│   │   ├── Metrics.jsx            # Live metrics dashboard (Level 6)
+│   │   ├── History.jsx            # Stream history page (Level 6)
+│   │   └── ...                    # Landing, Dashboard, CreateStream, Docs
+│   ├── utils/
+│   │   ├── logger.js              # Production logger (Level 6)
+│   │   ├── sponsorService.js      # Fee bump transactions (Level 6)
+│   │   ├── indexer.js             # Stream history indexing (Level 6)
+│   │   └── stellar.js             # Soroban contract interaction layer
 │   ├── App.jsx                    # Core Application Router
 │   └── index.css                  # Custom Design System
 └── README.md
@@ -119,7 +165,11 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | **Stream Math Validation** | 3/3 | ✅ Passing |
 | **Total Pipeline Verification** | **15/15** | ✅ **100% Passing** |
 
-### User Testnet Validation & Feedback
+---
+
+## 👥 User Testnet Validation & Feedback
+
+> 🔄 **User Onboarding In Progress** — Currently at **11 verified testnet users**. Actively onboarding community testers to reach 30+. Table will be updated as new wallets are verified.
 
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
@@ -132,8 +182,8 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 7 | `GDHPNSQIN...` | Tester | Created multiple streams; explored and verified professional UI responsiveness. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDHPNSQINMCUNO6DOWO7HSAW5NTNO2MDY6LDHGKPJMGLUSUMLVWBJKJ6) |
 | 8 | `GA7U4LNT7...` | Tester | Stress-tested the payment flow and verified transaction finality on Stellar Expert. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GA7U4LNT7R2CRWHCTQGGLML2SQHDPB2IN5W663VDK6PZFD7LJYMUAPL6) |
 | 9 | `GAYJALSDD...` | Tester | Validated stream lifecycle (creation, withdrawal, and cancellation logic). | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
-| 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | **Feedback:** "please fix the ui responsiveness on mobile its slightly conflicting..." <br/> **Fix:** Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices. **Fixed ✅** | [`d6f14d7`](https://github.com/yashannadate/LumensFlow/commit/d6f14d7) |
-| 11 | `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ` | Tester | **Feedback:** "Improved documentation clarity by adding a step-by-step workflow and example visuals..." <br/> **Fix:** Added manual "Alice & Bob" visuals, step-by-step guide, and technical specs to Docs.jsx. **Fixed ✅** | [`88c833b`](https://github.com/yashannadate/LumensFlow/commit/88c833b) |
+| 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | **Feedback:** "please fix the ui responsiveness on mobile its slightly conflicting..." <br/> **Fix:** Improved mobile responsiveness. **Fixed ✅** | [`d6f14d7`](https://github.com/yashannadate/LumensFlow/commit/d6f14d7) |
+| 11 | `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ` | Tester | **Feedback:** "Improved documentation clarity by adding a step-by-step workflow and example visuals..." <br/> **Fix:** Added Alice & Bob visuals and technical specs to Docs.jsx. **Fixed ✅** | [`88c833b`](https://github.com/yashannadate/LumensFlow/commit/88c833b) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
@@ -152,11 +202,13 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | **Wallet Protocol** | Stellar Wallets Kit (`@creit.tech/stellar-wallets-kit`) |
 | **API layer** | Soroban RPC + Horizon REST API |
 | **Infrastructure** | GitHub Actions (CI/CD) + Vercel Deployment |
+| **Logging** | Structured production logger (`logger.js`) |
+| **Fee Sponsorship** | Stellar FeeBump Transactions (`sponsorService.js`) |
+| **Data Indexing** | Horizon REST indexer (`indexer.js`) |
 
 ---
 
 ## ⚙️ Quick Start
-
 ```bash
 # Clone the repository
 git clone https://github.com/yashannadate/LumensFlow.git
@@ -171,7 +223,9 @@ npm run dev
 
 <p align="center">
   <b>Built by Yash Annadate</b> 👨💻 <br/>
-  <i>Admin Wallet: GB6B6QEJFY4HAKATRO6MI77WDZ66W4FFPJN6AYLISJEHTLXYFPHQFFTV</i><br/>
-  <b>🔵 Level 5 - Blue Belt | Stellar Journey to Mastery 2026</b><br/><br/>
+  <i>Admin Wallet: GB6B6QEJFY4HAKATRO6MI77WDZ66W4FFPJN6AYLISJEHTLXYFPHQFFTV</i><br/><br/>
+  <img src="https://img.shields.io/badge/Level_5-Blue_Belt-3B82F6?style=for-the-badge" alt="Blue Belt" />
+  <img src="https://img.shields.io/badge/Level_6-Black_Belt-111111?style=for-the-badge" alt="Black Belt" /><br/><br/>
+  <b>Stellar Journey to Mastery 2026</b><br/><br/>
   Released under the MIT License
 </p>
