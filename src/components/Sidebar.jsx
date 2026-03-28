@@ -1,10 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Waves, HelpCircle, Plus, Zap, X, BarChart3 } from 'lucide-react'
+import { Database } from 'lucide-react' // add to existing imports
 
 const NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
   { icon: Waves, label: 'Create Stream', to: '/create' },
   { icon: BarChart3, label: 'Metrics', to: '/metrics' },
+  { icon: Database, label: 'History', to: '/history' },
   { icon: HelpCircle, label: 'How It Works', to: '/how-it-works' },
 ]
 

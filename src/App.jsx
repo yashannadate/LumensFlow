@@ -14,9 +14,10 @@ import StreamDetails from './pages/StreamDetails.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
 import Docs from './pages/Docs.jsx'
 import Metrics from './pages/Metrics.jsx'
+import History from './pages/History.jsx'
 
 // Routes that use the sidebar shell layout
-const APP_ROUTES = ['/dashboard', '/create', '/stream', '/metrics']
+const APP_ROUTES = ['/dashboard', '/create', '/stream', '/metrics', '/history']
 
 function ProtectedRoute({ children }) {
   const { isConnected } = useWallet()
@@ -30,7 +31,7 @@ function AppRoutes() {
   const isAppRoute = APP_ROUTES.some(r => location.pathname.startsWith(r))
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  
+
   // Close sidebar on navigation
   useEffect(() => {
     setIsSidebarOpen(false)
@@ -41,22 +42,23 @@ function AppRoutes() {
       <div className="app-authenticated">
         {/* Mobile Backdrop */}
         {isSidebarOpen && (
-          <div 
-            className="sidebar-backdrop show-mobile" 
-            onClick={() => setIsSidebarOpen(false)} 
+          <div
+            className="sidebar-backdrop show-mobile"
+            onClick={() => setIsSidebarOpen(false)}
           />
         )}
-        
+
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        
+
         <div className="app-content">
           <AppHeader onMenuClick={() => setIsSidebarOpen(true)} />
           <main className="app-main">
             <Routes>
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/create"    element={<ProtectedRoute><CreateStream /></ProtectedRoute>} />
+              <Route path="/create" element={<ProtectedRoute><CreateStream /></ProtectedRoute>} />
               <Route path="/stream/:id" element={<ProtectedRoute><StreamDetails /></ProtectedRoute>} />
-              <Route path="/metrics"   element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
+              <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             </Routes>
           </main>
         </div>
@@ -70,11 +72,11 @@ function AppRoutes() {
       <Navbar />
       <main className="app-main" style={{ paddingTop: '88px' }}>
         <Routes>
-          <Route path="/"             element={<Landing />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/docs"         element={<Docs />} />
+          <Route path="/docs" element={<Docs />} />
           {/* Catch-all: redirect to dashboard or home */}
-          <Route path="*"             element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
