@@ -41,10 +41,7 @@
 | <img src="https://github.com/user-attachments/assets/5c0ad866-34a4-4598-bcb6-61df05701b85" width="400" /> | <img src="https://github.com/user-attachments/assets/0bae4f72-3fd8-4b93-b24c-416cb7f116d2" width="400" /> |
 | **Protocol Metrics** | **Stream History** |
 | <img src="https://github.com/user-attachments/assets/1ce7f9d1-f68d-465e-8de6-81d4cd82dbbd" width="400" /> | <img src="https://github.com/user-attachments/assets/ad00dd34-6d1e-4c8c-80ef-09b86b0f16c8" width="400" /> |
-| **Activity Monitoring Log** | **Gasless Stream Flow** |
-| *(Replace with Monitoring Screenshot)* | *(Replace with Gasless UI Screenshot)* |
-| **Activity Monitoring Log** | **Gasless Stream Flow** |
-| *(Replace with Monitoring Screenshot)* | *(Replace with Gasless UI Screenshot)* |
+
 
 <div align="center">
 
