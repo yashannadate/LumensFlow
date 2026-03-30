@@ -6,7 +6,11 @@ import ActivityFeed from '../components/ActivityFeed.jsx'
 import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
 import { useActivityFeed } from '../hooks/useActivityFeed.jsx'
-import { Plus, RefreshCw, Activity, Zap, Droplets, Send, Globe, Rocket, Wallet } from 'lucide-react'
+import { 
+  Plus, RefreshCw, Activity, Zap, Droplets, 
+  Send, Globe, Rocket, Wallet, ArrowUpRight, 
+  ArrowDownRight, ChevronRight 
+} from 'lucide-react'
 import { GaslessBadge } from '../components/GaslessBadge.jsx'
 
 export default function Dashboard() {
@@ -16,6 +20,9 @@ export default function Dashboard() {
   const [streams, setStreams] = useState([])
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState([])
+  
+  // State for toggling expanded views per user request for "Easy Access"
+  const [expandedSection, setExpandedSection] = useState('none') // 'none', 'incoming', 'outgoing'
 
   const load = async () => {
     if (!isConnected) { setLoading(false); return }
@@ -36,7 +43,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (streams && streams.length > 0) {
       const s = new Set()
-      streams.forEach(st => { if (st.sender) s.add(st.sender); if (st.receiver) s.add(st.receiver) })
+      streams.forEach(st => { 
+        if (st.sender) s.add(st.sender)
+        if (st.receiver) s.add(st.receiver) 
+      })
       setUsers(Array.from(s))
     } else {
       setUsers([])
@@ -68,13 +78,51 @@ export default function Dashboard() {
     </div>
   )
 
-  const SectionHeader = ({ icon, title, count }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 600, letterSpacing: '0.12em', color: 'var(--primary)', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '8px', padding: '3px 10px', textTransform: 'uppercase' }}>
-        {count}
+  const CategoryToggleCard = ({ title, count, icon: Icon, type, active, color }) => (
+    <div 
+      onClick={() => setExpandedSection(expandedSection === type ? 'none' : type)}
+      className={`card ${active ? 'active' : ''}`}
+      style={{
+        padding: '24px',
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        border: active ? `1px solid ${color}` : '1px solid rgba(255,255,255,0.05)',
+        background: active ? `${color}08` : 'rgba(255,255,255,0.02)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{
+          width: '40px', height: '40px', borderRadius: '12px',
+          background: active ? color : 'rgba(255,255,255,0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.3s'
+        }}>
+          <Icon size={20} color={active ? '#000' : color} />
+        </div>
+        <div>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '2px' }}>{title}</h3>
+          <p className="text-muted" style={{ fontSize: '12px' }}>{count} total streams found</p>
+        </div>
       </div>
-      <h3 style={{ fontSize: '14px', fontFamily: 'var(--font-brand)', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{title}</h3>
-      <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, #1f2937, transparent)' }} />
+      <div style={{ 
+        display: 'flex', alignItems: 'center', gap: '8px',
+        color: active ? color : 'var(--text-muted)',
+        transition: 'all 0.3s'
+      }}>
+        <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{active ? 'HIDE' : 'VIEW ALL'}</span>
+        <ChevronRight size={18} style={{ transform: active ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+      </div>
+      {active && (
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2px',
+          background: color
+        }} />
+      )}
     </div>
   )
 
@@ -132,34 +180,76 @@ export default function Dashboard() {
       {/* ── Main content sections ─────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '40px' }} className="dashboard-two-col">
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-          {/* Incoming */}
-          <section>
-            <SectionHeader title="Incoming Streams" count={incoming.length} />
-            {loading ? (
-              <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
-            ) : incoming.length === 0 ? (
-              <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No incoming streams detected</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {incoming.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
-              </div>
-            )}
-          </section>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          {/* Grouped Interaction Cards for "Easy Access" per Feedback #15 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="flex-col-mobile">
+            <CategoryToggleCard 
+              title="Outgoing Streams" 
+              count={outgoing.length} 
+              icon={ArrowUpRight} 
+              type="outgoing" 
+              active={expandedSection === 'outgoing'}
+              color="#86EE1E" 
+            />
+            <CategoryToggleCard 
+              title="Incoming Streams" 
+              count={incoming.length} 
+              icon={ArrowDownRight} 
+              type="incoming" 
+              active={expandedSection === 'incoming'}
+              color="#8b5cf6" 
+            />
+          </div>
 
-          {/* Outgoing */}
-          <section>
-            <SectionHeader title="Outgoing Streams" count={outgoing.length} />
-            {loading ? (
-              <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
-            ) : outgoing.length === 0 ? (
-              <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No outgoing streams found</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {outgoing.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
+          {/* Conditional Rendering Area for Expanded Streams */}
+          <div style={{ marginTop: '24px' }}>
+            {expandedSection === 'outgoing' && (
+              <section className="fade-in">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <ArrowUpRight size={20} color="#86EE1E" />
+                  <h4 style={{ fontSize: '16px', fontWeight: 800 }}>Manage Outgoing Streams</h4>
+                </div>
+                {loading ? (
+                  <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
+                ) : outgoing.length === 0 ? (
+                  <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No outgoing streams found. Start by creating one!</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {outgoing.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {expandedSection === 'incoming' && (
+              <section className="fade-in">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <ArrowDownRight size={20} color="#8b5cf6" />
+                  <h4 style={{ fontSize: '16px', fontWeight: 800 }}>Vew Incoming Streams</h4>
+                </div>
+                {loading ? (
+                  <div className="card center" style={{ padding: '48px' }}><RefreshCw className="animate-spin" color="var(--primary)" /></div>
+                ) : incoming.length === 0 ? (
+                  <div className="card center" style={{ padding: '48px', opacity: 0.6 }}>No incoming streams detected yet.</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {incoming.map(s => <StreamCard key={s.id.toString()} stream={s} onAction={load} />)}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {expandedSection === 'none' && !loading && (
+              <div className="card center fade-in" style={{ padding: '60px 40px', textAlign: 'center', borderStyle: 'dashed', background: 'transparent' }}>
+                <Activity size={32} color="#6b7280" style={{ marginBottom: '16px', opacity: 0.3 }} />
+                <h4 style={{ color: '#9ca3af', fontWeight: 700, marginBottom: '8px' }}>Select a category above</h4>
+                <p className="text-muted" style={{ fontSize: '13px', maxWidth: '300px' }}>
+                  Easily access and manage your incoming or outgoing streams by clicking the cards above.
+                </p>
               </div>
             )}
-          </section>
+          </div>
         </div>
 
         {/* Sidebar panels */}

@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 15/5 Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 16/30 Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -21,6 +21,7 @@
 | 13 | `GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG) |
 | 14 | `GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35) |
 | 15 | `GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO) |
+| 16 | `GD3VRMX22ZNVMQV5VSZUTPSI5PQKQJLYJL2OULIVZVJDMUZF2EKFTWW7` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GD3VRMX22ZNVMQV5VSZUTPSI5PQKQJLYJL2OULIVZVJDMUZF2EKFTWW7) |
 
 ---
 
@@ -41,6 +42,7 @@
 | UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
 | Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
 | Individualized metrics request | Redesigned Metrics to exclusively display individualized user stream analytics, removing global address lists for a focused per-wallet experience: Fixed ✅ (Commit: `e75df08`) |
+| Dashboard stream wrapping | Redesigned the Dashboard to group incoming and outgoing streams into interactive, one-one category cards for cleaner access: Fixed ✅ (Commit: `pending`) |
 
 ---
 
@@ -89,6 +91,20 @@ Enhanced documentation by adding a step-by-step workflow along with example visu
 Completely redesigned the Metrics page logic to filter on-chain events by the connected wallet address. Removed the global listing of user addresses to prioritize privacy and focus on individual performance metrics.
 
 **Commit ID:** `e75df08`  
+
+---
+
+### 🔹 Feedback 4: Dashboard Stream Grouping
+
+**Wallet Address:** `GD3VRMX22ZNVMQV5VSZUTPSI5PQKQJLYJL2OULIVZVJDMUZF2EKFTWW7`  
+
+**Feedback Statement:**  
+"Wrap the dashboard's incoming and outgoing streams into a one-one card like Outgoing streams >, Incoming Streams > to properly see and easy access."
+
+**Implementation:**  
+Successfully redesigned the Dashboard main content area to replace the scrolling stream lists with two primary, interactive "Category Toggle Cards". These cards summarize the counts and provide an expandable, focused view for either incoming or outgoing streams, significantly reducing UI clutter.
+
+**Commit ID:** `pending`  
 
 ---
 
