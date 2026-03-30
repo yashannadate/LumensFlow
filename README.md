@@ -202,7 +202,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 11 | `GDOQ2JNYGS2YTGEB2...` | Tester | **Feedback:** "Improved documentation clarity by adding a step-by-step workflow and example visuals..." <br/> **Fix:** Added Alice & Bob visuals and technical specs to Docs.jsx. **Fixed ✅** | [`88c833b`](https://github.com/yashannadate/LumensFlow/commit/88c833b) |
 | 12 | `GAGKWDKAZYZ7GSK2...` | Tester | Created stream with multiple durations and tested cancel streams. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGKWDKAZYZ7GSK2K6YZGGEDEZXL2GEHDU2NMOAU4AVHSFAVZH336FFX) |
 | 13 | `GB5ODAZF7LFOXU7J...` | Tester | Successfully created payment streams with various durations and verified cancellation logic. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG) |
-| 14 | `GBJ5773FVWAA3DNE...` | Tester | **Feedback:** "in the metrics page the analytics should be shown their own analysis not others combined" <br/> **Fix:** Redesigned Metrics to exclusively display individualized user stream analytics. **Fixed ✅** | [`e75df08`](https://github.com/yashannadate/LumensFlow/commit/e75df08) |
+| 14 | `GBJ5773FVWAA3DN...` | Tester | **Feedback:** "in the metrics page the analytics should be shown their own analysis not others combined" <br/> **Fix:** Redesigned Metrics to exclusively display individualized user stream analytics. **Fixed ✅** | [`e75df08`](https://github.com/yashannadate/LumensFlow/commit/e75df08) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
