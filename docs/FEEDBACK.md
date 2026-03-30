@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 11/5 Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 14/5 Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -17,6 +17,9 @@
 | 9 | `GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
 | 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN) |
 | 11 | `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ) |
+| 12 | `GAGKWDKAZYZ7GSK2K6YZGGEDEZXL2GEHDU2NMOAU4AVHSFAVZH336FFX` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAGKWDKAZYZ7GSK2K6YZGGEDEZXL2GEHDU2NMOAU4AVHSFAVZH336FFX) |
+| 13 | `GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG) |
+| 14 | `GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35) |
 
 ---
 
@@ -36,6 +39,7 @@
 | Lack of Explorer visibility | Added `[↗]` icon to every activity card for direct on-chain verification |
 | UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
 | Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
+| Individualized metrics request | Redesigned Metrics to exclusively display individualized user stream analytics, removing global address lists for a focused per-wallet experience: Fixed ✅ (Commit: `e75df08`) |
 
 ---
 
@@ -70,6 +74,20 @@ Improved mobile responsiveness by restructuring layout components, optimizing sp
 Enhanced documentation by adding a step-by-step workflow along with example visuals (e.g., "Alice & Bob") to simplify onboarding for new users in `Docs.jsx`.
 
 **Commit ID:** `88c833b`  
+
+---
+
+### 🔹 Feedback 3: Individualized User Analytics
+
+**Wallet Address:** `GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35`  
+
+**Feedback Statement:**  
+"In the metrics page the analytics should be shown their own analysis not others combined. The dashboard should feel personal to the connected user."
+
+**Implementation:**  
+Completely redesigned the Metrics page logic to filter on-chain events by the connected wallet address. Removed the global listing of user addresses to prioritize privacy and focus on individual performance metrics.
+
+**Commit ID:** `e75df08`  
 
 ---
 
