@@ -116,7 +116,7 @@
 | 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
 | 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
 | 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
-| 👥 30+ Verified Users | 🔄 In Progress | 14 verified · actively onboarding to 30+ |
+| 👥 30+ Verified Users | 🔄 In Progress | 15 verified · actively onboarding to 30+ |
 | 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
 
 ---
@@ -185,7 +185,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 
 ## 👥 User Testnet Validation & Feedback
 
-> 🔄 **User Onboarding In Progress** — Successfully onboarded **14 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
+> 🔄 **User Onboarding In Progress** — Successfully onboarded **15 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
 
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
@@ -203,6 +203,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 12 | `GAGKWDKAZYZ7GSK2...` | Tester | Created stream with multiple durations and tested cancel streams. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGKWDKAZYZ7GSK2K6YZGGEDEZXL2GEHDU2NMOAU4AVHSFAVZH336FFX) |
 | 13 | `GB5ODAZF7LFOXU7J...` | Tester | Successfully created payment streams with various durations and verified cancellation logic. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG) |
 | 14 | `GBJ5773FVWAA3DN...` | Tester | **Feedback:** "in the metrics page the analytics should be shown their own analysis not others combined" <br/> **Fix:** Redesigned Metrics to exclusively display individualized user stream analytics. **Fixed ✅** | [`e75df08`](https://github.com/yashannadate/LumensFlow/commit/e75df08) |
+| 15 | `GAGKZFDLP2P5CIK...` | Tester | Explored stream lifecycle; successfully created and cancelled payment streams with varied durations. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
