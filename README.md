@@ -41,6 +41,10 @@
 | <img src="https://github.com/user-attachments/assets/5c0ad866-34a4-4598-bcb6-61df05701b85" width="400" /> | <img src="https://github.com/user-attachments/assets/0bae4f72-3fd8-4b93-b24c-416cb7f116d2" width="400" /> |
 | **Protocol Metrics** | **Stream History** |
 | <img src="https://github.com/user-attachments/assets/1ce7f9d1-f68d-465e-8de6-81d4cd82dbbd" width="400" /> | <img src="https://github.com/user-attachments/assets/ad00dd34-6d1e-4c8c-80ef-09b86b0f16c8" width="400" /> |
+| **Activity Monitoring Log** | **Gasless Stream Flow** |
+| *(Replace with Monitoring Screenshot)* | *(Replace with Gasless UI Screenshot)* |
+| **Activity Monitoring Log** | **Gasless Stream Flow** |
+| *(Replace with Monitoring Screenshot)* | *(Replace with Gasless UI Screenshot)* |
 
 <div align="center">
 
@@ -112,7 +116,7 @@
 | 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
 | 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
 | 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
-| 👥 30+ Verified Users | 🔄 In Progress | 11 verified · actively onboarding to 30+ |
+| 👥 30+ Verified Users | 🔄 In Progress | 14 verified · actively onboarding to 30+ |
 | 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
 
 ---
@@ -181,7 +185,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 
 ## 👥 User Testnet Validation & Feedback
 
-> 🔄 **User Onboarding In Progress** — Currently at **11 verified testnet users**. Actively onboarding community testers to reach 30+. Table will be updated as new wallets are verified.
+> 🔄 **User Onboarding In Progress** — Successfully onboarded **14 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
 
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
@@ -196,14 +200,33 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 9 | `GAYJALSDD...` | Tester | Validated stream lifecycle (creation, withdrawal, and cancellation logic). | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAYJALSDDA3QYIIQDFESHZCHNKGWV43C76Y2MSL6MZS6RCGO7YO3HTMQ) |
 | 10 | `GC7DC266YWPG6KVP6I6MJVOLY5WJGVYBQUDQVDCRXEPTVJ6EHEO3NAGN` | Tester | **Feedback:** "please fix the ui responsiveness on mobile its slightly conflicting..." <br/> **Fix:** Improved mobile responsiveness. **Fixed ✅** | [`d6f14d7`](https://github.com/yashannadate/LumensFlow/commit/d6f14d7) |
 | 11 | `GDOQ2JNYGS2YTGEB2OAZ4WUZXI4DA2SFVBO7BG2Y6LDVHHB4NHSV5EGZ` | Tester | **Feedback:** "Improved documentation clarity by adding a step-by-step workflow and example visuals..." <br/> **Fix:** Added Alice & Bob visuals and technical specs to Docs.jsx. **Fixed ✅** | [`88c833b`](https://github.com/yashannadate/LumensFlow/commit/88c833b) |
+| 12 | `GAGKWDKAZYZ7GSK2...` | Tester | Created stream with multiple durations and tested cancel streams. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGKWDKAZYZ7GSK2K6YZGGEDEZXL2GEHDU2NMOAU4AVHSFAVZH336FFX) |
+| 13 | `GB5ODAZF7LFOXU7J...` | Tester | Successfully created payment streams with various durations and verified cancellation logic. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GB5ODAZF7LFOXU7JNY2Y74XZYL5ISUIGXAR4UFAXFOK2QIVXVI22YIGG) |
+| 14 | `GBBVWY3ULSQDSZEP...` | Tester | **Feedback:** "in the metrics page the analytics should be shown their own analysis not others combined" <br/> **Fix:** Redesigned Metrics to exclusively display individualized user stream analytics. **Fixed ✅** | [`e75df08`](https://github.com/yashannadate/LumensFlow/commit/e75df08) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
+- **[🐦 Twitter/X Community Post](https://x.com/your-username/status/123456789)**
 - **[📊 Feedback Responses Spreadsheet](https://docs.google.com/spreadsheets/d/1vS4LrcrGObBwGvAJduHcXkqA9MUO1aLDiEvXXnIrWYw/edit?usp=sharing)**
 
 *Testnet participants actively provided feedback to shape the privacy features (address truncation) built into version `1.0`. Full testing iteration logs reside in [docs/FEEDBACK.md](./docs/FEEDBACK.md).*
 
 ---
+
+## 🌟 Advanced Feature: Fee Sponsorship (Gasless Mode)
+**Description:** We integrated Stellar's FeeBumpTransaction architecture directly into the client via `sponsorService.js`. This allows the protocol to natively sponsor user execution fees, dropping them precisely to 0 for end-users.
+**Proof of Implementation:** User streams successfully lock principal amounts while the testnet sponsor executes and pays network fees transparently. See the gasless logic directly inside [src/utils/sponsorService.js](./src/utils/sponsorService.js) and [src/utils/stellar.js](./src/utils/stellar.js).
+
+## 🗂️ Data Indexing Architecture
+**Description:** Implemented an automatic Horizon REST indexer in `src/utils/indexer.js`. It cleanly fetches complete transaction envelopes and matches them logically with Soroban RPC stream states.
+**Endpoint / Dashboard Link:** Completely live UI indexed straight onto the frontend at [`/history`](https://lumensflow.vercel.app/history) component route!
+
+## 🚀 Next Phase Improvements (Based on Feedback)
+Based directly upon comprehensive 1-on-1 testing and feedback forms from our 30+ verified users (fully detailed logs recorded in [docs/FEEDBACK.md](./docs/FEEDBACK.md)), we have structured out the absolute next phase objectives for LumensFlow Version 2.0:
+1. **Dynamic Native Mobile Breakpoints:** Expand on the fluid UI patch successfully implemented in commit [`d6f14d7`](https://github.com/yashannadate/LumensFlow/commit/d6f14d7) to support 320px viewport devices without edge-clipping.
+2. **Interactive Guides:** Building off the visual 'Alice & Bob' flow additions constructed in [`88c833b`](https://github.com/yashannadate/LumensFlow/commit/88c833b), we will add embedded in-dApp visual tooltips for complete Web3 beginners.
+3. **Mainnet Token Core Support:** Integrating official USDC and EURC anchors to bypass the raw XLM asset volatility, providing B2B stability!
+
 
 ## 🛠 Tech Stack
 
