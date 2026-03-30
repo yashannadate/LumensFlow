@@ -42,7 +42,7 @@
 | UI responsiveness issues on mobile | Improved mobile responsiveness to resolve layout issues on smaller screens while maintaining a smooth experience across devices : Fixed ✅ (Commit: `d6f14d7`) |
 | Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
 | Individualized metrics request | Redesigned Metrics to exclusively display individualized user stream analytics, removing global address lists for a focused per-wallet experience: Fixed ✅ (Commit: `e75df08`) |
-| Dashboard stream wrapping | Redesigned the Dashboard to group incoming and outgoing streams into interactive, one-one category cards for cleaner access: Fixed ✅ (Commit: `pending`) |
+| Dashboard stream wrapping | Redesigned the Dashboard to group incoming and outgoing streams into interactive, one-one category cards for cleaner access: Fixed ✅ (Commit: `a6072ff`) |
 
 ---
 
@@ -104,7 +104,7 @@ Completely redesigned the Metrics page logic to filter on-chain events by the co
 **Implementation:**  
 Successfully redesigned the Dashboard main content area to replace the scrolling stream lists with two primary, interactive "Category Toggle Cards". These cards summarize the counts and provide an expandable, focused view for either incoming or outgoing streams, significantly reducing UI clutter.
 
-**Commit ID:** `pending`  
+**Commit ID:** `a6072ff`  
 
 ---
 
