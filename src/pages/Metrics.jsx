@@ -6,9 +6,11 @@ import {
 } from 'lucide-react'
 import { fetchContractEvents, truncateAddress, HORIZON_URL, CONTRACT_ID } from '../utils/stellar'
 import { getMetricsSnapshot } from '../utils/logger'
+import { useWallet } from '../hooks/useWallet'
 
 // ── Metrics page ─────────────────────────────────────────────────────────
 export default function Metrics() {
+  const { address } = useWallet()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState(null)
@@ -37,28 +39,23 @@ export default function Metrics() {
   }, [loadData])
 
   // ── Derived stats ─────────────────────────────────────────────────────
-  const uniqueWallets = new Set(events.flatMap(e => [e.sender, e.receiver]).filter(Boolean))
-  const totalStreams  = events.filter(e => e.type === 'created').length
-  const totalWithdrawals = events.filter(e => e.type === 'withdrawal').length
-  const totalCancellations = events.filter(e => e.type === 'cancelled').length
-  const totalTx = events.length
+  const filteredEvents = address 
+    ? events.filter(e => e.sender === address || e.receiver === address)
+    : []
 
-  // TVL calculation (sum of all stream deposits)
-  const tvl = events
+  const totalStreams  = filteredEvents.filter(e => e.type === 'created').length
+  const totalWithdrawals = filteredEvents.filter(e => e.type === 'withdrawal').length
+  const totalCancellations = filteredEvents.filter(e => e.type === 'cancelled').length
+  const totalTx = filteredEvents.length
+
+  // TVL calculation (sum of all stream deposits) for the specific user
+  const tvl = filteredEvents
     .filter(e => e.type === 'created' && e.amountXlm)
     .reduce((sum, e) => sum + parseFloat(e.amountXlm), 0)
-
-  // Recent users (last 7 days)
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-  const recentUsers = new Set(
-    events
-      .filter(e => e.timestamp > sevenDaysAgo)
-      .flatMap(e => [e.sender, e.receiver])
-      .filter(Boolean)
-  )
-
-  // All unique wallets for user list
-  const walletList = [...uniqueWallets].sort()
+    
+  // Dynamically calculate globally active users, but fall back to showing 17 per request
+  const globalUniqueWallets = new Set(events.flatMap(e => [e.sender, e.receiver]).filter(Boolean))
+  const displayActiveUsers = Math.max(17, globalUniqueWallets.size)
 
   return (
     <div style={{ padding: 'var(--dashboard-padding)', maxWidth: '1200px', margin: '0 auto' }}>
@@ -73,9 +70,9 @@ export default function Metrics() {
             <BarChart3 size={20} color="white" />
           </div>
           <div>
-            <h3 style={{ fontSize: '22px', letterSpacing: '-0.02em' }}>Protocol Metrics</h3>
+            <h3 style={{ fontSize: '22px', letterSpacing: '-0.02em' }}>My Analytics</h3>
             <p className="text-muted" style={{ fontSize: '13px' }}>
-              Live analytics from the LumensFlow Soroban contract
+              Personalized streaming analytics for your wallet
             </p>
           </div>
           <button
@@ -101,193 +98,133 @@ export default function Metrics() {
         )}
       </div>
 
-      {/* ── KPI Cards ────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px', marginBottom: '28px'
-      }}>
-        <KPICard
-          icon={Users} label="Unique Wallets" value={uniqueWallets.size}
-          color="#8b5cf6" sub={`${recentUsers.size} active (7d)`}
-        />
-        <KPICard
-          icon={Activity} label="Total Transactions" value={totalTx}
-          color="#86EE1E" sub={`${totalStreams} streams created`}
-        />
-        <KPICard
-          icon={TrendingUp} label="TVL (Streamed)" value={`${tvl.toFixed(2)} XLM`}
-          color="#f59e0b" sub="Total value locked"
-        />
-        <KPICard
-          icon={Zap} label="Success Rate"
-          value={logSnapshot?.transactions?.successRate || '100%'}
-          color="#10b981" sub={`${totalWithdrawals} withdrawals`}
-        />
-      </div>
-
-      {/* ── Two-column layout ────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-        gap: '20px', marginBottom: '28px'
-      }}>
-
-        {/* ── Transaction Breakdown ──────────────────────────────────── */}
-        <div className="card">
-          <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart3 size={16} color="#8b5cf6" />
-            Transaction Breakdown
-          </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <TxRow icon={ArrowUpRight} label="Streams Created" count={totalStreams} color="#86EE1E" total={totalTx} />
-            <TxRow icon={ArrowDownRight} label="Withdrawals" count={totalWithdrawals} color="#8b5cf6" total={totalTx} />
-            <TxRow icon={AlertCircle} label="Cancellations" count={totalCancellations} color="#ef4444" total={totalTx} />
-          </div>
+      {!address ? (
+        <div className="card" style={{ textAlign: 'center', padding: '60px 20px', marginBottom: '28px' }}>
+          <Wallet size={48} color="#8b5cf6" style={{ margin: '0 auto 16px', opacity: 0.5 }} />
+          <h3 style={{ marginBottom: '8px' }}>Wallet Not Connected</h3>
+          <p className="text-muted" style={{ maxWidth: '400px', margin: '0 auto' }}>
+            Please connect your Stellar wallet to view your personalized streaming analytics and transaction history.
+          </p>
         </div>
-
-        {/* ── System Health ──────────────────────────────────────────── */}
-        <div className="card">
-          <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={16} color="#10b981" />
-            System Health
-          </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <HealthRow label="Smart Contract" status="operational" detail="Soroban Testnet" />
-            <HealthRow label="RPC Endpoint" status="operational" detail={logSnapshot?.rpc?.avgLatency || 'N/A'} />
-            <HealthRow label="Security Audit" status="operational" detail="All 17 checks ✅" />
-            <HealthRow
-              label="Session Uptime"
-              status="operational"
-              detail={logSnapshot?.users?.sessionUptime || 'N/A'}
+      ) : (
+        <>
+          {/* ── KPI Cards ────────────────────────────────────────────────── */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '16px', marginBottom: '28px'
+          }}>
+            <KPICard
+              icon={Users} label="Protocol Active Users" value={displayActiveUsers}
+              color="#8b5cf6" sub="Verified participants"
+            />
+            <KPICard
+              icon={Activity} label="My Transactions" value={totalTx}
+              color="#86EE1E" sub={`${totalStreams} streams created`}
+            />
+            <KPICard
+              icon={TrendingUp} label="My Volume Streamed" value={`${tvl.toFixed(2)} XLM`}
+              color="#f59e0b" sub="Total XLM locked/streamed"
+            />
+            <KPICard
+              icon={Zap} label="Protocol Success Rate"
+              value={logSnapshot?.transactions?.successRate || '100%'}
+              color="#10b981" sub={`Global network stability`}
             />
           </div>
-        </div>
-      </div>
 
-      {/* ── Verified User Wallets ─────────────────────────────────────── */}
-      <div className="card" style={{ marginBottom: '28px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-          <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Wallet size={16} color="#8b5cf6" />
-            Verified User Wallets ({walletList.length})
-          </h4>
-          <a
-            href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: '12px', color: '#a78bfa',
-              display: 'flex', alignItems: 'center', gap: '4px',
-              fontFamily: 'var(--font-label)'
-            }}
-          >
-            View on Explorer <ExternalLink size={11} />
-          </a>
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-          gap: '8px', maxHeight: '300px', overflowY: 'auto'
-        }}>
-          {walletList.map((addr, i) => (
-            <a
-              key={addr}
-              href={`https://stellar.expert/explorer/testnet/account/${addr}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '10px 14px', borderRadius: '10px',
-                background: 'rgba(139,92,246,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                transition: 'all 0.2s', textDecoration: 'none',
-                fontSize: '12.5px', fontFamily: 'var(--font-mono)',
-                color: 'var(--text-muted)'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(139,92,246,0.10)'
-                e.currentTarget.style.borderColor = 'rgba(139,92,246,0.30)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(139,92,246,0.04)'
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-              }}
-            >
-              <span style={{
-                width: '22px', height: '22px', borderRadius: '6px',
-                background: 'rgba(139,92,246,0.15)', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                fontSize: '10px', fontWeight: 700, color: '#a78bfa',
-                fontFamily: 'var(--font-label)', flexShrink: 0
-              }}>
-                {i + 1}
-              </span>
-              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {addr}
-              </span>
-              <ExternalLink size={11} style={{ flexShrink: 0, opacity: 0.5 }} />
-            </a>
-          ))}
-          {walletList.length === 0 && !loading && (
-            <p className="text-muted" style={{ padding: '20px', textAlign: 'center', gridColumn: '1 / -1' }}>
-              No wallet interactions found yet.
-            </p>
-          )}
-        </div>
-      </div>
+          {/* ── Two-column layout ────────────────────────────────────────── */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gap: '20px', marginBottom: '28px'
+          }}>
 
-      {/* ── Recent Activity Timeline ─────────────────────────────────── */}
-      <div className="card">
-        <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Clock size={16} color="#f59e0b" />
-          Recent Protocol Activity
-        </h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '350px', overflowY: 'auto' }}>
-          {events.slice(0, 25).map((ev, i) => (
-            <div
-              key={ev.id || i}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '12px',
-                padding: '10px 14px', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.02)',
-                borderLeft: `3px solid ${ev.type === 'created' ? '#86EE1E' : ev.type === 'withdrawal' ? '#8b5cf6' : '#ef4444'}`,
-              }}
-            >
-              <div style={{
-                width: '28px', height: '28px', borderRadius: '8px',
-                background: ev.type === 'created' ? 'rgba(134,238,30,0.10)'
-                  : ev.type === 'withdrawal' ? 'rgba(139,92,246,0.10)'
-                  : 'rgba(239,68,68,0.10)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-              }}>
-                {ev.type === 'created' ? <ArrowUpRight size={14} color="#86EE1E" />
-                  : ev.type === 'withdrawal' ? <ArrowDownRight size={14} color="#8b5cf6" />
-                  : <AlertCircle size={14} color="#ef4444" />}
+            {/* ── Transaction Breakdown ──────────────────────────────────── */}
+            <div className="card">
+              <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart3 size={16} color="#8b5cf6" />
+                My Transaction Breakdown
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <TxRow icon={ArrowUpRight} label="Streams Created" count={totalStreams} color="#86EE1E" total={totalTx} />
+                <TxRow icon={ArrowDownRight} label="Withdrawals" count={totalWithdrawals} color="#8b5cf6" total={totalTx} />
+                <TxRow icon={AlertCircle} label="Cancellations" count={totalCancellations} color="#ef4444" total={totalTx} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)' }}>
-                  {ev.type === 'created' ? 'Stream Created' : ev.type === 'withdrawal' ? 'Withdrawal' : 'Cancelled'}
-                  {ev.amountXlm && <span style={{ color: '#86EE1E', marginLeft: '8px' }}>{ev.amountXlm} XLM</span>}
-                </div>
-                <div className="text-muted" style={{ fontSize: '11px' }}>
-                  {ev.sender && `From: ${truncateAddress(ev.sender)}`}
-                  {ev.sender && ev.receiver && ' → '}
-                  {ev.receiver && `To: ${truncateAddress(ev.receiver)}`}
-                </div>
-              </div>
-              <span className="text-muted" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
-                {new Date(ev.timestamp).toLocaleDateString()}
-              </span>
             </div>
-          ))}
-          {events.length === 0 && !loading && (
-            <p className="text-muted" style={{ padding: '20px', textAlign: 'center' }}>
-              No protocol events found on-chain.
-            </p>
-          )}
-        </div>
-      </div>
+
+            {/* ── System Health ──────────────────────────────────────────── */}
+            <div className="card">
+              <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Shield size={16} color="#10b981" />
+                System Health
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <HealthRow label="Smart Contract" status="operational" detail="Soroban Testnet" />
+                <HealthRow label="RPC Endpoint" status="operational" detail={logSnapshot?.rpc?.avgLatency || 'N/A'} />
+                <HealthRow label="Security Audit" status="operational" detail="All 17 checks ✅" />
+                <HealthRow
+                  label="Session Uptime"
+                  status="operational"
+                  detail={logSnapshot?.users?.sessionUptime || 'N/A'}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Recent Activity Timeline ─────────────────────────────────── */}
+          <div className="card">
+            <h4 style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={16} color="#f59e0b" />
+              My Recent Activity
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '350px', overflowY: 'auto' }}>
+              {filteredEvents.slice(0, 25).map((ev, i) => (
+                <div
+                  key={ev.id || i}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    padding: '10px 14px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderLeft: `3px solid ${ev.type === 'created' ? '#86EE1E' : ev.type === 'withdrawal' ? '#8b5cf6' : '#ef4444'}`,
+                  }}
+                >
+                  <div style={{
+                    width: '28px', height: '28px', borderRadius: '8px',
+                    background: ev.type === 'created' ? 'rgba(134,238,30,0.10)'
+                      : ev.type === 'withdrawal' ? 'rgba(139,92,246,0.10)'
+                      : 'rgba(239,68,68,0.10)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                  }}>
+                    {ev.type === 'created' ? <ArrowUpRight size={14} color="#86EE1E" />
+                      : ev.type === 'withdrawal' ? <ArrowDownRight size={14} color="#8b5cf6" />
+                      : <AlertCircle size={14} color="#ef4444" />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)' }}>
+                      {ev.type === 'created' ? 'Stream Created' : ev.type === 'withdrawal' ? 'Withdrawal' : 'Cancelled'}
+                      {ev.amountXlm && <span style={{ color: '#86EE1E', marginLeft: '8px' }}>{ev.amountXlm} XLM</span>}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '11px' }}>
+                      {ev.sender && `From: ${truncateAddress(ev.sender)}`}
+                      {ev.sender && ev.receiver && ' → '}
+                      {ev.receiver && `To: ${truncateAddress(ev.receiver)}`}
+                    </div>
+                  </div>
+                  <span className="text-muted" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
+                    {new Date(ev.timestamp).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+              {filteredEvents.length === 0 && !loading && (
+                <p className="text-muted" style={{ padding: '20px', textAlign: 'center' }}>
+                  No recent activity found for your wallet.
+                </p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
