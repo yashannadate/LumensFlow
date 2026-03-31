@@ -113,7 +113,7 @@
 | 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
 | 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
 | 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
-| 👥 Verified Users | 🔄 In Progress | 25 verified · actively onboarding to 25+ |
+| 👥 Verified Users |  ✅ Done | 25 verified · actively onboarding more users |
 | 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
 
 ---
