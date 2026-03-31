@@ -1,4 +1,4 @@
-import { Zap, Twitter, Github, Globe } from 'lucide-react'
+import { Zap, Linkedin, Twitter, Github, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
@@ -69,6 +69,9 @@ export default function Footer() {
       <div style={{ maxWidth: '1100px', margin: '64px auto 0', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>© 2026 LUMENS<span style={{ color: '#86EE1E' }}>FLOW</span> PROTOCOL</div>
         <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', gap: '20px' }}>
+          <a href="https://github.com/yashannadate/LumensFlow" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Github size={14} /></a>
+          <a href="https://www.linkedin.com/posts/yashannadate19_lumensflow-lumensflow-moneystreaming-share-7444708215520555008-IGNl?utm_source=share&utm_medium=member_ios&rcm=ACoAAEzGdpsBn8dJwPI4fsdTEmr4IkAWvynqXZU" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Linkedin size={14} /></a>
+          <a href="https://x.com/yashannadate19/status/2038944427373441376?s=46" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Twitter size={14} /></a>
         </div>
       </div>
     </footer>

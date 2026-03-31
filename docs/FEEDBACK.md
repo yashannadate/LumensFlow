@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 23/25+ Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 25/30 Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -29,6 +29,8 @@
 | 21 | `GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I) |
 | 22 | `GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL) |
 | 23 | `GDNB35Y2M3N2MIARV4PCHJYJ2THEZPIXZTM5H6RVBSRL3OVXQKNK4DD4` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDNB35Y2M3N2MIARV4PCHJYJ2THEZPIXZTM5H6RVBSRL3OVXQKNK4DD4) |
+| 24 | `GCJCNZPQUINMWCT66JKQ4I7CFPIVNDFU3AS65ARRL2FT4OWWSYAXIE62` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GCJCNZPQUINMWCT66JKQ4I7CFPIVNDFU3AS65ARRL2FT4OWWSYAXIE62) |
+| 25 | `GC7CUXZU5NBUK4WSITFYK6MV47BU3K6PF67GE5B3IHFWP44PZWLQBG57` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GC7CUXZU5NBUK4WSITFYK6MV47BU3K6PF67GE5B3IHFWP44PZWLQBG57) |
 
 ---
 
@@ -51,6 +53,7 @@
 | Individualized metrics request | Redesigned Metrics to exclusively display individualized user stream analytics, removing global address lists for a focused per-wallet experience: Fixed ✅ (Commit: `e75df08`) |
 | Dashboard stream wrapping | Redesigned the Dashboard to group incoming and outgoing streams into interactive, one-one category cards for cleaner access: Fixed ✅ (Commit: `a6072ff`) |
 | Visual Documentation Overhaul | Redesigned technical documentation for enhanced visual storytelling to guide the user through the token lifecycle: Fixed ✅ (Commit: `8bdee7c`) |
+| UI Cleanup & Simulator Upgrade | Removed redundant global metrics and upgraded the protocol simulator with real-world presets for Payroll, Subscriptions, and Vesting: Fixed ✅ (Commit: `2693f3f`) |
 
 ---
 
@@ -127,6 +130,22 @@ Successfully redesigned the Dashboard main content area to replace the scrolling
 Successfully overhauled the technical documentation in `Docs.jsx`. Replaced long text blocks with a "Quick Start" grid, implemented an interactive glossary system, and added a visual "Token Lifecycle" diagram that clearly illustrates the flow from Deposit to Completion.
 
 **Commit ID:** `8bdee7c`  
+
+---
+
+### 🔹 Feedback 6: UI Cleanup & Simulator Enhancement
+
+**Wallet Address:** `GCJCNZPQUINMWCT66JKQ4I7CFPIVNDFU3AS65ARRL2FT4OWWSYAXIE62`  
+
+**Feedback Statement:**  
+"Remove unnecessary options or cards... should be more properly and exactly working with proper sample add more example on docs like Payroll, Subscriptions, Vesting."
+
+**Implementation:**  
+1. **Cleanup**: Removed global "Network Pulse" and "Success Rate" cards from the Dashboard and Metrics to focus purely on user data.
+2. **Simulator**: Upgraded `HowItWorks.jsx` with three pre-calculated use-case presets (Payroll, Subscriptions, Vesting) and refined real-time accrual logic.
+3. **Docs**: Expanded `Docs.jsx` with a "Real-World Use Cases" section explaining salaries, recurring payments, and token unlocks.
+
+**Commit ID:** `2693f3f`  
 
 ---
 

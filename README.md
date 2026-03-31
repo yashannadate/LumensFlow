@@ -113,7 +113,7 @@
 | 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
 | 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
 | 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
-| 👥 Verified Users | 🔄 In Progress | 23 verified · actively onboarding to 25+ |
+| 👥 Verified Users | 🔄 In Progress | 25 verified · actively onboarding to 25+ |
 | 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
 
 ---
@@ -126,7 +126,7 @@
 | 📐 Technical Reference | Architecture, smart contract ABI, API reference, and security model | [Read →](./docs/TECHNICAL.md) |
 | 🛡️ Security Checklist | Full Level 6 security audit and checklist | [Read →](./docs/SECURITY.md) |
 | 🧪 Feedback Logs | User testing iterations and fixes applied | [Read →](./docs/FEEDBACK.md) |
-| 🌐 Community Post | Twitter/X community contribution post | [Read →](./docs/COMMUNITY.md) |
+| 🌐 Community Post | LinkedIn & Twitter/X project announcements | [Read →](./docs/COMMUNITY.md) |
 | 🎤 Demo Notes | Demo Day presentation bullet points | [Read →](./docs/DEMO_NOTES.md) |
 
 ---
@@ -182,7 +182,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 
 ## 👥 User Testnet Validation & Feedback
 
-> 🔄 **User Onboarding In Progress** — Successfully onboarded **23 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
+> 🔄 **User Onboarding** — Successfully onboarded **25 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
 
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
@@ -209,10 +209,13 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 21 | `GCLSO2OQHV6JH...` | Tester | Stress-tested the payment flow across multiple concurrent streams; verified transaction finality. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I) |
 | 22 | `GDCBAPWYVRLRO...` | Tester | Explored the application architecture and validated the Soroban contract state transitions. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL) |
 | 23 | `GDNB35Y2M3N2M...` | Tester | **Feedback:** "To make it more effective, focus on the how by reducing text density and using more visual storytelling..." <br/> **Fix:** Redesigned technical documentation for enhanced visual storytelling. **Fixed ✅** | [`8bdee7c`](https://github.com/yashannadate/LumensFlow/commit/8bdee7c) |
+| 24 | `GCJCNZPQUINMW...` | Tester | **Feedback:** "Remove unnecessary options or cards i can see it’s unnecessary... should be more properly and exactly working..." <br/> **Fix:** Cleaned up redundant global metrics and upgraded simulator with real-world presets. **Fixed ✅** | [`2693f3f`](https://github.com/yashannadate/LumensFlow/commit/2693f3f) |
+| 25 | `GC7CUXZU5NB...` | Tester | Explored the interactive simulator and verified the newly added 'Real-World' use cases in documentation. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GC7CUXZU5NBUK4WSITFYK6MV47BU3K6PF67GE5B3IHFWP44PZWLQBG57) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**
-- **[🐦 Twitter/X Community Post](https://x.com/your-username/status/123456789)**
+- **[🔗 LinkedIn Project Post](https://www.linkedin.com/posts/yashannadate19_lumensflow-lumensflow-moneystreaming-share-7444708215520555008-IGNl?utm_source=share&utm_medium=member_ios&rcm=ACoAAEzGdpsBn8dJwPI4fsdTEmr4IkAWvynqXZU)**
+- **[🐦 Twitter/X Project Post](https://x.com/yashannadate19/status/2038944427373441376?s=46)**
 - **[📊 Feedback Responses Spreadsheet](https://docs.google.com/spreadsheets/d/1vS4LrcrGObBwGvAJduHcXkqA9MUO1aLDiEvXXnIrWYw/edit?usp=sharing)**
 
 *Testnet participants actively provided feedback to shape the privacy features (address truncation) built into version `1.0`. Full testing iteration logs reside in [docs/FEEDBACK.md](./docs/FEEDBACK.md).*
