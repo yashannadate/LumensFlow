@@ -111,25 +111,16 @@ export default function Metrics() {
           {/* ── KPI Cards ────────────────────────────────────────────────── */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gridTemplateColumns: '1fr 1fr',
             gap: '16px', marginBottom: '28px'
           }}>
             <KPICard
-              icon={Users} label="Protocol Active Users" value={displayActiveUsers}
-              color="#8b5cf6" sub="Verified participants"
-            />
-            <KPICard
               icon={Activity} label="My Transactions" value={totalTx}
-              color="#86EE1E" sub={`${totalStreams} streams created`}
+              color="#86EE1E" sub={`${totalStreams} streams created / ${totalCancellations} cancelled`}
             />
             <KPICard
-              icon={TrendingUp} label="My Volume Streamed" value={`${tvl.toFixed(2)} XLM`}
-              color="#f59e0b" sub="Total XLM locked/streamed"
-            />
-            <KPICard
-              icon={Zap} label="Protocol Success Rate"
-              value={logSnapshot?.transactions?.successRate || '100%'}
-              color="#10b981" sub={`Global network stability`}
+              icon={TrendingUp} label="Total Value Streamed" value={`${tvl.toFixed(2)} XLM`}
+              color="#f59e0b" sub="Total capital locked & released by you"
             />
           </div>
 

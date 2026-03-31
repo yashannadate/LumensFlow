@@ -5,7 +5,7 @@ import {
   Code, Activity, Terminal, ExternalLink,
   Wallet, Send, Settings, UserCheck, Lock, Cpu,
   ArrowRight, Coins, CheckCircle2, History,
-  Globe, Rocket, Layers
+  Globe, Rocket, Layers, Briefcase, CreditCard, Landmark
 } from 'lucide-react'
 
 const DOCS_SECTIONS = [
@@ -44,30 +44,53 @@ const DOCS_SECTIONS = [
     )
   },
   {
-    id: 'money-streaming',
-    title: 'Money Streaming',
-    icon: <Droplets size={18} />,
+    id: 'use-cases',
+    title: 'Real-World Use Cases',
+    icon: <Layers size={18} />,
     content: (
       <>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }} className="grid-2-mobile">
-          <div className="card" style={{ padding: '24px', borderStyle: 'dashed' }}>
-             <h4 style={{ color: '#fff', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-               <History size={16} color="#8b5cf6" /> Standard Transfers
-             </h4>
-             <p style={{ fontSize: '13px', color: '#6b7280' }}>Value moves in a single, large block. Capital is "locked" in transit and only available after confirmation and waiting periods.</p>
-          </div>
-          <div className="card" style={{ padding: '24px', background: 'rgba(134, 238, 30, 0.05)', borderColor: 'rgba(134, 238, 30, 0.2)' }}>
-             <h4 style={{ color: '#86EE1E', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-               <Zap size={16} color="#86EE1E" /> Money Streams
-             </h4>
-             <p style={{ fontSize: '13px', color: '#9ca3af' }}>Value moves at every ledger update. Receivers gain liquidity every second, enabling real-time payroll and service monetization.</p>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+          {[
+            { 
+              icon: <Briefcase color="#86EE1E" />, 
+              title: "On-Chain Payroll", 
+              desc: "Pay employees by the second. Instead of waiting for bi-weekly cycles, workers gain immediate access to their earned capital.",
+              tag: "Continuity"
+            },
+            { 
+              icon: <CreditCard color="#8b5cf6" />, 
+              title: "Subscriptions", 
+              desc: "Renew services with zero friction. Automate recurring micro-payments without the risk of over-charging or manual billing.",
+              tag: "Automation"
+            },
+            { 
+              icon: <Landmark color="#3b82f6" />, 
+              title: "Trustless Vesting", 
+              desc: "Unlock tokens gradually for founders and investors. Smart contracts enforce linear cliffs and release schedules automatically.",
+              tag: "Security"
+            }
+          ].map((item, i) => (
+            <div key={i} className="card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {item.icon}
+                </div>
+                <span style={{ fontSize: '9px', fontWeight: 800, color: '#6b7280', border: '1px solid #1f2937', padding: '2px 8px', borderRadius: '9999px', textTransform: 'uppercase' }}>
+                  {item.tag}
+                </span>
+              </div>
+              <div>
+                <h4 style={{ color: '#fff', fontSize: '16px', marginBottom: '8px' }}>{item.title}</h4>
+                <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </>
     )
   },
   {
-    id: 'how-it-works',
+    id: 'money-streaming',
     title: 'How It Works (Really)',
     icon: <Settings size={18} />,
     content: (

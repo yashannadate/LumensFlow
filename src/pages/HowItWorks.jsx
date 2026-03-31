@@ -4,24 +4,49 @@ import {
   Wallet, Send, Droplets, ArrowRight, Zap, 
   Shield, TrendingUp, XCircle, ChevronRight, 
   HelpCircle, Play, Pause, RotateCcw,
-  CheckCircle2, Lock, Coins
+  CheckCircle2, Lock, Coins,
+  Briefcase, CreditCard, Landmark
 } from 'lucide-react'
+
+const SIM_PRESETS = {
+  PAYROLL: {
+    label: 'Employee Payroll',
+    icon: <Briefcase size={16} />,
+    rate: 0.0009645, // 2,500 XLM / Month
+    monthly: 2500,
+    desc: 'Pay your team precisely for every second of work.'
+  },
+  SUBSCRIPTION: {
+    label: 'Subscription',
+    icon: <CreditCard size={16} />,
+    rate: 0.0000096, // 25 XLM / Month
+    monthly: 25,
+    desc: 'Automated recurring renewals with zero friction.'
+  },
+  VESTING: {
+    label: 'Token Vesting',
+    icon: <Landmark size={16} />,
+    rate: 0.0003171, // 10,000 XLM / Year
+    monthly: 833.33,
+    desc: 'Gradual, trustless unlock for founders and teams.'
+  }
+}
 
 export default function HowItWorks() {
   const navigate = useNavigate()
+  const [activePreset, setActivePreset] = useState('PAYROLL')
   const [simulating, setSimulating] = useState(false)
   const [simAmount, setSimAmount] = useState(0)
-  const FLOW_RATE = 0.0004629 // Sample rate: 1200 XLM / 30 days
 
   useEffect(() => {
     let interval
     if (simulating) {
       interval = setInterval(() => {
-        setSimAmount(prev => prev + FLOW_RATE)
+        setSimAmount(prev => prev + SIM_PRESETS[activePreset].rate)
       }, 100)
     }
     return () => clearInterval(interval)
-  }, [simulating])
+  }, [simulating, activePreset])
 
   const STEPS = [
     {
@@ -80,17 +105,39 @@ export default function HowItWorks() {
         background: 'linear-gradient(135deg, rgba(13,17,23,0.8), rgba(20,27,38,0.8))',
         border: '1px solid #1f2937', position: 'relative', overflow: 'hidden'
       }}>
-        <div style={{ position: 'absolute', top: 0, right: 0, padding: '20px', opacity: 0.05 }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, padding: '20px', opacity: 0.05, pointerEvents: 'none' }}>
            <Zap size={200} color="#86EE1E" />
         </div>
 
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <h2 style={{ fontSize: '24px', color: '#fff', marginBottom: '32px', textAlign: 'center' }}>Protocol Live Simulator</h2>
+          <h2 style={{ fontSize: '24px', color: '#fff', marginBottom: '16px', textAlign: 'center' }}>Protocol Live Simulator</h2>
+          <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px', marginBottom: '40px' }}>Select a use-case to see the exact second-by-second flow rate.</p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 300px', gap: '48px' }} className="grid-2-mobile">
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 320px', gap: '48px' }} className="grid-2-mobile">
             
             {/* Simulation Canvas */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', justifyContent: 'center' }}>
+              
+              {/* Preset Selector */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                {Object.keys(SIM_PRESETS).map(key => (
+                  <button
+                    key={key}
+                    onClick={() => { setActivePreset(key); resetSim(); }}
+                    style={{
+                      flex: 1, minWidth: '130px', padding: '12px', borderRadius: '12px',
+                      background: activePreset === key ? 'rgba(139,92,246,0.1)' : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${activePreset === key ? '#8b5cf6' : '#1f2937'}`,
+                      color: activePreset === key ? '#fff' : '#6b7280',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', 
+                      fontSize: '12px', fontWeight: 700, transition: 'all 0.2s'
+                    }}
+                  >
+                    {SIM_PRESETS[key].icon} {SIM_PRESETS[key].label}
+                  </button>
+                ))}
+              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(139,92,246,0.1)', border: '2px solid #8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
@@ -118,44 +165,56 @@ export default function HowItWorks() {
               </div>
 
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '48px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#fff', letterSpacing: '-0.05em' }}>
-                  {simAmount.toFixed(6)} <span style={{ fontSize: '20px', color: '#6b7280' }}>XLM</span>
+                <div style={{ fontSize: '52px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#fff', letterSpacing: '-0.05em' }}>
+                  {simAmount.toFixed(7)} <span style={{ fontSize: '20px', color: '#6b7280' }}>XLM</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#86EE1E', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '4px' }}>
-                  Currently Streaming
+                  Accrued Flow Value
                 </div>
               </div>
             </div>
 
             {/* Controls */}
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '32px', borderRadius: '24px', border: '1px solid #1f2937' }}>
-              <h4 style={{ fontSize: '14px', color: '#fff', marginBottom: '20px' }}>Simulate Stream</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button 
-                  onClick={() => setSimulating(!simulating)}
-                  style={{ 
-                    display: 'flex', alignItems: 'center', gap: '10px', width: '100%', 
-                    padding: '14px', borderRadius: '12px', background: simulating ? 'rgba(239,68,68,0.1)' : 'rgba(134,238,30,0.1)',
-                    border: `1px solid ${simulating ? '#ef4444' : '#86EE1E'}`, color: simulating ? '#ef4444' : '#86EE1E',
-                    cursor: 'pointer', fontWeight: 700
-                  }}
-                >
-                  {simulating ? <><Pause size={16} /> Stop Stream</> : <><Play size={16} /> Start Stream</>}
-                </button>
-                <button 
-                  onClick={resetSim}
-                  style={{ 
-                    display: 'flex', alignItems: 'center', gap: '10px', width: '100%', 
-                    padding: '14px', borderRadius: '12px', background: 'transparent',
-                    border: '1px solid #1f2937', color: '#6b7280',
-                    cursor: 'pointer', fontWeight: 700
-                  }}
-                >
-                  <RotateCcw size={16} /> Reset
-                </button>
+              <div style={{ marginBottom: '24px' }}>
+                <h4 style={{ fontSize: '16px', color: '#fff', marginBottom: '8px' }}>{SIM_PRESETS[activePreset].label}</h4>
+                <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: 1.5 }}>{SIM_PRESETS[activePreset].desc}</p>
               </div>
-              <div style={{ marginTop: '24px', fontSize: '12px', color: '#6b7280', lineHeight: 1.6 }}>
-                Flow rate set to <strong>0.0004629 XLM/s</strong> (Equivalent to 1,200 XLM per month).
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid #1f2937' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '4px' }}>Estimated Flow Rate</div>
+                  <div style={{ fontSize: '18px', color: '#86EE1E', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                    {SIM_PRESETS[activePreset].rate.toFixed(7)} <span style={{ fontSize: '11px' }}>XLM/s</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                  <button 
+                    onClick={() => setSimulating(!simulating)}
+                    style={{ 
+                      flex: 1, display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center',
+                      padding: '14px', borderRadius: '12px', background: simulating ? 'rgba(239,68,68,0.1)' : 'rgba(134,238,30,0.1)',
+                      border: `1px solid ${simulating ? '#ef4444' : '#86EE1E'}`, color: simulating ? '#ef4444' : '#86EE1E',
+                      cursor: 'pointer', fontWeight: 700
+                    }}
+                  >
+                    {simulating ? <><Pause size={16} /> Pause</> : <><Play size={16} /> Start</>}
+                  </button>
+                  <button 
+                    onClick={resetSim}
+                    style={{ 
+                      padding: '14px', borderRadius: '12px', background: 'transparent',
+                      border: '1px solid #1f2937', color: '#6b7280',
+                      cursor: 'pointer', fontWeight: 700
+                    }}
+                  >
+                    <RotateCcw size={16} />
+                  </button>
+                </div>
+              </div>
+              <div style={{ marginTop: '24px', fontSize: '11px', color: '#6b7280', lineHeight: 1.6, textAlign: 'center' }}>
+                Calculation: <strong>~{SIM_PRESETS[activePreset].monthly.toLocaleString()} XLM</strong> released periodically.
               </div>
             </div>
           </div>

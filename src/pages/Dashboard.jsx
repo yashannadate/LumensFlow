@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import StreamCard from '../components/StreamCard.jsx'
-import ActiveUsers from '../components/ActiveUsers.jsx'
 import ActivityFeed from '../components/ActivityFeed.jsx'
 import { useStream } from '../hooks/useStream.jsx'
 import { useWallet } from '../hooks/useWallet.jsx'
@@ -156,7 +155,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Stat row ──────────────────────────────────────── */}
-      <div style={{ display: 'grid', gap: '16px' }} className="stats-3-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
         <StatCard
           icon={<Activity size={16} color="var(--primary)" />}
           label="Total Streams"
@@ -290,7 +289,7 @@ export default function Dashboard() {
 
           <ActivityFeed activities={activities} loading={feedLoading} />
 
-          <ActiveUsers streams={streams} />
+
         </div>
 
       </div>

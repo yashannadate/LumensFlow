@@ -62,16 +62,13 @@ export default function ActiveUsers({ activities = [] }) {
     <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fff', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          Testnet Network Pulse
-          <span style={{ fontSize: '9px', fontWeight: 500, color: '#6b7280', letterSpacing: 'normal', textTransform: 'none' }}>Data directly from public Stellar Testnet</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fff' }}>
+          Active Peer Access
         </h3>
-
-        {/* ✅ Correct LIVE count */}
-        <div style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '9999px', padding: '2px 10px', fontSize: '10px', fontWeight: 700, color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: '#22c55e', fontWeight: 700 }}>
           <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor' }} />
-          {userList.length} LIVE
+          {userList.length} Connected
         </div>
       </div>
 
@@ -124,17 +121,7 @@ export default function ActiveUsers({ activities = [] }) {
         </div>
       )}
 
-      {/* Footer */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-        padding: '12px', borderRadius: '14px', background: 'rgba(139,92,246,0.06)',
-        border: '1px dashed rgba(139,92,246,0.2)'
-      }}>
-        <Users size={14} color="#8b5cf6" />
-        <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>
-          Protocol Pulse (Live from Contract)
-        </span>
-      </div>
+
 
     </div>
   )
