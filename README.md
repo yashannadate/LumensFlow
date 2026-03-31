@@ -113,7 +113,7 @@
 | 📐 Technical Docs | ✅ Done | See [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) |
 | 🌐 Community Post | ✅ Done | See [`docs/COMMUNITY.md`](./docs/COMMUNITY.md) |
 | 🏗️ Production Logging | ✅ Live | Structured logging via `src/utils/logger.js` |
-| 👥 30+ Verified Users | 🔄 In Progress | 16 verified · actively onboarding to 30+ |
+| 👥 Verified Users | 🔄 In Progress | 23 verified · actively onboarding to 25+ |
 | 🎤 Demo Day Prep | ✅ Done | See [`docs/DEMO_NOTES.md`](./docs/DEMO_NOTES.md) |
 
 ---
@@ -182,7 +182,7 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 
 ## 👥 User Testnet Validation & Feedback
 
-> 🔄 **User Onboarding In Progress** — Successfully onboarded **16 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
+> 🔄 **User Onboarding In Progress** — Successfully onboarded **23 verified testnet users** during the testing and feedback phase. Table will be updated as new wallets are verified.
 
 | # | Wallet Address | Role | Action | Verification |
 |---|---|---|---|---|
@@ -202,6 +202,13 @@ All core protocol logic and frontend elements have been rigorously tested to ens
 | 14 | `GBJ5773FVWAA3DN...` | Tester | **Feedback:** "in the metrics page the analytics should be shown their own analysis not others combined" <br/> **Fix:** Redesigned Metrics to exclusively display individualized user stream analytics. **Fixed ✅** | [`e75df08`](https://github.com/yashannadate/LumensFlow/commit/e75df08) |
 | 15 | `GAGKZFDLP2P5CIK...` | Tester | Explored stream lifecycle; successfully created and cancelled payment streams with varied durations. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO) |
 | 16 | `GD3VRMX22ZNVMQV...` | Tester | **Feedback:** "Wrap the dashboard's incoming and outgoing streams into a one-one card to properly see and easy access..." <br/> **Fix:** Redesigned Dashboard to group streams into interactive category cards. **Fixed ✅** | [`a6072ff`](https://github.com/yashannadate/LumensFlow/commit/a6072ff) |
+| 17 | `GALWWEGHOMU5Y...` | Tester | Validated real-time balance calculations; successfully tested the gasless fee sponsorship. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GALWWEGHOMU5YODTZBVGPFP2OHCJH5VO3VKWNMW7ZNT6OECINVPQT7SQ) |
+| 18 | `GDK7TWNN3H57J...` | Tester | Explored the metrics dashboard and verified individualized wallet telemetry. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDK7TWNN3H57JWZBBC4V3BQNI3NTHSUDEVDZB5DGPPCULFJRIP3APG42) |
+| 19 | `GAGBMRVUN2IBM...` | Tester | Verified stream lifecycle events (creation, withdrawal, and cancellation) on-chain. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GAGBMRVUN2IBMXJUFNGRD7BHWYQACCGXDVV6X4GXTNXQC5DGCRMW2CQ3) |
+| 20 | `GBARYA4OGBU2D...` | Tester | Successfully tested multi-duration stream creation; verified UI responsiveness on tablet view. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GBARYA4OGBU2DKVQXZBX2X7NPLIW5ICYKLXQATEXHOAQ7VUFY5TE6V62) |
+| 21 | `GCLSO2OQHV6JH...` | Tester | Stress-tested the payment flow across multiple concurrent streams; verified transaction finality. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I) |
+| 22 | `GDCBAPWYVRLRO...` | Tester | Explored the application architecture and validated the Soroban contract state transitions. | [Verify ↗](https://stellar.expert/explorer/testnet/account/GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL) |
+| 23 | `GDNB35Y2M3N2M...` | Tester | **Feedback:** "To make it more effective, focus on the how by reducing text density and using more visual storytelling..." <br/> **Fix:** Redesigned technical documentation for enhanced visual storytelling. **Fixed ✅** | [`8bdee7c`](https://github.com/yashannadate/LumensFlow/commit/8bdee7c) |
 
 **Community Insight:**
 - **[📝 User Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeZDIj-q9VYGrWRbhM8iAc02VlIoCNVQZJvPPkH50NJ-ZzVnw/viewform)**

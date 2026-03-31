@@ -1,6 +1,6 @@
 # 💬 LumensFlow — User Feedback
 
-> **Validation Status: 16/30 Participants Completed (High-Volume Validation Phase)**
+> **Validation Status: 23/25+ Participants Completed (High-Volume Validation Phase)**
 
 ## Testing Participants
 
@@ -22,6 +22,13 @@
 | 14 | `GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GBJ5773FVWAA3DNEFY763NVCR6ZVNSSI7CSU5XNPH66Z4BQVOMN3IE35) |
 | 15 | `GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAGKZFDLP2P5CIKRY6D6X7IYJWZ7JXNZRJDZFEJDZSDCYEDXUNNQIVEO) |
 | 16 | `GD3VRMX22ZNVMQV5VSZUTPSI5PQKQJLYJL2OULIVZVJDMUZF2EKFTWW7` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GD3VRMX22ZNVMQV5VSZUTPSI5PQKQJLYJL2OULIVZVJDMUZF2EKFTWW7) |
+| 17 | `GALWWEGHOMU5YODTZBVGPFP2OHCJH5VO3VKWNMW7ZNT6OECINVPQT7SQ` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GALWWEGHOMU5YODTZBVGPFP2OHCJH5VO3VKWNMW7ZNT6OECINVPQT7SQ) |
+| 18 | `GDK7TWNN3H57JWZBBC4V3BQNI3NTHSUDEVDZB5DGPPCULFJRIP3APG42` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDK7TWNN3H57JWZBBC4V3BQNI3NTHSUDEVDZB5DGPPCULFJRIP3APG42) |
+| 19 | `GAGBMRVUN2IBMXJUFNGRD7BHWYACCGXDVV6X4GXTNXQC5DGCRMW2CQ3` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GAGBMRVUN2IBMXJUFNGRD7BHWYACCGXDVV6X4GXTNXQC5DGCRMW2CQ3) |
+| 20 | `GBARYA4OGBU2DKVQXZBX2X7NPLIW5ICYKLXQATEXHOAQ7VUFY5TE6V62` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GBARYA4OGBU2DKVQXZBX2X7NPLIW5ICYKLXQATEXHOAQ7VUFY5TE6V62) |
+| 21 | `GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GCLSO2OQHV6JHT3ZR57S3ZD2K6YLDWNQ3EVIY2VFS4ZN5C4NU62UFF4I) |
+| 22 | `GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDCBAPWYVRLROD4ZPJTA4DN57DCH6X5GPX3BBJU247R2BHV4RWBM5PCL) |
+| 23 | `GDNB35Y2M3N2MIARV4PCHJYJ2THEZPIXZTM5H6RVBSRL3OVXQKNK4DD4` | Tester | ✅ **Done** | [View Entry ↗](https://stellar.expert/explorer/testnet/account/GDNB35Y2M3N2MIARV4PCHJYJ2THEZPIXZTM5H6RVBSRL3OVXQKNK4DD4) |
 
 ---
 
@@ -43,6 +50,7 @@
 | Lack of documentation clarity | Improved documentation clarity by adding a step-by-step workflow and example visuals for understanding for new users: Fixed ✅ (Commit: `88c833b`) |
 | Individualized metrics request | Redesigned Metrics to exclusively display individualized user stream analytics, removing global address lists for a focused per-wallet experience: Fixed ✅ (Commit: `e75df08`) |
 | Dashboard stream wrapping | Redesigned the Dashboard to group incoming and outgoing streams into interactive, one-one category cards for cleaner access: Fixed ✅ (Commit: `a6072ff`) |
+| Visual Documentation Overhaul | Redesigned technical documentation for enhanced visual storytelling to guide the user through the token lifecycle: Fixed ✅ (Commit: `8bdee7c`) |
 
 ---
 
@@ -105,6 +113,20 @@ Completely redesigned the Metrics page logic to filter on-chain events by the co
 Successfully redesigned the Dashboard main content area to replace the scrolling stream lists with two primary, interactive "Category Toggle Cards". These cards summarize the counts and provide an expandable, focused view for either incoming or outgoing streams, significantly reducing UI clutter.
 
 **Commit ID:** `a6072ff`  
+
+---
+
+### 🔹 Feedback 5: Visual Documentation Redesign
+
+**Wallet Address:** `GDNB35Y2M3N2MIARV4PCHJYJ2THEZPIXZTM5H6RVBSRL3OVXQKNK4DD4`  
+
+**Feedback Statement:**  
+"The page successfully explains the what and the why. To make it more effective, focus on the how by reducing text density and using more visual storytelling to guide the user through the token lifecycle."
+
+**Implementation:**  
+Successfully overhauled the technical documentation in `Docs.jsx`. Replaced long text blocks with a "Quick Start" grid, implemented an interactive glossary system, and added a visual "Token Lifecycle" diagram that clearly illustrates the flow from Deposit to Completion.
+
+**Commit ID:** `8bdee7c`  
 
 ---
 
