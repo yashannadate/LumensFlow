@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Waves, HelpCircle, Plus, Zap, X, BarChart3 } from 'lucide-react'
 import { Database } from 'lucide-react' // add to existing imports
+import logo from '../assets/logo_cropped.png'
 
 const NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
@@ -27,19 +28,9 @@ export default function Sidebar({ isOpen, onClose }) {
         <Link
           to="/"
           onClick={onClose}
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}
+          style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
         >
-          <div style={{
-            width: '32px', height: '32px', borderRadius: '10px',
-            background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            <Zap size={18} color="white" />
-          </div>
-          <span style={{
-            fontFamily: 'var(--font-brand)', fontSize: '18px', fontWeight: 900,
-            color: '#fff', letterSpacing: '-0.02em'
-          }}>Lumens<span style={{ color: '#86EE1E' }}>Flow</span></span>
+          <img src={logo} alt="LumensFlow" style={{ height: '28px', width: 'auto', display: 'block' }} />
         </Link>
 
         {/* Mobile Close Button */}

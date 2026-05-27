@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
 import { ArrowRight, LogOut, Wallet, User, Zap, Menu, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import logo from '../assets/logo_cropped.png'
 
 export default function Navbar() {
   const { isConnected, address, balance, connect, disconnect } = useWallet()
@@ -63,18 +64,8 @@ export default function Navbar() {
     }}>
 
       {/* Logo */}
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-        <div style={{
-          width: '32px', height: '32px', borderRadius: '10px',
-          background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>
-          <Zap size={18} color="white" />
-        </div>
-        <span style={{
-          fontFamily: 'var(--font-brand)', fontSize: '18px', fontWeight: 900,
-          color: '#fff', letterSpacing: '-0.02em'
-        }}>Lumens<span style={{ color: '#86EE1E' }}>Flow</span></span>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <img src={logo} alt="LumensFlow" style={{ height: '32px', width: 'auto', display: 'block' }} />
       </Link>
 
       {/* Desktop Links */}

@@ -1,5 +1,6 @@
 import { Zap, Linkedin, Twitter, Github, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import logo from '../assets/logo_cropped.png'
 
 export default function Footer() {
   return (
@@ -19,17 +20,8 @@ export default function Footer() {
         gap: '48px',
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-              borderRadius: '10px', padding: '7px', display: 'flex',
-              boxShadow: '0 4px 16px rgba(139, 92, 246, 0.30)'
-            }}>
-              <Zap size={18} color="white" />
-            </div>
-            <span style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-brand)', color: '#fff', letterSpacing: '-0.02em' }}>
-              Lumens<span style={{ color: '#86EE1E' }}>Flow</span>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <img src={logo} alt="LumensFlow" style={{ height: '34px', width: 'auto', display: 'block' }} />
           </div>
           <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '280px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>
             The protocol for continuous payment streaming on Stellar. Built with Soroban.

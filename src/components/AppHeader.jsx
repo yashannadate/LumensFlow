@@ -1,6 +1,8 @@
 import { Search, Wallet, ChevronDown, Bell, LogOut, Menu } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import logo from '../assets/logo_cropped.png'
 
 export default function AppHeader({ onMenuClick }) {
   const { isConnected, address, balance, disconnect, connect } = useWallet()
@@ -35,6 +37,11 @@ export default function AppHeader({ onMenuClick }) {
         >
           <Menu size={24} />
         </button>
+
+        {/* Logo - visible only on mobile top header */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }} className="show-mobile">
+          <img src={logo} alt="LumensFlow" style={{ height: '22px', width: 'auto', display: 'block' }} />
+        </Link>
 
         {/* Search feature temporarily disabled until global search logic exists */}
       </div>
