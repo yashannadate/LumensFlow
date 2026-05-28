@@ -6,6 +6,7 @@ import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit'
 import { FreighterModule } from '@creit.tech/stellar-wallets-kit/modules/freighter'
 import { xBullModule } from '@creit.tech/stellar-wallets-kit/modules/xbull'
 import { LobstrModule } from '@creit.tech/stellar-wallets-kit/modules/lobstr'
+import { WalletConnectModule, WalletConnectTargetChain } from '@creit.tech/stellar-wallets-kit/modules/wallet-connect'
 import { fetchXlmBalance } from '../utils/stellar.js'
 
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
@@ -13,7 +14,21 @@ const WalletContext = createContext(null)
 
 function initKit() {
   StellarWalletsKit.init({
-    modules: [new FreighterModule(), new xBullModule(), new LobstrModule()],
+    modules: [
+      new FreighterModule(),
+      new xBullModule(),
+      new LobstrModule(),
+      new WalletConnectModule({
+        projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '84b82ab35c24d9c4fb2070fca68340d2',
+        metadata: {
+          name: 'LumensFlow',
+          description: 'The Future of Programmable Cash Flows on Stellar',
+          url: window.location.origin,
+          icons: [window.location.origin + '/favicon.png']
+        },
+        allowedChains: [WalletConnectTargetChain.TESTNET]
+      })
+    ],
     selectedWalletId: 'freighter',
     network: NETWORK_PASSPHRASE,
     authModal: {
