@@ -1,4 +1,4 @@
-<h1 align="center"><img width="985" alt="LumensFlow Logo" src="https://github.com/user-attachments/assets/2643f2bc-ba65-4da7-bbb7-91d457514ff3" /></h1>
+<h1 align="center"><img width="985" alt="LumensFlow Logo" src="./docs/images/logo.png" /></h1>
 
 <div align="center">
   <img src="https://img.shields.io/badge/Stellar-7D7D7D?style=for-the-badge&logo=stellar&logoColor=white" alt="Stellar" />
@@ -37,6 +37,13 @@
 | <img src="./docs/images/landing_page.png" width="400" /> | <img src="./docs/images/how_it_works.png" width="400" /> |
 | **Main Dashboard** | **Create Stream** |
 | <img src="./docs/images/dashboard.png" width="400" /> | <img src="./docs/images/create_stream.png" width="400" /> |
+
+<div align="center">
+  <br />
+  <strong>Interactive Technical Documentation</strong>
+  <br /><br />
+  <img src="./docs/images/technical_docs.png" width="820" alt="Technical Documentation" />
+</div>
 
 ---
 
