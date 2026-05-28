@@ -111,9 +111,7 @@ export default function Landing() {
             color: 'rgba(26,28,30,0.60)', maxWidth: '560px', marginBottom: '44px',
             textAlign: 'center'
           }}>
-            {wordIndex === 0 && 'Every second on Stellar, your balance grows. Real-time XLM streaming — no waiting, no batching.'}
-            {wordIndex === 1 && '60 blocks, 60 settlements. Stream by the minute for subscriptions, rentals, and recurring payments.'}
-            {wordIndex === 2 && 'Hourly payroll, hourly billing. Transparent on-chain flows that settle continuously.'}
+            Watch your money grow in real time on the Stellar network. Send and receive continuous payments instantly - no more waiting for payday.
           </p>
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
             <button
