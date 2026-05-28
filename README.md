@@ -34,22 +34,9 @@
 
 | Landing Page | How It Works |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/12e3ebb3-fbf9-4bfd-bfba-5c92f8e6b77a" width="400" /> | <img src="https://github.com/user-attachments/assets/c599e5ff-f604-4003-b4ba-1859fe4f77f2" width="400" /> |
+| <img src="./docs/images/landing_page.png" width="400" /> | <img src="./docs/images/how_it_works.png" width="400" /> |
 | **Main Dashboard** | **Create Stream** |
-| <img src="https://github.com/user-attachments/assets/34a04f0e-55dd-49ed-9857-f07254f0c186" width="400" /> | <img src="https://github.com/user-attachments/assets/e239645f-1c15-4563-bc82-c3148134d02a" width="400" /> |
-| **Protocol Features** | **Active Stream Flow** |
-| <img src="https://github.com/user-attachments/assets/5c0ad866-34a4-4598-bcb6-61df05701b85" width="400" /> | <img src="https://github.com/user-attachments/assets/0bae4f72-3fd8-4b93-b24c-416cb7f116d2" width="400" /> |
-| **Protocol Metrics** | **Stream History** |
-| <img src="https://github.com/user-attachments/assets/1ce7f9d1-f68d-465e-8de6-81d4cd82dbbd" width="400" /> | <img src="https://github.com/user-attachments/assets/ad00dd34-6d1e-4c8c-80ef-09b86b0f16c8" width="400" /> |
-
-
-<div align="center">
-
-**Technical Docs**
-
-<img src="https://github.com/user-attachments/assets/217bcae2-65e1-4970-9880-9ebdbde8e423" width="400" />
-
-</div>
+| <img src="./docs/images/dashboard.png" width="400" /> | <img src="./docs/images/create_stream.png" width="400" /> |
 
 ---
 

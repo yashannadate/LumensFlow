@@ -3,77 +3,82 @@ import { formatDistanceToNow } from 'date-fns'
 import { CONTRACT_ID } from '../utils/stellar.js'
 
 const ICONS = {
-  'created': { icon: Plus, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
-  'withdrawal':      { icon: ArrowDownLeft, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-  'cancelled':{ icon: PauseCircle, color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' },
+  'created': { icon: Plus, color: '#000000', bg: '#1DFF00' },
+  'withdrawal':      { icon: ArrowDownLeft, color: '#000000', bg: '#1DFF00' },
+  'cancelled':{ icon: PauseCircle, color: '#4c4546', bg: '#e2e2e5' },
 }
 
 export default function ActivityFeed({ activities, loading }) {
   return (
-    <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="bg-white border border-outline-variant/65 rounded-2xl p-6 flex flex-col gap-5 shadow-xs text-left">
       
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div className="flex items-center justify-between">
+        <h3 className="font-label-sm text-[11px] font-bold uppercase tracking-wider text-primary flex flex-col gap-1">
           Live Testnet Ledger
-          <span style={{ fontSize: '9px', fontWeight: 500, color: '#6b7280', letterSpacing: 'normal', textTransform: 'none' }}>Data directly from public Stellar Testnet</span>
+          <span className="font-body-md text-[10px] text-on-surface-variant tracking-normal normal-case font-normal">Data directly from public Stellar Testnet</span>
         </h3>
-        <HelpCircle size={14} color="#6b7280" />
+        <HelpCircle size={14} className="text-on-surface-variant/60" />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto' }}>
+      <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-1">
         {loading ? (
           [1, 2, 3].map(i => (
-            <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', opacity: 0.5 }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#1f2937' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ width: '60%', height: '10px', background: '#1f2937', borderRadius: '4px', marginBottom: '6px' }} />
-                <div style={{ width: '40%', height: '8px', background: '#1f2937', borderRadius: '4px' }} />
+            <div key={i} className="flex gap-3 items-center opacity-50">
+              <div className="w-7 h-7 rounded-full bg-surface-container-low animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="w-3/5 h-2.5 bg-surface-container-low rounded animate-pulse" />
+                <div className="w-2/5 h-2 bg-surface-container-low rounded animate-pulse" />
               </div>
             </div>
           ))
         ) : activities.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
+          <div className="text-center py-5 text-on-surface-variant font-mono text-xs">
             No activity yet
           </div>
         ) : (
           activities.slice(0, 10).map((activity, i) => {
-            const config = ICONS[activity.type] || { icon: TrendingUp, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' }
+            const config = ICONS[activity.type] || { icon: TrendingUp, color: '#000000', bg: '#1DFF00' }
             const Icon = config.icon
             
             const shortAddr = (addr) => addr ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : ''
 
             return (
-              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', paddingBottom: i < 9 ? '16px' : '0', borderBottom: i < 9 ? '1px solid rgba(31,41,55,0.6)' : 'none' }}>
-                <div style={{ 
-                  width: '28px', height: '28px', borderRadius: '50%', 
-                  background: config.bg, border: `1px solid ${config.color}33`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
-                }}>
-                  <Icon size={14} color={config.color} />
+              <div key={i} className={`flex gap-3 items-center pb-4 ${i < 9 ? 'border-b border-outline-variant/30' : ''}`}>
+                <div 
+                  className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: config.bg, color: config.color }}
+                >
+                  <Icon size={14} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-xs font-bold text-primary truncate">
                       {activity.type === 'created' ? `Created Stream #${activity.streamId}` : 
                        activity.type === 'withdrawal' ? `Withdrew Funds #${activity.streamId}` : 
                        activity.type === 'cancelled' ? `Cancelled Stream #${activity.streamId}` : activity.type}
                     </span>
-                    <a href={`https://stellar.expert/explorer/testnet/tx/${activity.txHash}`} target="_blank" rel="noreferrer" style={{ color: '#4b5563', display: 'flex', alignItems: 'center', transition: 'color 0.2s', cursor: 'pointer' }} title="View on Block Explorer">
+                    <a 
+                      href={`https://stellar.expert/explorer/testnet/tx/${activity.txHash}`} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                      title="View on Block Explorer"
+                    >
                       <ExternalLink size={12} />
                     </a>
                   </div>
                   
-                  <div style={{ fontSize: '10px', color: '#8b5cf6', fontFamily: 'var(--font-mono)', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div className="text-[10px] text-primary/80 font-mono font-semibold mt-0.5 flex items-center gap-1">
                     {activity.type === 'created' ? (
-                      <>{shortAddr(activity.sender)} <span style={{ opacity: 0.5 }}>→</span> {shortAddr(activity.receiver)}</>
+                      <>{shortAddr(activity.sender)} <span className="opacity-40">→</span> {shortAddr(activity.receiver)}</>
                     ) : activity.type === 'withdrawal' ? (
-                       <>{shortAddr(activity.receiver)} <span style={{ opacity: 0.5 }}>(Recipient)</span></>
+                       <>{shortAddr(activity.receiver)} <span className="opacity-40">(Recipient)</span></>
                     ) : (
-                       <>{shortAddr(activity.sender)} <span style={{ opacity: 0.5 }}>(Sender)</span></>
+                       <>{shortAddr(activity.sender)} <span className="opacity-40">(Sender)</span></>
                     )}
                   </div>
 
-                  <div style={{ fontSize: '10px', color: '#4b5563', marginTop: '2px' }}>
+                  <div className="text-[10px] text-on-surface-variant/60 mt-1">
                     {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
                   </div>
                 </div>
@@ -83,10 +88,12 @@ export default function ActivityFeed({ activities, loading }) {
         )}
       </div>
 
-      <a href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} target="_blank" rel="noreferrer" style={{ 
-        textAlign: 'center', fontSize: '11px', color: '#8b5cf6', fontWeight: 600, textDecoration: 'none', 
-        fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em', paddingTop: '4px' 
-      }}>
+      <a 
+        href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} 
+        target="_blank" 
+        rel="noreferrer" 
+        className="text-center text-[10px] text-primary hover:text-secondary font-bold font-mono uppercase tracking-wider pt-2"
+      >
         View All ↗
       </a>
     </div>

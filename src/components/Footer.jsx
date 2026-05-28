@@ -1,69 +1,44 @@
-import { Zap, Linkedin, Twitter, Github, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import logo from '../assets/logo_cropped.png'
+import React from 'react'
+import logoBlack from '../assets/logo_black_cropped.png'
 
 export default function Footer() {
   return (
-    <footer style={{
-      borderTop: '1px solid #1f2937',
-      padding: '80px 28px 60px',
-      background: 'rgba(6, 6, 13, 0.85)',
-      backdropFilter: 'blur(20px)',
-      position: 'relative',
-      zIndex: 1
-    }}>
-      <div style={{
-        maxWidth: '1100px',
-        margin: '0 auto',
-        display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr 1fr 1fr',
-        gap: '48px',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            <img src={logo} alt="LumensFlow" style={{ height: '34px', width: 'auto', display: 'block' }} />
+    <footer className="bg-surface border-t border-outline-variant py-section-gap relative z-10">
+      <div className="max-w-[1280px] mx-auto px-6 md:px-container-margin">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-20">
+          <div className="col-span-1 md:col-span-2">
+            <Link to="/" className="flex items-center gap-2 mb-6">
+              <img src={logoBlack} alt="LumensFlow" className="h-7 w-auto object-contain" />
+            </Link>
+            <p className="font-body-md text-on-surface-variant max-w-xs">
+              The protocol for continuous payment streaming on Stellar. Built with Soroban.
+            </p>
           </div>
-          <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '280px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>
-            The protocol for continuous payment streaming on Stellar. Built with Soroban.
-          </p>
-        </div>
-
-        <div>
-          <h4 style={{ fontSize: '11px', color: '#fff', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '24px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Platform</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { label: 'Dashboard', to: '/dashboard' },
-              { label: 'Documentation', to: '/docs' },
-              { label: 'Features', to: '/#features' },
-              { label: 'How It Works', to: '/how-it-works' },
-            ].map(link => (
-              <Link key={link.label} to={link.to} style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '13.5px', transition: 'color 0.2s' }}>{link.label}</Link>
-            ))}
+          <div>
+            <span className="font-label-sm font-bold text-primary block mb-6 uppercase tracking-wider">Platform</span>
+            <ul className="space-y-4">
+              <li><Link className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" to="/dashboard">Dashboard</Link></li>
+              <li><Link className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" to="/docs">Documentation</Link></li>
+              <li><Link className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" to="/">Features</Link></li>
+              <li><a className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" href="#how-it-works">How It Works</a></li>
+            </ul>
+          </div>
+          <div>
+            <span className="font-label-sm font-bold text-primary block mb-6 uppercase tracking-wider">Resources</span>
+            <ul className="space-y-4">
+              <li><a className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" href="https://stellar.expert" target="_blank" rel="noreferrer">Stellar Expert</a></li>
+              <li><a className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" href="https://soroban.stellar.org" target="_blank" rel="noreferrer">Soroban Docs</a></li>
+              <li><a className="text-on-surface-variant hover:text-secondary transition-colors font-label-sm font-semibold" href="https://laboratory.stellar.org" target="_blank" rel="noreferrer">Network Laboratory</a></li>
+            </ul>
           </div>
         </div>
-
-        <div>
-          <h4 style={{ fontSize: '11px', color: '#fff', fontWeight: 700, letterSpacing: '0.12em', marginBottom: '24px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Resources</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { label: 'Stellar Expert', to: 'https://stellar.expert' },
-              { label: 'Soroban Docs', to: 'https://soroban.stellar.org' },
-              { label: 'Network laboratory', to: 'https://laboratory.stellar.org' },
-            ].map(link => (
-              <a key={link.label} href={link.to} target="_blank" rel="noreferrer" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '13.5px' }}>{link.label} ↗</a>
-            ))}
+        <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-outline-variant/30 gap-6">
+          <p className="font-label-sm text-on-surface-variant">© 2026 LUMENSFLOW PROTOCOL</p>
+          <div className="flex gap-8">
+            <a className="font-label-sm text-on-surface-variant hover:text-secondary font-semibold" href="#privacy">Privacy Policy</a>
+            <a className="font-label-sm text-on-surface-variant hover:text-secondary font-semibold" href="#terms">Terms of Service</a>
           </div>
-        </div>
-
-        <div></div>
-      </div>
-
-      <div style={{ maxWidth: '1100px', margin: '64px auto 0', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>© 2026 LUMENS<span style={{ color: '#86EE1E' }}>FLOW</span> PROTOCOL</div>
-        <div style={{ fontSize: '11px', color: '#6b7280', display: 'flex', gap: '20px' }}>
-          <a href="https://github.com/yashannadate/LumensFlow" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Github size={14} /></a>
-          <a href="https://www.linkedin.com/posts/yashannadate19_lumensflow-lumensflow-moneystreaming-share-7444708215520555008-IGNl?utm_source=share&utm_medium=member_ios&rcm=ACoAAEzGdpsBn8dJwPI4fsdTEmr4IkAWvynqXZU" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Linkedin size={14} /></a>
-          <a href="https://x.com/yashannadate19/status/2038944427373441376?s=46" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}><Twitter size={14} /></a>
         </div>
       </div>
     </footer>

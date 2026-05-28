@@ -59,22 +59,22 @@ export default function ActiveUsers({ activities = [] }) {
   }
 
   return (
-    <div style={{ background: '#0d1117', border: '1px solid #1f2937', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fff' }}>
+        <h3 style={{ fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#1a1c1e' }}>
           Active Peer Access
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: '#22c55e', fontWeight: 700 }}>
-          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: '#055300', fontWeight: 700 }}>
+          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#1DFF00' }} />
           {userList.length} Connected
         </div>
       </div>
 
       {/* ✅ Empty State */}
       {displayUsers.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', fontSize: '12px' }}>
+        <div style={{ textAlign: 'center', padding: '20px', color: '#7e7576', fontSize: '12px' }}>
           No active users yet
         </div>
       ) : (
@@ -82,31 +82,31 @@ export default function ActiveUsers({ activities = [] }) {
           {displayUsers.map((u) => (
             <div key={u.address} style={{
               display: 'flex', alignItems: 'center', gap: '12px',
-              padding: '12px', background: 'rgba(17,24,39,0.5)',
-              border: '1px solid #1f2937', borderRadius: '14px'
+              padding: '12px', background: '#f3f3f6',
+              border: '1px solid rgba(0,0,0,0.06)', borderRadius: '14px'
             }}>
 
               <div style={{
                 width: '36px', height: '36px', borderRadius: '50%',
-                background: 'linear-gradient(135deg, #1f2937, #0d1117)',
+                background: 'rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
-                <User size={16} color="#8b5cf6" />
+                <User size={16} color="#000000" />
               </div>
 
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: '#fff', fontWeight: 600 }}>
+                <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: '13px', color: '#1a1c1e', fontWeight: 600 }}>
                   {shortAddr(u.address)}
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#9ca3af' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#4c4546' }}>
                     <Activity size={10} />
                     <span style={{ fontSize: '11px' }}>{formatType(u.lastAction)}</span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#6b7280' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#7e7576' }}>
                     <Clock size={10} />
                     <span style={{ fontSize: '10px' }}>
                       {getTime(u.timestamp)}

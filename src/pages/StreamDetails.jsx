@@ -5,31 +5,20 @@ import { useWallet } from '../hooks/useWallet.jsx'
 import { useToast } from '../components/Toast.jsx'
 
 import { getErrorMessage, truncateAddress, getStream, fetchContractEvents, CONTRACT_ID } from '../utils/stellar.js'
-import { getStreamStatus, calculateProgress } from '../utils/time.js'
 import {
-  ArrowLeft, Download, XCircle, Clock,
+  ArrowLeft, Download, XCircle,
   Copy, Check, ExternalLink,
-  ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, ShieldCheck, Info
+  ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, Info
 } from 'lucide-react'
 
 const ANON = 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN'
 
 function SkeletonBox({ h = '50px', w = '100%' }) {
   return (
-    <div style={{
-      height: h, width: w,
-      background: 'rgba(31, 41, 55, 0.4)',
-      borderRadius: '16px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-       <div style={{
-         position: 'absolute', inset: 0,
-         background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent)',
-         animation: 'shimmer 2s infinite',
-         backgroundSize: '200% 100%'
-       }} />
-    </div>
+    <div 
+      className="bg-surface-container-low rounded-2xl relative overflow-hidden animate-pulse"
+      style={{ height: h, width: w }}
+    />
   )
 }
 
@@ -76,7 +65,6 @@ export default function StreamDetails() {
 
       } catch (e) {
         setLoading(false)
-        // setError('Failed to load stream: ' + e.message)
       } finally {
         setLoading(false)
       }
@@ -121,14 +109,16 @@ export default function StreamDetails() {
   }
 
   if (loading && !stream) return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 32px 80px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', color: '#6b7280', fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+    <div className="max-w-[800px] mx-auto px-6 py-20 flex flex-col gap-6 text-left">
+      <div className="flex items-center gap-2 text-on-surface-variant font-mono text-sm">
         <RefreshCw size={14} className="animate-spin" /> Synchronizing with Stellar Ledger...
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="flex flex-col gap-5">
         <SkeletonBox h="120px" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-          <SkeletonBox h="100px" /> <SkeletonBox h="100px" /> <SkeletonBox h="100px" />
+        <div className="grid grid-cols-3 gap-4">
+          <SkeletonBox h="100px" /> 
+          <SkeletonBox h="100px" /> 
+          <SkeletonBox h="100px" />
         </div>
         <SkeletonBox h="240px" />
       </div>
@@ -136,11 +126,15 @@ export default function StreamDetails() {
   )
 
   if (error && !stream) return (
-    <div style={{ maxWidth: '680px', margin: '100px auto', textAlign: 'center' }}>
-      <XCircle size={48} color="#ef4444" style={{ marginBottom: '24px' }} />
-      <h2 style={{ marginBottom: '12px' }}>Stream Not Found</h2>
-      <p style={{ color: '#9ca3af', marginBottom: '32px' }}>{error}</p>
-      <Link to="/dashboard"><button className="btn-primary">Back to Dashboard</button></Link>
+    <div className="max-w-[680px] mx-auto py-24 text-center">
+      <XCircle size={48} className="text-red-500 mx-auto mb-6" />
+      <h2 className="font-headline-lg text-primary text-2xl font-bold mb-3">Stream Not Found</h2>
+      <p className="text-on-surface-variant mb-8">{error}</p>
+      <Link to="/dashboard">
+        <button className="bg-secondary text-on-secondary px-8 py-3 rounded-xl font-bold btn-hover-glow-neon border-none cursor-pointer">
+          Back to Dashboard
+        </button>
+      </Link>
     </div>
   )
 
@@ -170,82 +164,94 @@ export default function StreamDetails() {
   const canCancel = isSender && status === 'Active'
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: 'var(--dashboard-padding, 40px 32px 100px)', position: 'relative', zIndex: 1 }}>
+    <div className="bg-surface font-body-md text-on-surface min-h-screen py-12 px-6 md:px-container-margin max-w-[1000px] mx-auto flex flex-col gap-6 text-left">
       
-      <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#6b7280', textDecoration: 'none', fontSize: '13px', fontWeight: 600, marginBottom: '32px', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <Link to="/dashboard" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary no-underline font-semibold font-mono text-xs uppercase tracking-wider mb-4">
         <ArrowLeft size={14} /> Back to Dashboard
       </Link>
 
-      <div className="dashboard-two-col" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="lg:col-span-7 flex flex-col gap-6">
           
           {/* Main Display Card */}
-          <div className="card" style={{ padding: '40px 32px', textAlign: 'center', background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.10) 0%, transparent 75%)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(31,41,55,0.4)', borderRadius: '99px', border: '1px solid #374151' }}>
-                <div style={{ 
-                  width: '6px', height: '6px', borderRadius: '50%', 
-                  background: status === 'Active' ? '#22c55e' : status === 'Completed' ? '#8b5cf6' : '#ef4444' 
-                }} />
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff', textTransform: 'capitalize' }}>{status}</span>
+          <div className="bg-white border border-outline-variant/65 rounded-2xl p-8 flex flex-col items-center shadow-xs text-center relative overflow-hidden group">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-surface-container-low border border-outline-variant/60 rounded-full mb-6">
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  status === 'Active' ? 'bg-secondary animate-pulse' : status === 'Completed' ? 'bg-primary' : 'bg-red-500' 
+                }`} />
+                <span className="text-[11px] font-bold text-primary capitalize font-mono">{status}</span>
               </div>
 
-             <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>Withdrawable Now</div>
-             <div style={{ fontFamily: 'var(--font-brand)', fontSize: 'clamp(32px, 8vw, 48px)', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '8px' }}>
-                {withdrawable.toFixed(7)} <span style={{ fontSize: '0.45em', opacity: 0.5, fontWeight: 400 }}>XLM</span>
+             <div className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Withdrawable Now</div>
+             <div className="font-display-lg text-[44px] font-extrabold text-primary tracking-tight mb-2 tabular-nums">
+                {withdrawable.toFixed(7)} <span className="text-lg font-normal opacity-60">XLM</span>
              </div>
-             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#22c55e', fontSize: '13px', fontWeight: 600, marginBottom: '32px' }}>
-                <Zap size={14} /> +{flowRate.toFixed(6)} XLM/s Flow
+             <div className="flex items-center justify-center gap-1.5 text-secondary-fixed-dim font-bold text-xs mb-8">
+                <Zap size={12} className="fill-current" /> +{flowRate.toFixed(6)} XLM/s Flow
              </div>
-
-             <div style={{ marginBottom: '24px' }}>
-                <div style={{ width: '100%', height: '6px', background: '#131920', borderRadius: '9999px', overflow: 'hidden', marginBottom: '10px' }}>
-                   <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #22c55e)', transition: 'width 1s linear' }} />
+ 
+             <div className="w-full mb-6">
+                <div className="w-full h-1.5 bg-surface-container-low rounded-full overflow-hidden mb-2">
+                   <div 
+                     style={{ width: `${progress}%` }} 
+                     className="h-full bg-secondary transition-all duration-1000" 
+                   />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>
+                <div className="flex justify-between text-[10px] text-on-surface-variant font-mono uppercase tracking-wider font-bold">
                    <span>{progress.toFixed(2)}% Streamed</span>
                    <span>Target: {total.toFixed(2)} XLM</span>
                 </div>
              </div>
-
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '24px', borderTop: '1px solid #1f2937' }}>
-                <div style={{ textAlign: 'left' }}>
-                   <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '4px' }}>Started</div>
-                   <div style={{ fontSize: '13px', color: '#fff', fontWeight: 500 }}>{new Date(start * 1000).toLocaleDateString()}</div>
+ 
+             <div className="w-full grid grid-cols-2 gap-4 pt-6 border-t border-outline-variant/30 text-left">
+                <div>
+                   <div className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Started</div>
+                   <div className="text-sm font-bold text-primary">{new Date(start * 1000).toLocaleDateString()}</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                   <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', marginBottom: '4px' }}>Ends</div>
-                   <div style={{ fontSize: '13px', color: '#fff', fontWeight: 500 }}>{new Date(end * 1000).toLocaleDateString()}</div>
+                <div className="text-right">
+                   <div className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Ends</div>
+                   <div className="text-sm font-bold text-primary">{new Date(end * 1000).toLocaleDateString()}</div>
                 </div>
              </div>
           </div>
 
           {/* Parties Card */}
-          <div className="card" style={{ padding: '24px' }}>
-             <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280', marginBottom: '20px', fontFamily: 'var(--font-mono)' }}>Stream Counterparties</h3>
-             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <ArrowUpRight size={18} color="#8b5cf6" />
+          <div className="bg-white border border-outline-variant/65 rounded-2xl p-6 shadow-xs">
+             <h3 className="font-label-sm text-[11px] font-bold uppercase tracking-wider text-on-surface-variant mb-5">Stream Counterparties</h3>
+             <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-4 p-3 bg-surface-container-low rounded-xl">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-primary flex-shrink-0">
+                         <ArrowUpRight size={18} />
+                      </div>
+                      <div>
+                         <div className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Sender</div>
+                         <div className="text-xs font-bold text-primary font-mono">{truncateAddress(stream.sender)}</div>
+                      </div>
                    </div>
-                   <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Sender</div>
-                      <div style={{ fontSize: '14px', color: '#fff', fontFamily: 'var(--font-mono)' }}>{truncateAddress(stream.sender)}</div>
-                   </div>
-                   <button onClick={() => copy(stream.sender, 's')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
-                      {copied === 's' ? <Check size={16} color="#22c55e" /> : <Copy size={16} />}
+                   <button 
+                     onClick={() => copy(stream.sender, 's')} 
+                     className="bg-none border-none cursor-pointer text-on-surface-variant hover:text-primary p-1"
+                   >
+                      {copied === 's' ? <Check size={16} className="text-secondary" /> : <Copy size={16} />}
                    </button>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <ArrowDownLeft size={18} color="#22c55e" />
+                <div className="flex items-center justify-between gap-4 p-3 bg-surface-container-low rounded-xl">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-primary flex-shrink-0">
+                         <ArrowDownLeft size={18} />
+                      </div>
+                      <div>
+                         <div className="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Recipient</div>
+                         <div className="text-xs font-bold text-primary font-mono">{truncateAddress(stream.receiver)}</div>
+                      </div>
                    </div>
-                   <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Recipient</div>
-                      <div style={{ fontSize: '14px', color: '#fff', fontFamily: 'var(--font-mono)' }}>{truncateAddress(stream.receiver)}</div>
-                   </div>
-                   <button onClick={() => copy(stream.receiver, 'r')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
-                      {copied === 'r' ? <Check size={16} color="#22c55e" /> : <Copy size={16} />}
+                   <button 
+                     onClick={() => copy(stream.receiver, 'r')} 
+                     className="bg-none border-none cursor-pointer text-on-surface-variant hover:text-primary p-1"
+                   >
+                      {copied === 'r' ? <Check size={16} className="text-secondary" /> : <Copy size={16} />}
                    </button>
                 </div>
              </div>
@@ -253,33 +259,32 @@ export default function StreamDetails() {
         </div>
 
         {/* Sidebar Actions */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="lg:col-span-5 flex flex-col gap-6">
            
            {/* Summary Stats */}
-           <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1f2937', paddingBottom: '12px' }}>
-                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Deposited</span>
-                 <span style={{ fontSize: '14px', color: '#fff', fontWeight: 600 }}>{total.toFixed(2)} XLM</span>
+           <div className="bg-white border border-outline-variant/65 rounded-2xl p-6 flex flex-col gap-4 shadow-xs">
+              <div className="flex justify-between border-b border-outline-variant/30 pb-3">
+                 <span className="text-xs text-on-surface-variant">Deposited</span>
+                 <span className="text-sm font-bold text-primary font-mono">{total.toFixed(2)} XLM</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1f2937', paddingBottom: '12px' }}>
-                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Withdrawn</span>
-                 <span style={{ fontSize: '14px', color: '#fff', fontWeight: 600 }}>{withdrawn.toFixed(4)} XLM</span>
+              <div className="flex justify-between border-b border-outline-variant/30 pb-3">
+                 <span className="text-xs text-on-surface-variant">Withdrawn</span>
+                 <span className="text-sm font-bold text-primary font-mono">{withdrawn.toFixed(4)} XLM</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Remaining</span>
-                 <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: 700 }}>{(total - (withdrawn + withdrawable)).toFixed(4)} XLM</span>
+              <div className="flex justify-between">
+                 <span className="text-xs text-on-surface-variant">Remaining</span>
+                 <span className="text-sm font-extrabold text-primary font-mono bg-secondary px-1.5 py-0.5 rounded-sm">{(total - (withdrawn + withdrawable)).toFixed(4)} XLM</span>
               </div>
            </div>
 
            {/* Dynamic Actions */}
            {(canWithdraw || canCancel) && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="flex flex-col gap-3">
                  {canWithdraw && (
                     <button 
                       disabled={working}
                       onClick={handleWithdraw}
-                      className="btn-primary" 
-                      style={{ width: '100%', padding: '16px', borderRadius: '9999px', fontSize: '15px' }}
+                      className="w-full bg-secondary text-on-secondary py-4 rounded-xl font-bold flex items-center justify-center gap-2 btn-hover-glow-neon transition-all active:scale-95 border-none cursor-pointer text-base shadow-xs"
                     >
                        <Download size={18} /> {working ? 'Processing...' : `Withdraw ${withdrawable.toFixed(4)} XLM`}
                     </button>
@@ -288,11 +293,7 @@ export default function StreamDetails() {
                     <button 
                       disabled={working}
                       onClick={handleCancel}
-                      style={{ 
-                        width: '100%', padding: '16px', borderRadius: '9999px', fontSize: '14px', fontWeight: 600,
-                        background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444',
-                        cursor: 'pointer'
-                      }}
+                      className="w-full bg-red-50 border border-red-200 text-red-600 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-100 transition-colors active:scale-95 cursor-pointer text-sm shadow-xs"
                     >
                        <XCircle size={18} /> {working ? 'Processing...' : 'Cancel Stream'}
                     </button>
@@ -301,18 +302,21 @@ export default function StreamDetails() {
            )}
 
            {/* Identity Context */}
-           <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed #1f2937' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                 <Info size={16} color="#6b7280" style={{ marginTop: '2px' }} />
-                 <p style={{ fontSize: '12px', color: '#6b7280', lineHeight: 1.6 }}>
-                    {isReceiver ? 'You are the recipient of this stream. You can withdraw accrued funds in real-time.' : 
-                     isSender ? 'You are the creator of this stream. You can cancel it to refund the remaining balance.' : 
-                     'You are viewing this stream as a public observer on the Stellar network.'}
-                 </p>
-              </div>
+           <div className="p-5 bg-surface-container-low border border-outline-variant/50 rounded-2xl flex gap-3">
+              <Info size={16} className="text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-on-surface-variant leading-relaxed font-normal">
+                 {isReceiver ? 'You are the recipient of this stream. You can withdraw accrued funds in real-time.' : 
+                  isSender ? 'You are the creator of this stream. You can cancel it to refund the remaining balance.' : 
+                  'You are viewing this stream as a public observer on the Stellar network.'}
+              </p>
            </div>
 
-           <a href={txHash ? `https://stellar.expert/explorer/testnet/tx/${txHash}` : `https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ justifyContent: 'center', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+           <a 
+             href={txHash ? `https://stellar.expert/explorer/testnet/tx/${txHash}` : `https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} 
+             target="_blank" 
+             rel="noreferrer" 
+             className="w-full border border-outline hover:bg-surface-container-low py-3.5 rounded-xl font-semibold transition-all cursor-pointer flex items-center gap-2 justify-center text-xs uppercase tracking-wider bg-white no-underline text-primary"
+           >
               View on Explorer <ExternalLink size={14} />
            </a>
         </div>

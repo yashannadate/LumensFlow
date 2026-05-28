@@ -1,50 +1,28 @@
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
-import { ArrowRight, Zap, Shield, Droplets, BarChart3, Globe, Clock, ShieldCheck, Gauge, RefreshCcw } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-
-// ── Particle component ──────────────────────────────────────────────────────
-const PARTICLES = Array.from({ length: 10 }, (_, i) => ({
-  id: i,
-  left: `${8 + i * 9}%`,
-  size: `${4 + (i % 5)}px`,
-  delay: `${(i * 0.7).toFixed(1)}s`,
-  dur: `${6 + (i % 5)}s`,
-  opacity: 0.4 + (i % 3) * 0.15,
-}))
-
-// ── Wave SVG paths ──────────────────────────────────────────────────────────
-function WaveLayer({ color, opacity, duration, direction = 1, yOffset = 0 }) {
-  return (
-    <svg
-      preserveAspectRatio="none"
-      viewBox="0 0 1440 120"
-      style={{
-        position: 'absolute', bottom: `${yOffset}px`, left: 0, width: '200%', height: '120px',
-        animation: `waveScroll${direction > 0 ? 'R' : 'L'} ${duration}s linear infinite`,
-        opacity,
-      }}
-    >
-      <defs>
-        <linearGradient id={`wg${duration}`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#8b5cf6" />
-          <stop offset="50%" stopColor="#7c3aed" />
-          <stop offset="100%" stopColor="#a78bfa" />
-        </linearGradient>
-      </defs>
-      <path
-        fill={`url(#wg${duration})`}
-        d="M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,20 1440,60 L1440,120 L0,120 Z"
-      />
-    </svg>
-  )
-}
+import React, { useEffect, useState, useRef } from 'react'
 
 export default function Landing() {
   const { isConnected, connect } = useWallet()
   const navigate = useNavigate()
-  const [cyclingWord, setCyclingWord] = useState('Second')
+  
+  // Cycling words for the hero title
+  const WORDS = ['Seconds', 'Minute', 'Hour']
+  const [wordIndex, setWordIndex] = useState(0)
   const [wordVisible, setWordVisible] = useState(true)
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      // Slide/fade out upward
+      setWordVisible(false)
+      setTimeout(() => {
+        setWordIndex(prev => (prev + 1) % WORDS.length)
+        // Slide/fade in from below
+        setWordVisible(true)
+      }, 500)
+    }, 3200)
+    return () => clearInterval(cycle)
+  }, [])
 
   const handleStart = async () => {
     if (!isConnected) {
@@ -55,363 +33,286 @@ export default function Landing() {
   }
 
   useEffect(() => {
-    const words = ['Second', 'Minute', 'Hour', 'Day']
-    let index = 0
-    const interval = setInterval(() => {
-      setWordVisible(false)
-      setTimeout(() => {
-        index = (index + 1) % words.length
-        setCyclingWord(words[index])
-        setWordVisible(true)
-      }, 300)
-    }, 2200)
-    return () => clearInterval(interval)
+    const observerOptions = {
+      threshold: 0.1
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0')
+          entry.target.classList.remove('opacity-0', 'translate-y-10')
+        }
+      })
+    }, observerOptions)
+
+    const sections = document.querySelectorAll('.animate-section')
+    sections.forEach(section => {
+      observer.observe(section)
+    })
+
+    return () => {
+      sections.forEach(section => {
+        observer.unobserve(section)
+      })
+    }
   }, [])
 
   return (
-    <div style={{ position: 'relative', overflowX: 'hidden' }}>
-
-      <style>{`
-        @keyframes waveScrollR { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        @keyframes waveScrollL { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-        @keyframes floatUp {
-          0%   { transform: translateY(0) scale(1); opacity: var(--p-op); }
-          100% { transform: translateY(-120vh) scale(0.6); opacity: 0; }
-        }
-        @keyframes wordSlideIn  { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes wordSlideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-14px); } }
-        @keyframes ripple { 0%,100%{transform:scale(1);opacity:0.6;} 50%{transform:scale(2);opacity:0;} }
-        @keyframes badge-glow { 0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,0);} 50%{box-shadow:0 0 16px 4px rgba(139,92,246,0.2);} }
-
-        .word-in  { animation: wordSlideIn  0.30s ease both; }
-        .word-out { animation: wordSlideOut 0.30s ease both; }
-
-        .feature-card { transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease !important; }
-        .feature-card:hover {
-          border-color: rgba(139,92,246,0.40) !important;
-          box-shadow: 0 0 28px rgba(139,92,246,0.18) !important;
-          transform: translateY(-3px) !important;
-        }
-        .step-card { transition: border-color 0.2s, box-shadow 0.2s; }
-        .step-card:hover { border-color: rgba(139,92,246,0.30) !important; }
-
-        .cta-btn-primary:hover { transform: translateY(-2px) !important; box-shadow: 0 8px 28px rgba(139,92,246,0.40) !important; }
-        .cta-btn-ghost:hover { background: rgba(139,92,246,0.08) !important; border-color: #8b5cf6 !important; }
-      `}</style>
-
-      {/* ── Particles ── */}
-      {PARTICLES.map(p => (
-        <div key={p.id} style={{
-          position: 'fixed',
-          bottom: '-12px',
-          left: p.left,
-          width: p.size,
-          height: p.size,
-          borderRadius: '50%',
-          background: `rgba(139, 92, 246, ${p.opacity})`,
-          boxShadow: `0 0 ${parseInt(p.size) + 2}px rgba(139,92,246,0.4)`,
-          animation: `floatUp ${p.dur} ${p.delay} linear infinite`,
-          '--p-op': p.opacity,
-          pointerEvents: 'none',
-          zIndex: 0,
-        }} />
-      ))}
-
-      {/* ── Hero Glow ── */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0,
-        height: '80vh', pointerEvents: 'none', zIndex: 0,
-        background: 'radial-gradient(ellipse at 50% 20%, rgba(139,92,246,0.14) 0%, transparent 65%)',
-      }} />
-
-      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
-      <section style={{
-        position: 'relative', zIndex: 1,
-        minHeight: '95vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
-        textAlign: 'center', padding: '100px 24px 80px',
-      }}>
-
-
-        {/* Heading */}
-        <h1 style={{ marginBottom: '12px', maxWidth: '880px' }}>
-          Stream Every
-        </h1>
-        <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '28px' }}>
-          <span
-            key={cyclingWord}
-            className="word-in"
-            style={{
-              fontFamily: 'var(--font-brand)',
-              fontSize: 'clamp(40px, 7vw, 72px)',
-              fontWeight: 900,
-              lineHeight: 1.08,
-              letterSpacing: '-0.035em',
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #e0d4ff 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              display: 'block',
-            }}
-          >
-            {cyclingWord}
-          </span>
-        </div>
-
-        {/* Subtitle */}
-        <p style={{ fontSize: '17px', color: '#9ca3af', maxWidth: '520px', lineHeight: 1.75, marginBottom: '48px', fontFamily: 'var(--font-body)' }}>
-          Stream real-time XLM payments on the Stellar Network. Every second earns.
-        </p>
-
-
-        {/* CTAs */}
-        <div className="flex-col-mobile mobile-gap-sm" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '80px' }}>
-          <button
-            onClick={handleStart}
-            className="cta-btn-primary mobile-w-full"
-            style={{
-              background: '#8b5cf6', color: '#fff', border: 'none',
-              borderRadius: '9999px', padding: '14px 32px',
-              fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
-              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              boxShadow: '0 4px 20px rgba(139,92,246,0.35)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-            }}
-          >
-            Start Streaming <ArrowRight size={17} />
-          </button>
-          <button
-            onClick={() => navigate('/how-it-works')}
-            className="cta-btn-ghost mobile-w-full"
-            style={{
-              background: 'transparent', color: '#8b5cf6',
-              border: '1px solid rgba(139,92,246,0.40)',
-              borderRadius: '9999px', padding: '14px 32px',
-              fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
-              cursor: 'pointer', transition: 'background 0.2s, border-color 0.2s',
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            How It Works
-          </button>
-        </div>
-
-        {/* Animated wave band */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', overflow: 'hidden', pointerEvents: 'none' }}>
-          <WaveLayer opacity={0.25} duration={8} direction={1} yOffset={0} color="#8b5cf6" />
-          <WaveLayer opacity={0.15} duration={13} direction={-1} yOffset={20} color="#7c3aed" />
-          <WaveLayer opacity={0.10} duration={20} direction={1} yOffset={40} color="#a78bfa" />
-        </div>
-      </section>
-
-      {/* ══ STATS BAR ═════════════════════════════════════════════════════ */}
-      <style>{`
-        .stats-bar-scroll {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          gap: 0;
-          padding: 0 16px;
-        }
-        .stats-bar-scroll::-webkit-scrollbar { display: none; }
+    <div className="bg-surface font-body-md text-on-surface min-h-screen">
+      <main className="pt-12">
         
-        .stats-bar-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 24px 40px;
-          flex-shrink: 0;
-          justify-content: center;
-        }
-        .stats-bar-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
-        
-        @media (min-width: 1024px) {
-          .stats-bar-scroll { justify-content: center; padding: 0; }
-        }
-      `}</style>
-      <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid #1f2937', borderBottom: '1px solid #1f2937', background: 'rgba(17,24,39,0.70)', backdropFilter: 'blur(20px)' }}>
-        <div className="stats-bar-scroll">
-          {[
-            { icon: RefreshCcw, n: 'Real-Time', s: 'Every Second' },
-            { icon: ShieldCheck, n: '100% On-Chain', s: 'Verified' },
-            { icon: Zap, n: 'Gasless', s: 'Fee Sponsored' },
-            { icon: Gauge, n: '5s Finality', s: 'Stellar Speed' },
-          ].map((stat, i, arr) => {
-            const Icon = stat.icon
-            return (
-              <React.Fragment key={i}>
-                <div className="stats-bar-item">
-                  <Icon size={18} color="#86EE1E" style={{ flexShrink: 0 }} />
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', whiteSpace: 'nowrap' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>{stat.n}</span>
-                    <span style={{ fontSize: '13px', color: '#9ca3af', fontFamily: 'var(--font-label)', fontWeight: 500 }}>{stat.s}</span>
-                  </div>
-                </div>
-                {i < arr.length - 1 && <div className="stats-bar-divider" />}
-              </React.Fragment>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* ══ HOW IT WORKS ══════════════════════════════════════════════════ */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '100px 0 80px' }}>
-        <div className="page-wrap" style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
-              Getting Started
-            </div>
-            <h2 style={{ color: '#ffffffff' }}>How It Works</h2>
-          </div>
-
-          {/* Cards with dashed connector */}
-          <style>{`
-            .how-it-works-scroll {
-              display: grid;
-              grid-template-columns: repeat(3, minmax(280px, 1fr));
-              gap: 24px;
-              width: 100%;
-              transition: all 0.3s;
-            }
-            @media (max-width: 960px) {
-              .how-it-works-scroll {
-                display: flex;
-                overflow-x: auto;
-                padding: 10px 20px 30px;
-                scroll-snap-type: x mandatory;
-                scrollbar-width: thin;
-                scrollbar-color: var(--primary) transparent;
-              }
-              .how-it-works-scroll > div {
-                flex: 0 0 calc(100% - 40px);
-                scroll-snap-align: center;
-              }
-              .dashed-line { display: none !important; }
-            }
-          `}</style>
-          
-          <div className="how-it-works-scroll" style={{ position: 'relative', maxWidth: '1060px', margin: '0 auto' }}>
-            {/* Dashed connector line */}
-            <div className="hide-mobile dashed-line" style={{ position: 'absolute', top: '32px', left: 'calc(16.66% + 12px)', right: 'calc(16.66% + 12px)', height: '1px', borderTop: '2px dashed rgba(139,92,246,0.35)', zIndex: 0, pointerEvents: 'none' }} />
-
-            {[
-              { num: '01', Icon: Shield, title: 'Connect Wallet', desc: 'Link your Stellar wallet (Freighter / xBull) in one click.', iconColor: '#8b5cf6' },
-              { num: '02', Icon: Zap, title: 'Create Stream', desc: 'Set recipient, amount per second, and duration. Done in seconds.', iconColor: '#86EE1E' },
-              { num: '03', Icon: BarChart3, title: 'Earn Live', desc: 'Watch XLM flow in real-time. Withdraw any time.', iconColor: '#22c55e' },
-            ].map((step, i) => {
-              const Icon = step.Icon
-              return (
-                <div key={i} className="step-card" style={{
-                  background: 'rgba(17,24,39,0.80)', border: '1px solid #1f2937',
-                  borderRadius: '24px', padding: '32px 24px', textAlign: 'center',
-                  backdropFilter: 'blur(16px)', position: 'relative', zIndex: 1,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                    <div style={{
-                      width: '52px', height: '52px', borderRadius: '14px',
-                      background: step.iconColor === '#22c55e' ? 'rgba(34,197,94,0.10)' : 'rgba(139,92,246,0.10)',
-                      border: `1px solid ${step.iconColor === '#22c55e' ? 'rgba(34,197,94,0.25)' : 'rgba(139,92,246,0.25)'}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Icon size={24} color={step.iconColor} />
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', fontFamily: 'var(--font-label)', letterSpacing: '0.08em', marginBottom: '8px' }}>STEP {step.num}</div>
-                  <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px', color: '#86EE1E' }}>{step.title}</h3>
-                  <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.65, fontFamily: 'var(--font-body)' }}>{step.desc}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ FEATURES GRID ═════════════════════════════════════════════════ */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '80px 0', background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.05) 0%, transparent 65%)' }}>
-        <div className="page-wrap" style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '16px' }}>
-              Built Different
-            </div>
-            <h2 style={{ color: '#ffffffff' }}>Everything You Need</h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '18px', maxWidth: '1060px', margin: '0 auto' }}>
-            {[
-              { Icon: Droplets, title: 'Real-Time Streaming', desc: 'Funds flow every second with zero manual inputs — time does the work.' },
-              { Icon: ShieldCheck, title: 'Non-Custodial Escrow', desc: 'Your keys, your funds. Stellar Soroban smart contract holds everything.' },
-              { Icon: Zap, title: 'Gasless Transactions', desc: 'Fee Sponsorship covers network costs — stream without worrying about gas fees.', isNew: true },
-              { Icon: BarChart3, title: 'Live Dashboard', desc: 'Track all streams with real-time metrics and live XLM counters.' },
-              { Icon: Globe, title: 'Fully On-Chain', desc: '100% transparent, every action verifiable on the Stellar ledger.' },
-              { Icon: Clock, title: 'Flexible Duration', desc: 'Stream for minutes, days, or months. Cancel anytime with auto-refund.' },
-            ].map(({ Icon, title, desc, isNew }, i) => (
-              <div key={i} className="feature-card" style={{
-                background: 'rgba(17,24,39,0.75)', border: '1px solid #1f2937',
-                borderRadius: '24px', padding: '32px',
-                backdropFilter: 'blur(16px)',
-                position: 'relative',
-              }}>
-                {isNew && (
-                  <div style={{
-                    position: 'absolute', top: '20px', right: '20px',
-                    background: 'rgba(134,238,30,0.12)',
-                    border: '1px solid rgba(134,238,30,0.30)',
-                    color: '#86EE1E', fontSize: '9px', fontWeight: 800,
-                    fontFamily: 'var(--font-label)', letterSpacing: '0.12em',
-                    textTransform: 'uppercase', padding: '3px 8px', borderRadius: '6px',
-                  }}>NEW</div>
-                )}
-                <div style={{
-                  width: '52px', height: '52px', borderRadius: '14px',
-                  background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.22)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px',
-                }}>
-                  <Icon size={24} color="#8b5cf6" />
-                </div>
-                <h3 style={{ fontSize: '17px', fontFamily: 'var(--font-brand)', marginBottom: '10px', color: '#86EE1E' }}>{title}</h3>
-                <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ FINAL CTA ══════════════════════════════════════════════════════ */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '100px 0 130px', textAlign: 'center' }}>
-        <div className="page-wrap" style={{ maxWidth: '680px', width: '100%' }}>
-          <div style={{
-            background: 'rgba(17,24,39,0.85)', border: '1px solid rgba(139,92,246,0.20)',
-            borderRadius: '28px', padding: '64px 48px',
-            backdropFilter: 'blur(24px)',
-            boxShadow: '0 0 40px rgba(139,92,246,0.08)',
+        {/* Hero Section */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 max-w-[1280px] mx-auto px-6 md:px-container-margin py-section-gap flex flex-col items-center text-center">
+          <span style={{
+            background: '#1DFF00', color: '#000000',
+            padding: '6px 18px', borderRadius: '9999px',
+            fontFamily: 'Hanken Grotesk, sans-serif',
+            fontSize: '11px', fontWeight: 700,
+            letterSpacing: '0.14em', textTransform: 'uppercase',
+            marginBottom: '28px', display: 'inline-block',
+            userSelect: 'none'
           }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8b5cf6', fontFamily: 'var(--font-label)', marginBottom: '20px' }}>
-              Get Started Now
-            </div>
-            <h2 style={{ marginBottom: '16px' }}>Ready to stream?</h2>
-            <p style={{ color: '#9ca3af', marginBottom: '36px', fontSize: '16px', lineHeight: 1.65, fontFamily: 'var(--font-body)' }}>
-              Start your first payment stream in under 60 seconds.
-            </p>
-            <button
-              onClick={handleStart}
-              className="cta-btn-primary"
+            EXPERIENCE THE FUTURE OF MONEY
+          </span>
+          <h1 style={{
+            fontFamily: 'Hanken Grotesk, sans-serif',
+            fontSize: 'clamp(44px, 7.5vw, 80px)',
+            fontWeight: 800,
+            lineHeight: 1.05,
+            color: '#000000',
+            marginBottom: '32px',
+            letterSpacing: '-0.035em',
+            maxWidth: '860px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0px',
+          }}>
+            <span>Stream Every</span>
+            <span
+              key={WORDS[wordIndex]}
               style={{
-                background: '#8b5cf6', color: '#fff', border: 'none',
-                borderRadius: '9999px', padding: '14px 36px',
-                fontFamily: 'var(--font-label)', fontSize: '15px', fontWeight: 600,
-                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '10px',
-                boxShadow: '0 4px 20px rgba(139,92,246,0.35)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                display: 'block',
+                color: '#1DFF00',
+                transition: 'opacity 0.50s cubic-bezier(0.16, 1, 0.3, 1), transform 0.50s cubic-bezier(0.16, 1, 0.3, 1)',
+                opacity: wordVisible ? 1 : 0,
+                transform: wordVisible ? 'translateY(0) scale(1)' : 'translateY(-18px) scale(0.96)',
+                willChange: 'opacity, transform',
               }}
             >
-              Stream Now <ArrowRight size={17} />
+              {WORDS[wordIndex]}
+            </span>
+          </h1>
+          <p style={{
+            fontFamily: 'Hanken Grotesk, sans-serif',
+            fontSize: '17px', fontWeight: 400, lineHeight: 1.65,
+            color: 'rgba(26,28,30,0.60)', maxWidth: '560px', marginBottom: '44px',
+            textAlign: 'center'
+          }}>
+            {wordIndex === 0 && 'Every second on Stellar, your balance grows. Real-time XLM streaming — no waiting, no batching.'}
+            {wordIndex === 1 && '60 blocks, 60 settlements. Stream by the minute for subscriptions, rentals, and recurring payments.'}
+            {wordIndex === 2 && 'Hourly payroll, hourly billing. Transparent on-chain flows that settle continuously.'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              onClick={handleStart}
+              style={{
+                background: '#000000', color: '#ffffff', border: 'none',
+                borderRadius: '9999px', padding: '14px 32px',
+                fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '15px', fontWeight: 700,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.18)', transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                letterSpacing: '-0.01em'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#1c1c1c'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.22)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#000000'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.18)' }}
+            >
+              Start Streaming
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
             </button>
+            <a
+              href="#how-it-works"
+              style={{
+                fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '15px', fontWeight: 600,
+                color: 'rgba(26,28,30,0.60)', textDecoration: 'none', letterSpacing: '-0.01em',
+                transition: 'color 0.18s ease'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#000000'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(26,28,30,0.60)'}
+            >
+              How It Works →
+            </a>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Stats Section */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 bg-surface-container-low py-20 border-y border-outline-variant/20">
+          <div className="max-w-[1280px] mx-auto px-6 md:px-container-margin grid grid-cols-1 md:grid-cols-2 gap-12 text-center md:text-left">
+            <div className="flex flex-col items-center md:items-start">
+              <span className="font-label-sm text-on-surface-variant mb-2 uppercase tracking-wider font-semibold">TOTAL STREAMED</span>
+              <span className="font-display-lg text-[40px] md:text-headline-lg text-primary flex items-baseline gap-1">
+                <span className="text-secondary">1,000+</span> XLM
+              </span>
+            </div>
+            <div className="flex flex-col items-center md:items-start">
+              <span className="font-label-sm text-on-surface-variant mb-2 uppercase tracking-wider font-semibold">ACTIVE USERS</span>
+              <span className="font-display-lg text-[40px] md:text-headline-lg text-primary font-bold">
+                30<span className="text-secondary">+</span>
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid (Key Highlights) */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 max-w-[1280px] mx-auto px-6 md:px-container-margin py-section-gap">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+            
+            {/* Bento 1: Real-Time / Every Second */}
+            <div className="md:col-span-8 bg-surface-container-lowest border-t-2 border-secondary border-l border-r border-b border-outline-variant p-10 rounded-xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <span className="material-symbols-outlined text-secondary text-4xl mb-6 select-none" data-icon="update">update</span>
+                <h3 className="font-headline-lg text-primary mb-4">Real-Time / Every Second</h3>
+                <p className="font-body-md text-on-surface-variant max-w-md">
+                  Watch your balance grow in real-time with continuous settlement on every block of the Stellar ledger.
+                </p>
+              </div>
+              {/* Decorative pulse rings — no external image */}
+              <div style={{
+                position: 'absolute', right: '-20px', bottom: '-20px',
+                width: '180px', height: '180px', pointerEvents: 'none'
+              }}>
+                {[0,1,2].map(i => (
+                  <div key={i} style={{
+                    position: 'absolute', inset: `${i * 22}px`,
+                    borderRadius: '50%', border: '1.5px solid rgba(29,255,0,0.25)',
+                    animation: `ping 2s ease-in-out ${i * 0.5}s infinite`,
+                    opacity: 0.6 - i * 0.15
+                  }} />
+                ))}
+                <div style={{
+                  position: 'absolute', inset: '66px', borderRadius: '50%',
+                  background: 'rgba(29,255,0,0.12)'
+                }} />
+              </div>
+            </div>
+
+            {/* Bento 2: 100% On-Chain / Verified */}
+            <div className="md:col-span-4 bg-surface-container-lowest border-t-2 border-secondary border-l border-r border-b border-outline-variant p-10 rounded-xl hover:border-primary transition-colors">
+              <span className="material-symbols-outlined text-secondary text-4xl mb-6 select-none" data-icon="verified_user">verified_user</span>
+              <h3 className="font-title-md text-primary mb-4 font-bold">100% On-Chain / Verified</h3>
+              <p className="font-body-md text-on-surface-variant">
+                Every payment and state change is fully transparent and verifiable on the Stellar Network.
+              </p>
+            </div>
+
+            {/* Bento 3: Gasless / Fee Sponsored */}
+            <div className="md:col-span-4 bg-surface-container-lowest border-t-2 border-secondary border-l border-r border-b border-outline-variant p-10 rounded-xl hover:border-primary transition-colors">
+              <span className="material-symbols-outlined text-secondary text-4xl mb-6 select-none" data-icon="volunteer_activism">volunteer_activism</span>
+              <h3 className="font-title-md text-primary mb-4 font-bold">Gasless / Fee Sponsored</h3>
+              <p className="font-body-md text-on-surface-variant">
+                Enjoy a seamless experience with sponsored network fees. Stream without worrying about holding extra XLM for gas.
+              </p>
+            </div>
+
+            {/* Bento 4: 5s Finality / Stellar Speed */}
+            <div className="md:col-span-8 bg-primary text-on-primary p-10 rounded-xl flex flex-col justify-center border-l-4 border-secondary">
+              <h3 className="font-headline-lg mb-6 text-white font-bold">5s Finality / Stellar Speed</h3>
+              <div className="flex gap-4 flex-wrap">
+                <span className="px-4 py-1 border border-secondary text-secondary rounded-full font-label-sm uppercase font-semibold">Instant</span>
+                <span className="px-4 py-1 border border-secondary text-secondary rounded-full font-label-sm uppercase font-semibold">Secure</span>
+                <span className="px-4 py-1 border border-secondary text-secondary rounded-full font-label-sm uppercase font-semibold">Soroban</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 bg-surface-container-low py-section-gap" id="how-it-works">
+          <div className="max-w-[1280px] mx-auto px-6 md:px-container-margin text-center">
+            <h2 className="font-display-lg text-primary mb-16 tracking-tight">How It Works</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-display-lg mb-6 font-bold select-none">1</div>
+                <h3 className="font-headline-lg text-primary mb-4 font-bold text-2xl">Connect Wallet</h3>
+                <p className="font-body-md text-on-surface-variant max-w-sm">Link your Stellar wallet (Freighter / xBull) in one click.</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-display-lg mb-6 font-bold select-none">2</div>
+                <h3 className="font-headline-lg text-primary mb-4 font-bold text-2xl">Create Stream</h3>
+                <p className="font-body-md text-on-surface-variant max-w-sm">Set recipient, amount per second, and duration. Done in seconds.</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-display-lg mb-6 font-bold select-none">3</div>
+                <h3 className="font-headline-lg text-primary mb-4 font-bold text-2xl">Earn Live</h3>
+                <p className="font-body-md text-on-surface-variant max-w-sm">Watch XLM flow in real-time. Withdraw any time.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Built Different Section (Everything You Need) */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 max-w-[1280px] mx-auto px-6 md:px-container-margin py-section-gap">
+          <div className="text-center mb-16">
+            <h2 className="font-headline-lg text-primary mb-4 tracking-tight">Everything You Need</h2>
+            <p className="font-body-md text-on-surface-variant font-semibold">Built Different on Stellar</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="bolt">bolt</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">Real-Time Streaming</h4>
+              <p className="font-body-md text-on-surface-variant">Funds flow every second with zero manual inputs — time does the work.</p>
+            </div>
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="lock">lock</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">Non-Custodial Escrow</h4>
+              <p className="font-body-md text-on-surface-variant">Your keys, your funds. Stellar Soroban smart contract holds everything.</p>
+            </div>
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="new_releases">new_releases</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">NEW: Gasless Transactions</h4>
+              <p className="font-body-md text-on-surface-variant">Fee Sponsorship covers network costs — stream without worrying about gas fees.</p>
+            </div>
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="dashboard_customize">dashboard_customize</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">Live Dashboard</h4>
+              <p className="font-body-md text-on-surface-variant">Track all streams with real-time metrics and live XLM counters.</p>
+            </div>
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="link">link</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">Fully On-Chain</h4>
+              <p className="font-body-md text-on-surface-variant">100% transparent, every action verifiable on the Stellar ledger.</p>
+            </div>
+            <div className="p-8 border border-outline-variant/30 rounded-xl hover:border-secondary transition-colors">
+              <span className="material-symbols-outlined text-secondary mb-4 text-3xl select-none" data-icon="calendar_today">calendar_today</span>
+              <h4 className="font-title-md text-primary mb-2 font-bold">Flexible Duration</h4>
+              <p className="font-body-md text-on-surface-variant">Stream for minutes, days, or months. Cancel anytime with auto-refund.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="animate-section transition-all duration-700 opacity-0 translate-y-10 max-w-[1280px] mx-auto px-6 md:px-container-margin py-section-gap">
+          <div className="bg-surface-container-high rounded-xl p-16 flex flex-col md:flex-row items-center justify-between gap-12 border border-outline-variant/30 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
+            <div className="max-w-xl relative z-10 text-left">
+              <h2 className="font-headline-lg text-primary mb-4 tracking-tight">Get Started Now</h2>
+              <p className="font-body-lg text-on-surface-variant">Ready to stream? Start your first payment stream in under 60 seconds.</p>
+            </div>
+            <div className="flex flex-col gap-4 w-full md:w-auto relative z-10">
+              <button 
+                onClick={handleStart}
+                className="bg-secondary text-on-secondary px-12 py-4 rounded-xl font-title-md btn-hover-glow-neon transition-all active:scale-95 border-none cursor-pointer font-bold"
+              >
+                Stream Now
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
     </div>
   )
 }

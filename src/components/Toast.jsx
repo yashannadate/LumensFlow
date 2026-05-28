@@ -14,10 +14,9 @@ const nextId = () => ++_id
 /* ─── Single Toast ────────────────────────────────────────────────────── */
 function Toast({ toast, onRemove }) {
   const isSuccess = toast.type === 'success'
-  const color = isSuccess ? '#22c55e' : '#ef4444'
-  const accent = isSuccess ? '#22c55e' : '#ef4444'
-  const border = isSuccess ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'
-  const bg = '#0d1117'
+  const color = isSuccess ? '#055300' : '#ba1a1a'
+  const border = isSuccess ? 'rgba(29, 255, 0, 0.30)' : 'rgba(186, 26, 26, 0.20)'
+  const bg = '#ffffff'
   
   const shortHash = toast.txHash
     ? `${toast.txHash.slice(0, 6)}…${toast.txHash.slice(-4)}`
@@ -31,13 +30,12 @@ function Toast({ toast, onRemove }) {
       padding: '16px 20px',
       minWidth: '320px',
       maxWidth: '420px',
-      boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 0 20px ${isSuccess ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)'}`,
+      boxShadow: `0 8px 32px rgba(0,0,0,0.10), 0 0 20px ${isSuccess ? 'rgba(29, 255, 0, 0.06)' : 'rgba(186,26,26,0.04)'}`,
       animation: 'toast-in 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
       display: 'flex',
       flexDirection: 'column',
       gap: '10px',
       position: 'relative',
-      backdropFilter: 'blur(12px)'
     }}>
       {/* Close */}
       <button
@@ -45,11 +43,11 @@ function Toast({ toast, onRemove }) {
         style={{
           position: 'absolute', top: '12px', right: '12px',
           background: 'none', border: 'none', cursor: 'pointer',
-          color: '#6b7280', padding: '4px', display: 'flex',
+          color: '#7e7576', padding: '4px', display: 'flex',
           transition: 'color 0.2s'
         }}
-        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = '#6b7280'}
+        onMouseEnter={e => e.currentTarget.style.color = '#1a1c1e'}
+        onMouseLeave={e => e.currentTarget.style.color = '#7e7576'}
       >
         <X size={14} />
       </button>
@@ -58,14 +56,14 @@ function Toast({ toast, onRemove }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingRight: '24px' }}>
         <div style={{ 
           width: '28px', height: '28px', borderRadius: '8px', 
-          background: isSuccess ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+          background: isSuccess ? 'rgba(29, 255, 0, 0.12)' : 'rgba(186, 26, 26, 0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           {isSuccess ? <CheckCircle size={16} color={color} /> : <XCircle size={16} color={color} />}
         </div>
         <span style={{ 
-          fontWeight: 700, fontSize: '14px', color: '#fff', 
-          fontFamily: 'var(--font-brand)', letterSpacing: '-0.01em' 
+          fontWeight: 700, fontSize: '14px', color: '#1a1c1e', 
+          fontFamily: 'Hanken Grotesk, sans-serif', letterSpacing: '-0.01em' 
         }}>
           {toast.title}
         </span>
@@ -74,8 +72,8 @@ function Toast({ toast, onRemove }) {
       {/* Description */}
       {toast.description && (
         <p style={{ 
-          fontSize: '13px', color: '#9ca3af', margin: 0, 
-          paddingLeft: '38px', lineHeight: 1.5, fontFamily: 'var(--font-body)' 
+          fontSize: '13px', color: '#4c4546', margin: 0, 
+          paddingLeft: '38px', lineHeight: 1.5, fontFamily: 'Hanken Grotesk, sans-serif' 
         }}>
           {toast.description}
         </p>
@@ -85,8 +83,8 @@ function Toast({ toast, onRemove }) {
       {shortHash && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '38px', marginTop: '4px' }}>
            <div style={{ 
-             fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#6b7280',
-             background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: '6px'
+             fontFamily: 'IBM Plex Mono, monospace', fontSize: '11px', color: '#7e7576',
+             background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: '6px'
            }}>
              {shortHash}
            </div>
@@ -95,8 +93,8 @@ function Toast({ toast, onRemove }) {
              target="_blank" rel="noreferrer"
              style={{
                display: 'inline-flex', alignItems: 'center', gap: '6px',
-               fontSize: '11px', fontWeight: 600, color: '#8b5cf6',
-               textDecoration: 'none', fontFamily: 'var(--font-label)',
+               fontSize: '11px', fontWeight: 600, color: '#000000',
+               textDecoration: 'none', fontFamily: 'Hanken Grotesk, sans-serif',
                textTransform: 'uppercase', letterSpacing: '0.05em'
              }}
            >

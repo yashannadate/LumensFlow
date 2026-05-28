@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { WalletProvider, useWallet } from './hooks/useWallet.jsx'
 import { ToastProvider } from './components/Toast.jsx'
@@ -19,11 +19,47 @@ import History from './pages/History.jsx'
 // Routes that use the sidebar shell layout
 const APP_ROUTES = ['/dashboard', '/create', '/stream', '/metrics', '/history']
 
-function ProtectedRoute({ children }) {
-  const { isConnected } = useWallet()
-  const location = useLocation()
-  if (!isConnected) return <Navigate to="/" replace state={{ from: location }} />
-  return children
+/* ── Animated page wrapper ──────────────────────────────── */
+function PageTransition({ children, locationKey }) {
+  const [show, setShow] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const prevKey = useRef(null)
+
+  useEffect(() => {
+    if (prevKey.current === locationKey) return
+    prevKey.current = locationKey
+
+    // Fade out
+    setVisible(false)
+    const t1 = setTimeout(() => {
+      setShow(true)
+      // Tiny delay to let DOM paint before fading in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true))
+      })
+    }, 180)
+
+    return () => clearTimeout(t1)
+  }, [locationKey])
+
+  // Initial mount
+  useEffect(() => {
+    const t = setTimeout(() => { setShow(true); setVisible(true) }, 20)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <div
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(10px)',
+        transition: 'opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1), transform 0.30s cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'opacity, transform',
+      }}
+    >
+      {children}
+    </div>
+  )
 }
 
 function AppRoutes() {
@@ -53,13 +89,15 @@ function AppRoutes() {
         <div className="app-content">
           <AppHeader onMenuClick={() => setIsSidebarOpen(true)} />
           <main className="app-main">
-            <Routes>
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/create" element={<ProtectedRoute><CreateStream /></ProtectedRoute>} />
-              <Route path="/stream/:id" element={<ProtectedRoute><StreamDetails /></ProtectedRoute>} />
-              <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
-              <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-            </Routes>
+            <PageTransition locationKey={location.pathname}>
+              <Routes location={location}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/create" element={<CreateStream />} />
+                <Route path="/stream/:id" element={<StreamDetails />} />
+                <Route path="/metrics" element={<Metrics />} />
+                <Route path="/history" element={<History />} />
+              </Routes>
+            </PageTransition>
           </main>
         </div>
       </div>
@@ -71,13 +109,15 @@ function AppRoutes() {
     <div className="app-shell">
       <Navbar />
       <main className="app-main" style={{ paddingTop: '88px' }}>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/docs" element={<Docs />} />
-          {/* Catch-all: redirect to dashboard or home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <PageTransition locationKey={location.pathname}>
+          <Routes location={location}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/docs" element={<Docs />} />
+            {/* Catch-all: redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </PageTransition>
       </main>
       <Footer />
     </div>
