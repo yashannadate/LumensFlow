@@ -91,12 +91,16 @@ export function WalletProvider({ children }) {
     }
   }, [])
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     setAddress(null)
     setBalance('0.00')
     setError(null)
     window.localStorage.removeItem('lumensflow:address')
-    StellarWalletsKit.disconnect()
+    try {
+      await StellarWalletsKit.disconnect()
+    } catch (e) {
+      console.warn('StellarWalletsKit disconnect:', e)
+    }
   }, [])
 
   // Returns a bare XDR string so invokeContract can use it directly

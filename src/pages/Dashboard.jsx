@@ -12,7 +12,7 @@ import {
 
 
 export default function Dashboard() {
-  const { isConnected, address } = useWallet()
+  const { isConnected, address, connect } = useWallet()
   const { fetchUserStreams } = useStream()
   const { activities, loading: feedLoading, refresh: refreshFeed } = useActivityFeed()
   const [streams, setStreams] = useState([])
