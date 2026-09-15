@@ -2,11 +2,15 @@ import {
   createContext, useContext, useState,
   useCallback, useEffect, useRef,
 } from 'react'
-import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit'
+import { StellarWalletsKit, KitEventType } from '@creit.tech/stellar-wallets-kit'
 import { FreighterModule } from '@creit.tech/stellar-wallets-kit/modules/freighter'
 import { xBullModule } from '@creit.tech/stellar-wallets-kit/modules/xbull'
+import { AlbedoModule } from '@creit.tech/stellar-wallets-kit/modules/albedo'
 import { LobstrModule } from '@creit.tech/stellar-wallets-kit/modules/lobstr'
+import { RabetModule } from '@creit.tech/stellar-wallets-kit/modules/rabet'
+import { HanaModule } from '@creit.tech/stellar-wallets-kit/modules/hana'
 import { WalletConnectModule, WalletConnectTargetChain } from '@creit.tech/stellar-wallets-kit/modules/wallet-connect'
+import { WatchWalletChanges } from '@stellar/freighter-api'
 import { fetchXlmBalance } from '../utils/stellar.js'
 
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015'
@@ -17,7 +21,10 @@ function initKit() {
     modules: [
       new FreighterModule(),
       new xBullModule(),
+      new AlbedoModule(),
       new LobstrModule(),
+      new RabetModule(),
+      new HanaModule(),
       new WalletConnectModule({
         projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '84b82ab35c24d9c4fb2070fca68340d2',
         metadata: {
@@ -29,10 +36,10 @@ function initKit() {
         allowedChains: [WalletConnectTargetChain.TESTNET]
       })
     ],
-    selectedWalletId: 'freighter',
     network: NETWORK_PASSPHRASE,
     authModal: {
-      hideUnsupportedWallets: false
+      hideUnsupportedWallets: false,
+      showInstallLabel: true
     }
   })
 }
@@ -72,14 +79,69 @@ export function WalletProvider({ children }) {
     return () => clearInterval(t)
   }, [address, refreshBalance])
 
+  // Real-time multi-account & wallet state listener
+  useEffect(() => {
+    let unsubState
+    let unsubDisconnect
+    try {
+      unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, ({ payload }) => {
+        if (payload?.address) {
+          setAddress(payload.address)
+          window.localStorage.setItem('lumensflow:address', payload.address)
+        }
+      })
+    } catch (e) {
+      console.warn('Could not subscribe to STATE_UPDATED:', e)
+    }
+
+    try {
+      unsubDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
+        setAddress(null)
+        setBalance('0.00')
+        window.localStorage.removeItem('lumensflow:address')
+      })
+    } catch (e) {
+      console.warn('Could not subscribe to DISCONNECT:', e)
+    }
+
+    // Freighter real-time active account watcher
+    let watcher
+    try {
+      watcher = new WatchWalletChanges(2000)
+      watcher.watch(({ address: newAddr }) => {
+        if (newAddr) {
+          setAddress(prev => {
+            if (prev && prev !== newAddr) {
+              window.localStorage.setItem('lumensflow:address', newAddr)
+              return newAddr
+            }
+            return prev
+          })
+        }
+      })
+    } catch (e) {
+      console.warn('Could not start WatchWalletChanges:', e)
+    }
+
+    return () => {
+      if (typeof unsubState === 'function') unsubState()
+      if (typeof unsubDisconnect === 'function') unsubDisconnect()
+      if (watcher && typeof watcher.stop === 'function') watcher.stop()
+    }
+  }, [])
+
   const connect = useCallback(async () => {
     setConnecting(true)
     setError(null)
     try {
-      const { address: pubKey } = await StellarWalletsKit.authModal()
-      setAddress(pubKey)
-      window.localStorage.setItem('lumensflow:address', pubKey)
-      return true
+      const res = await StellarWalletsKit.authModal()
+      if (res?.address) {
+        setAddress(res.address)
+        window.localStorage.setItem('lumensflow:address', res.address)
+        refreshBalance(res.address)
+        return true
+      }
+      return false
     } catch (e) {
       if (e?.code !== -1) {
         console.error('Wallet connect error:', e)
@@ -89,7 +151,7 @@ export function WalletProvider({ children }) {
     } finally {
       setConnecting(false)
     }
-  }, [])
+  }, [refreshBalance])
 
   const disconnect = useCallback(async () => {
     setAddress(null)

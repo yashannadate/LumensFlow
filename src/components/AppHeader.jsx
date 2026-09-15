@@ -1,4 +1,4 @@
-import { Wallet, LogOut, Menu, ChevronDown } from 'lucide-react'
+import { Wallet, LogOut, Menu, ChevronDown, Copy, Check, RefreshCw } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -16,6 +16,7 @@ const PAGE_TITLES = {
 export default function AppHeader({ onMenuClick }) {
   const { isConnected, address, balance, disconnect, connect } = useWallet()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
   const dropdownRef = useRef(null)
   const location = useLocation()
 
@@ -34,6 +35,18 @@ export default function AppHeader({ onMenuClick }) {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  const handleCopy = () => {
+    if (!address) return
+    navigator.clipboard.writeText(address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleSwitchAccount = async () => {
+    setIsDropdownOpen(false)
+    await connect()
+  }
 
   return (
     <header style={{
@@ -133,20 +146,53 @@ export default function AppHeader({ onMenuClick }) {
                 position: 'absolute', top: 'calc(100% + 8px)', right: 0,
                 background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: '16px', padding: '8px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.10)', minWidth: '220px', zIndex: 1000
+                boxShadow: '0 8px 32px rgba(0,0,0,0.10)', minWidth: '240px', zIndex: 1000
               }}>
-                {/* Address display */}
+                {/* Address display with copy */}
                 <div style={{ padding: '10px 12px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '6px' }}>
-                  <div style={{
-                    fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '9px',
-                    fontWeight: 700, color: 'rgba(26,28,30,0.40)',
-                    textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px'
-                  }}>Connected as</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{
+                      fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '9px',
+                      fontWeight: 700, color: 'rgba(26,28,30,0.40)',
+                      textTransform: 'uppercase', letterSpacing: '0.1em'
+                    }}>Connected Account</span>
+                    <button
+                      onClick={handleCopy}
+                      title="Copy Address"
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '11px',
+                        color: copied ? '#055300' : 'rgba(26,28,30,0.60)',
+                        padding: '2px 4px', borderRadius: '4px'
+                      }}
+                    >
+                      {copied ? <Check size={12} color="#055300" /> : <Copy size={12} />}
+                      <span>{copied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
                   <div style={{
                     fontFamily: 'IBM Plex Mono, monospace', fontSize: '11px',
                     fontWeight: 600, color: '#000000', wordBreak: 'break-all', lineHeight: 1.4
                   }}>{address}</div>
                 </div>
+
+                {/* Switch / Change Account button */}
+                <button
+                  onClick={handleSwitchAccount}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '10px 12px', borderRadius: '10px', marginBottom: '4px',
+                    background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)',
+                    color: '#000000', cursor: 'pointer', transition: 'all 0.2s',
+                    fontFamily: 'Hanken Grotesk, sans-serif', fontSize: '13px', fontWeight: 600
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.06)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+                >
+                  <RefreshCw size={14} />
+                  Switch Account / Wallet
+                </button>
 
                 {/* Disconnect button */}
                 <button
